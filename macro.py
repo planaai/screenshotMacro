@@ -37,8 +37,8 @@ class CaptureMacro:
     def get_name_roi(self, img):
         # Resize to 1920x1080 to match extractor's ROI precisely
         img_resized = cv2.resize(img, (1920, 1080))
-        # ROI for student name (x=175, y=172, w=300, h=60)
-        x, y, w, h = (175, 172, 300, 60)
+        # ROI for student name (matches extractor ROI)
+        x, y, w, h = (120, 840, 300, 40)
         roi = img_resized[y:y+h, x:x+w]
         return cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
         
@@ -101,9 +101,11 @@ class CaptureMacro:
         self.log(f"✅ 첫 학생 [{first_name_str}] 확인 완료! 반복 캡처를 시작합니다...")
         
         screen_w, screen_h = pyautogui.size()
-        # Next button is around 98% width and 50% height
-        next_x = int(screen_w * 0.98)
-        next_y = int(screen_h * 0.5)
+        # The '>' arrow button in Blue Archive student info screen is at the right edge.
+        # Based on actual screenshot analysis (2560x1440 capture):
+        #   Arrow center at approximately x=97.7% of width, y=47.2% of height
+        next_x = int(screen_w * 0.977)
+        next_y = int(screen_h * 0.472)
         
         count = 0
         try:
@@ -124,18 +126,32 @@ class CaptureMacro:
                 self.log(f"📸 캡처 완료: {count}번째 장 저장됨.")
                 
                 # Click next
-                pyautogui.click(x=next_x, y=next_y)
+                pyautogui.mouseDown(x=next_x, y=next_y)
+                time.sleep(0.15)
+                pyautogui.mouseUp(x=next_x, y=next_y)
                 
-                # Wait for UI animation (1.5s)
-                # Split wait into smaller intervals to allow faster F9 stop detection
-                for _ in range(15):
+                # Wait for UI animation to finish by detecting actual screen change
+                current_name_roi = self.get_name_roi(current_img)
+                changed = False
+                for _ in range(30): # wait up to 3 seconds
                     if keyboard.is_pressed('F9'): break
                     time.sleep(0.1)
+                    check_img = self.get_fullscreen_image()
+                    check_name_roi = self.get_name_roi(check_img)
+                    if not self.is_same_student(current_name_roi, check_name_roi):
+                        changed = True
+                        # Wait an additional 0.5s for the sliding animation to completely settle
+                        time.sleep(0.5)
+                        break
+                        
                 if keyboard.is_pressed('F9'):
                     self.log("⏹️ [F9] 비상 정지 감지! 캡처를 중단합니다.")
                     break
+                    
+                if not changed:
+                    self.log(f"⚠️ 화면 전환이 지연되었습니다. 재시도합니다...")
                 
-                # Check if we looped back
+                # Check if we looped back to the first student
                 new_img = self.get_fullscreen_image()
                 new_name_roi = self.get_name_roi(new_img)
                 

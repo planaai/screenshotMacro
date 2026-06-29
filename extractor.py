@@ -10,52 +10,193 @@ import easyocr
 import json
 import os
 import re
+import requests
+import urllib3
+import difflib
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Load student names
 STUDENT_NAMES = []
 try:
-    with open('students.json', 'r', encoding='utf-8') as f:
-        STUDENT_NAMES = json.load(f)
+    response = requests.get("https://localhost:3443/api/students/names", verify=False, timeout=5)
+    if response.status_code == 200:
+        STUDENT_NAMES = response.json()
+    else:
+        raise Exception(f"Server returned {response.status_code}")
 except Exception as e:
-    print("Could not load students.json:", e)
+    print("Could not load students from server, falling back to local:", e)
+    try:
+        # Fallback to local students.json based on current directory or script directory
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        json_path = os.path.join(script_dir, 'students.json')
+        with open(json_path, 'r', encoding='utf-8') as f:
+            STUDENT_NAMES = json.load(f)
+    except Exception as e2:
+        print("Could not load local students.json:", e2)
 
-def levenshtein(a, b):
-    if not a: return len(b)
-    if not b: return len(a)
-    matrix = [[i + j if i * j == 0 else 0 for j in range(len(b) + 1)] for i in range(len(a) + 1)]
-    for i in range(1, len(a) + 1):
-        for j in range(1, len(b) + 1):
-            if a[i - 1] == b[j - 1]:
-                matrix[i][j] = matrix[i - 1][j - 1]
-            else:
-                matrix[i][j] = min(matrix[i - 1][j - 1] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j] + 1)
-    return matrix[len(a)][len(b)]
+import datetime
+
+def log_debug(msg):
+    try:
+        log_dir = "logs"
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+        with open(os.path.join(log_dir, "extractor_debug.log"), "a", encoding="utf-8") as f:
+            timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            f.write(f"[{timestamp}] {msg}\n")
+    except:
+        pass
+
+def split_jamo(text):
+    CHOSUNG = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ"
+    JUNGSUNG = "ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ"
+    JONGSUNG = " ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ"
+    
+    result = []
+    for char in text:
+        if '가' <= char <= '힣':
+            char_code = ord(char) - 44032
+            cho1 = char_code // 588
+            jung1 = (char_code - (588 * cho1)) // 28
+            jong1 = (char_code - (588 * cho1) - (28 * jung1))
+            result.append(CHOSUNG[cho1])
+            result.append(JUNGSUNG[jung1])
+            if jong1 > 0:
+                result.append(JONGSUNG[jong1])
+        else:
+            result.append(char)
+    return "".join(result)
+
+def split_jamo_char(char):
+    if '가' <= char <= '힣':
+        code = ord(char) - 44032
+        cho = code // 588
+        jung = (code - 588*cho) // 28
+        jong = code - 588*cho - 28*jung
+        return (cho, jung, jong)
+    return None
+
+def char_similarity(c1, c2):
+    j1 = split_jamo_char(c1)
+    j2 = split_jamo_char(c2)
+    if j1 is None or j2 is None:
+        return 1.0 if c1 == c2 else 0.0
+    score = 0
+    # Chosung match (out of 1)
+    score += 1.0 if j1[0] == j2[0] else 0.0
+    # Jungsung match (out of 1) 
+    score += 1.0 if j1[1] == j2[1] else 0.0
+    # Jongsung match (out of 1)
+    score += 1.0 if j1[2] == j2[2] else 0.0
+    return score / 3.0
+
+def name_similarity(ocr_text, candidate):
+    ocr_k = re.sub(r'[^가-힣]', '', ocr_text)
+    # Compare against the full name, since OCR often extracts the variant part like (수영복)
+    name_k = re.sub(r'[^가-힣]', '', candidate)
+    if not ocr_k or not name_k:
+        return 0.0
+    
+    # Severe penalty for length mismatch to prevent short strings from matching long ones
+    if abs(len(ocr_k) - len(name_k)) > 1:
+        return 0.3
+    
+    min_len = min(len(ocr_k), len(name_k))
+    max_len = max(len(ocr_k), len(name_k))
+    
+    total = sum(char_similarity(ocr_k[i], name_k[i]) for i in range(min_len))
+    
+    # If there's an exact base name match, boost it slightly
+    if ocr_k == name_k:
+        return 1.0
+        
+    return total / max_len
 
 def match_student_name(extracted_name):
     if not extracted_name or not STUDENT_NAMES:
-        return extracted_name
-    clean_ex = re.sub(r'[^가-힣a-zA-Z0-9]', '', extracted_name)
-    if not clean_ex: return extracted_name
+        log_debug("Empty extracted_name or STUDENT_NAMES list.")
+        return ""
     
-    for name in STUDENT_NAMES:
-        if name == extracted_name: return name
+    log_debug(f"--- Name Matching Start ---")
+    log_debug(f"Raw OCR Output: '{extracted_name}'")
+    
+    # Remove all non-alphanumeric/Korean characters
+    clean_ex = re.sub(r'[^가-힣a-zA-Z0-9]', '', extracted_name)
+    if not clean_ex: 
+        log_debug("Cleaned name is empty.")
+        return ""
         
-    best_match = None
-    best_dist = float('inf')
-    for n in STUDENT_NAMES:
-        clean_n = re.sub(r'[^가-힣a-zA-Z0-9]', '', n)
-        d = levenshtein(clean_ex, clean_n)
-        if d < best_dist:
-            best_dist = d
-            best_match = n
+    # Apply manual OCR fallbacks for known difficult cases
+    ocr_fallbacks = {
+        "숲": "슌",
+        "순": "슌",
+        "숨": "슌",
+        "슘": "슌",
+        "스프미": "스즈미",
+        "치하로": "치히로",
+        "소구호미사키": "쇼쿠호미사키",
+        "사례루이코": "사텐루이코",
+    }
+    for bad, good in ocr_fallbacks.items():
+        if clean_ex.startswith(bad):
+            clean_ex = good + clean_ex[len(bad):]
+            break
             
-    if best_match and best_dist <= 2:
+    # Exact match fallbacks for single characters to avoid breaking longer names (e.g., 레이사)
+    exact_fallbacks = {
+        "레이": "케이",
+        "켜이": "케이",
+        "웨이": "케이"
+    }
+    if clean_ex in exact_fallbacks:
+        clean_ex = exact_fallbacks[clean_ex]
+            
+    log_debug(f"Cleaned String: '{clean_ex}'")
+    
+    cleaned_names = {re.sub(r'[^가-힣a-zA-Z0-9]', '', n): n for n in STUDENT_NAMES}
+    
+    # 1. Exact match
+    if clean_ex in cleaned_names:
+        log_debug(f"Exact match found: '{cleaned_names[clean_ex]}'")
+        return cleaned_names[clean_ex]
+        
+    # 2. Similarity match using character-by-character Jamo matching
+    best_match = None
+    best_ratio = 0.0
+    
+    # We want to match against base names first, but if there's a variant, 
+    # we need to be careful. The OCR only sees the base name since it's 
+    # extracted from the UI name field which doesn't contain the variant suffix like "(수영복)".
+    # Therefore, matching should be primarily against the base name.
+    
+    for orig_n in STUDENT_NAMES:
+        ratio = name_similarity(clean_ex, orig_n)
+        
+        # In case of ties, prefer the base character over the variant (e.g. '히나타' over '히나타(수영복)')
+        # If the ratio is strictly greater, it becomes the new best match.
+        if ratio > best_ratio:
+            best_ratio = ratio
+            best_match = orig_n
+        elif ratio == best_ratio and ratio > 0:
+            # Tie breaker: if orig_n is shorter (i.e. it doesn't have parenthesis), prefer it
+            if orig_n == orig_n.split('(')[0] and best_match != best_match.split('(')[0]:
+                best_match = orig_n
+            
+    # Require a high confidence ratio to prevent matching completely wrong names
+    # Per-character Jamo matching ratios: 1 wrong vowel out of 3 chars = 8/9 = 0.88
+    # 1 wrong consonant = 8/9 = 0.88
+    log_debug(f"Best Match Candidate: '{best_match}' with ratio: {best_ratio:.3f}")
+    if best_match and best_ratio >= 0.65:
+        log_debug(f"Accepted Match: '{best_match}'")
         return best_match
-    return extracted_name
+        
+    log_debug("Match Rejected (Ratio < 0.7)")
+    return ""
 
 # Bounding Box: (x, y, w, h) based on 1920x1080 resolution
 ROI_CONFIG = {
-    "studentName": (120, 840, 300, 40),
+    "studentName": (85, 835, 350, 45),
     "bondRank": (50, 835, 60, 40),
     "currentLevel": (20, 880, 100, 40),
     "stars_area": (390, 840, 150, 40),
@@ -105,11 +246,12 @@ def count_stars(img_crop, is_weapon=False):
             
     return star_count
 
-def extract_text(img, bbox, allowlist=None, scale=1):
+def extract_text(img, bbox, allowlist=None, scale=1, is_name=False):
     x, y, w, h = bbox
     crop = img[y:y+h, x:x+w]
     
     gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
+        
     if scale != 1:
         gray = cv2.resize(gray, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
     
@@ -119,6 +261,22 @@ def extract_text(img, bbox, allowlist=None, scale=1):
         
     # Using raw grayscale is usually best for EasyOCR, especially for text with outlines
     result = reader.readtext(gray, **kwargs)
+    
+    if is_name:
+        # The name ROI may include the bond rank number (e.g. "16") before the name.
+        # EasyOCR often splits these into separate results like ["16", "나기사"].
+        # We want only the Korean text part, so filter out pure number/symbol results.
+        korean_parts = []
+        for part in result:
+            # Keep parts that contain at least one Korean character
+            if re.search(r'[가-힣]', part):
+                korean_parts.append(part)
+        text = "".join(korean_parts).replace(" ", "")
+        # Also strip any leading digits/symbols that might be stuck to the name
+        text = re.sub(r'^[0-9\+\-\}\{\[\]\(\)\!\@\#\$\%\^\&\*\'\"]+', '', text)
+        log_debug(f"Name OCR raw parts: {result} -> filtered: '{text}'")
+        return text
+    
     text = "".join(result).replace(" ", "")
     
     # If it failed to read, try inverted threshold
@@ -207,7 +365,15 @@ def extract_screenshot_data(img_path):
     data = {}
     
     # 1. OCR Extraction
-    data["studentName"] = match_student_name(extract_text(img, ROI_CONFIG["studentName"]))
+    data["studentName"] = match_student_name(extract_text(img, ROI_CONFIG["studentName"], scale=3, is_name=True))
+    
+    # Disambiguate '케이' vs '레이' using Attack Type color (Mystic=Blue vs Sonic=Purple)
+    if data["studentName"] == "케이":
+        atk_type_crop = img[940:990, 300:400]
+        hsv_crop = cv2.cvtColor(atk_type_crop, cv2.COLOR_BGR2HSV)
+        purple_mask = cv2.inRange(hsv_crop, np.array([125, 50, 50]), np.array([165, 255, 255]))
+        if cv2.countNonZero(purple_mask) > 500:
+            data["studentName"] = "레이"
     data["bondRank"] = parse_number(extract_text(img, ROI_CONFIG["bondRank"], allowlist='0123456789', scale=2))
     data["currentLevel"] = parse_number(extract_text(img, ROI_CONFIG["currentLevel"], allowlist='0123456789Lv'))
     
@@ -244,6 +410,8 @@ def extract_screenshot_data(img_path):
         
         tier = 2 if cv2.countNonZero(pink_mask) > 500 else 1
         data["equipment"]["slot4"] = {"tier": tier}
+    else:
+        data["equipment"]["slot4"] = {"tier": 0}
     
     # 2. Detailed Stats OCR
     hp_stat, hp_ability = parse_stat_with_ability(extract_text(img, ROI_CONFIG["stat_hp"], allowlist='0123456789Lv'))
