@@ -21,7 +21,7 @@
 
 
 
-<img width="1076" height="722" alt="Image" src="https://github.com/user-attachments/assets/3d28d36a-4f5b-49df-ada2-6894aeaccbe6" />
+<img width="1102" height="739" alt="Image" src="https://github.com/user-attachments/assets/6456b13a-4009-48c5-a5b8-b6a8cfbd27a3" />
 4. 여기서 추출 결과를 확인 합니다. 추출 결과에 따라 검수 필요 상태가 뜰 수 있으니 참고 바랍니다. (검수 필요 상태의 기준은 스캔 후 필드가 비어 있거나 하는 경우에 발생하며, 설령 스캔을 해도 오류값으로 채워지는 경우 준비됨 상태로 채워지니 유의 부탁 드립니다)
 
 
