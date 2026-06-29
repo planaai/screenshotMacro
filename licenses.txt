@@ -1,0 +1,75 @@
+Third-Party Software Licenses
+=============================
+
+This software uses the following open-source libraries and code (or references their logic):
+
+1. VArchiveMacro
+- License: MIT License
+- Copyright (c) 2022 johypark97
+
+2. opencv-python
+- License: MIT License / Apache License 2.0
+
+2. numpy
+- License: BSD 3-Clause License
+
+3. PyQt5
+- License: GNU General Public License v3.0 (GPLv3)
+- Copyright (c) Riverbank Computing Limited
+
+4. easyocr
+- License: Apache License 2.0
+- Copyright (c) 2020 Jaided AI
+
+5. PyAutoGUI
+- License: BSD 3-Clause License
+- Copyright (c) 2014, Al Sweigart
+
+6. keyboard
+- License: MIT License
+- Copyright (c) 2017 BoppreH
+
+7. mss
+- License: MIT License
+- Copyright (c) 2013-2023 Mickaël Schoentgen
+
+8. requests
+- License: Apache License 2.0
+- Copyright (c) 2019 Kenneth Reitz
+
+9. torch (PyTorch)
+- License: BSD-style License
+- Copyright (c) 2016- Facebook, Inc (Meta Platforms)
+
+11. torchvision
+- License: BSD 3-Clause License
+- Copyright (c) Soumith Chintala 2016
+
+----------------------------------------------------------------------
+Fonts & Assets
+==============
+
+1. 경기천년체
+- License: 공공누리 제1유형 (Korea Open Government License Type 1)
+- Source: 경기도 (Gyeonggi Province)
+- 해당 폰트는 공공누리 제1유형 조건에 따라 출처를 표시하고 자유롭게 사용 가능합니다.
+
+----------------------------------------------------------------------
+For full texts of these licenses (MIT, Apache 2.0, BSD 3-Clause, GPLv3),
+please refer to the official Open Source Initiative (OSI) license registry 
+or the respective library's source repository.
+
+----------------------------------------------------------------------
+Disclaimer & Original IP Copyright (블루 아카이브 2차 창작 관련 고지)
+======================================================================
+
+본 프로그램은 '블루 아카이브(Blue Archive)'의 2차 창작물이며, 비공식 팬메이드(Fan-made) 소프트웨어입니다.
+프로그램 내에 포함되거나 프로그램이 다루는 '블루 아카이브' 관련 이미지, 캐릭터, 세계관 등 모든 원본 IP에 대한 1차 저작권 및 권리는 NEXON Games Co., Ltd. 및 넥슨코리아(Nexon Korea Corp.) 또는 원저작권자에게 있습니다.
+
+본 소프트웨어는 공식 개발사 및 퍼블리셔와 어떠한 관련도 없는 비공식 2차 창작물입니다.
+원칙적으로 상업적 영리 목적으로 사용될 수 없으나, 서버 유지보수 및 원활한 서비스 제공을 위한 최소한의 후원 및 수익 창출에 한하여 원저작권자의 2차 창작 가이드라인 및 사전 문의 답변에 따라 예외적으로 허용된 범위 내에서 운영됩니다.
+
+This software is an unofficial fan-made derivative work of "Blue Archive". 
+All primary copyrights and intellectual property rights regarding the images, characters, and concepts of "Blue Archive" belong to NEXON Games Co., Ltd. and their respective original copyright holders. 
+This software is not affiliated with, endorsed, or sponsored by the official developers or publishers.
+While commercial use is strictly prohibited, generating minimal revenue solely for the purpose of covering server maintenance and operating costs is conducted within the permitted scope in accordance with the official derivative work guidelines and direct inquiry responses from the original copyright holder.

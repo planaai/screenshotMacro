@@ -1,0 +1,10 @@
+opencv-python
+numpy
+PyQt5
+easyocr
+PyAutoGUI
+keyboard
+mss
+requests
+torch
+torchvision
