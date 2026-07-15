@@ -1,0 +1,48 @@
+Name: 노노미 | Reason: Invalid Level (831). 
+Data: {"studentName": "노노미", "bondRank": 26, "currentLevel": 831, "skills": {"ex": "MAX", "basic": "7", "enh": "5", "sub": "3"}, "weapon": {"level": 1, "star": 2}, "equipment": {"slot1": {"tier": 5, "level": 45}, "slot2": {"tier": 5, "level": 45}, "slot3": {"tier": 5, "level": 45}, "slot4": {"tier": 2}}, "stats": {"maxHP": 8472, "hpAbility": 0, "attackPower": 5464, "atkAbility": 0, "defensePower": 414, "healPower": 5338, "healAbility": 0}, "currentStar": 5, "needs_review": false}
+
+Name: 레이사 | Reason: Invalid HP (3). 
+Data: {"studentName": "레이사", "bondRank": 20, "currentLevel": 1, "skills": {"ex": "1", "basic": "1", "enh": "1", "sub": "1"}, "weapon": {"level": null, "star": 0}, "equipment": {"slot1": {"tier": 0, "level": 0}, "slot2": {"tier": 0, "level": 0}, "slot3": {"tier": 0, "level": 0}, "slot4": {"tier": 0}}, "stats": {"maxHP": 3, "hpAbility": 0, "attackPower": 209, "atkAbility": 0, "defensePower": 163, "healPower": 2132, "healAbility": 0}, "currentStar": 3, "needs_review": false}
+
+Name: 리오(무장) | Reason: Invalid HP (69). 
+Data: {"studentName": "리오(무장)", "bondRank": 16, "currentLevel": 1, "skills": {"ex": "1", "basic": "1", "enh": "1", "sub": "1"}, "weapon": {"level": null, "star": 0}, "equipment": {"slot1": {"tier": 0, "level": 0}, "slot2": {"tier": 0, "level": 0}, "slot3": {"tier": 0, "level": 0}, "slot4": {"tier": 0}}, "stats": {"maxHP": 69, "hpAbility": 0, "attackPower": 337, "atkAbility": 0, "defensePower": 19, "healPower": 1846, "healAbility": 0}, "currentStar": 4, "needs_review": false}
+
+Name: 세리카(새해) | Reason: Invalid Level (801). 
+Data: {"studentName": "세리카(새해)", "bondRank": 20, "currentLevel": 801, "skills": {"ex": "3", "basic": "7", "enh": "5", "sub": "4"}, "weapon": {"level": 1, "star": 1}, "equipment": {"slot1": {"tier": 5, "level": 45}, "slot2": {"tier": 5, "level": 45}, "slot3": {"tier": 5, "level": 45}, "slot4": {"tier": 0}}, "stats": {"maxHP": 5820, "hpAbility": 0, "attackPower": 3418, "atkAbility": 0, "defensePower": 1191, "healPower": 6797, "healAbility": 0}, "currentStar": 5, "needs_review": false}
+
+Name: 스즈미 | Reason: Invalid HP (25). 
+Data: {"studentName": "스즈미", "bondRank": 23, "currentLevel": 6, "skills": {"ex": "1", "basic": "1", "enh": "1", "sub": "1"}, "weapon": {"level": 1, "star": 3}, "equipment": {"slot1": {"tier": 0, "level": 0}, "slot2": {"tier": 0, "level": 0}, "slot3": {"tier": 0, "level": 0}, "slot4": {"tier": 1}}, "stats": {"maxHP": 25, "hpAbility": 0, "attackPower": 644, "atkAbility": 0, "defensePower": 25, "healPower": 2195, "healAbility": 0}, "currentStar": 5, "needs_review": false}
+
+Name: 아리스 | Reason: Invalid Level (781). 
+Data: {"studentName": "아리스", "bondRank": 35, "currentLevel": 781, "skills": {"ex": "3", "basic": "7", "enh": "4", "sub": "3"}, "weapon": {"level": 6, "star": 3}, "equipment": {"slot1": {"tier": 7, "level": 55}, "slot2": {"tier": 7, "level": 55}, "slot3": {"tier": 7, "level": 55}, "slot4": {"tier": 0}}, "stats": {"maxHP": 4487, "hpAbility": 0, "attackPower": 8096, "atkAbility": 0, "defensePower": 332, "healPower": 5947, "healAbility": 0}, "currentStar": 5, "needs_review": false}
+
+Name: 아즈사(수영복) | Reason: Invalid HP (29). 
+Data: {"studentName": "아즈사(수영복)", "bondRank": 21, "currentLevel": 75, "skills": {"ex": "3", "basic": "3", "enh": "3", "sub": "3"}, "weapon": {"level": null, "star": 0}, "equipment": {"slot1": {"tier": 0, "level": 0}, "slot2": {"tier": 0, "level": 0}, "slot3": {"tier": 4, "level": 40}, "slot4": {"tier": 0}}, "stats": {"maxHP": 29, "hpAbility": 0, "attackPower": 2953, "atkAbility": 0, "defensePower": 32, "healPower": 5090, "healAbility": 0}, "currentStar": 4, "needs_review": false}
+
+Name: 아츠코(수영복) | Reason: Invalid HP (81). 
+Data: {"studentName": "아츠코(수영복)", "bondRank": 1, "currentLevel": 1, "skills": {"ex": "1", "basic": "1", "enh": "1", "sub": "1"}, "weapon": {"level": 20, "star": 1}, "equipment": {"slot1": {"tier": 0, "level": 0}, "slot2": {"tier": 0, "level": 0}, "slot3": {"tier": 0, "level": 0}, "slot4": {"tier": 0}}, "stats": {"maxHP": 81, "hpAbility": 0, "attackPower": 469, "atkAbility": 0, "defensePower": 95, "healPower": 4325, "healAbility": 0}, "currentStar": 5, "needs_review": false}
+
+Name: 우타하 | Reason: Invalid HP (12). 
+Data: {"studentName": "우타하", "bondRank": 27, "currentLevel": 90, "skills": {"ex": "MAX", "basic": "7", "enh": "7", "sub": "7"}, "weapon": {"level": 50, "star": 4}, "equipment": {"slot1": {"tier": 9, "level": 65}, "slot2": {"tier": 9, "level": 65}, "slot3": {"tier": 8, "level": 60}, "slot4": {"tier": 2}}, "stats": {"maxHP": 12, "hpAbility": 0, "attackPower": 5747, "atkAbility": 0, "defensePower": 112, "healPower": 7292, "healAbility": 0}, "currentStar": 5, "needs_review": false}
+
+Name: 유우카(파자마) | Reason: Invalid HP (79). 
+Data: {"studentName": "유우카(파자마)", "bondRank": 14, "currentLevel": 1, "skills": {"ex": "1", "basic": "1", "enh": "1", "sub": "1"}, "weapon": {"level": null, "star": 0}, "equipment": {"slot1": {"tier": 0, "level": 0}, "slot2": {"tier": 0, "level": 0}, "slot3": {"tier": 0, "level": 0}, "slot4": {"tier": 0}}, "stats": {"maxHP": 79, "hpAbility": 0, "attackPower": 266, "atkAbility": 0, "defensePower": 170, "healPower": 1545, "healAbility": 0}, "currentStar": 3, "needs_review": false}
+
+Name: 유즈 | Reason: Invalid HP (69). 
+Data: {"studentName": "유즈", "bondRank": 33, "currentLevel": 1, "skills": {"ex": "1", "basic": "1", "enh": "1", "sub": "1"}, "weapon": {"level": 1, "star": 3}, "equipment": {"slot1": {"tier": 0, "level": 0}, "slot2": {"tier": 0, "level": 0}, "slot3": {"tier": 0, "level": 0}, "slot4": {"tier": 0}}, "stats": {"maxHP": 69, "hpAbility": 0, "attackPower": 1064, "atkAbility": 0, "defensePower": 19, "healPower": 2070, "healAbility": 0}, "currentStar": 5, "needs_review": false}
+
+Name: 이오리(수영복) | Reason: Invalid Level (711). 
+Data: {"studentName": "이오리(수영복)", "bondRank": 20, "currentLevel": 711, "skills": {"ex": "3", "basic": "7", "enh": "3", "sub": "3"}, "weapon": {"level": null, "star": 0}, "equipment": {"slot1": {"tier": 4, "level": 40}, "slot2": {"tier": 4, "level": 40}, "slot3": {"tier": 4, "level": 40}, "slot4": {"tier": 0}}, "stats": {"maxHP": 9208, "hpAbility": 0, "attackPower": 3815, "atkAbility": 0, "defensePower": 31, "healPower": 4394, "healAbility": 0}, "currentStar": 3, "needs_review": false}
+
+Name: 츠쿠요 | Reason: Invalid Level (411). 
+Data: {"studentName": "츠쿠요", "bondRank": 21, "currentLevel": 411, "skills": {"ex": "1", "basic": "1", "enh": "1", "sub": "1"}, "weapon": {"level": 0, "star": 0}, "equipment": {"slot1": {"tier": 0, "level": 0}, "slot2": {"tier": 0, "level": 0}, "slot3": {"tier": 0, "level": 0}, "slot4": {"tier": 0}}, "stats": {"maxHP": 4985, "hpAbility": 0, "attackPower": 882, "atkAbility": 0, "defensePower": 32, "healPower": 3754, "healAbility": 0}, "currentStar": 4, "needs_review": false}
+
+Name: 하나에 | Reason: Invalid Level (781). 
+Data: {"studentName": "하나에", "bondRank": 26, "currentLevel": 781, "skills": {"ex": "3", "basic": "4", "enh": "4", "sub": "5"}, "weapon": {"level": 1, "star": 3}, "equipment": {"slot1": {"tier": 4, "level": 40}, "slot2": {"tier": 4, "level": 40}, "slot3": {"tier": 5, "level": 45}, "slot4": {"tier": 0}}, "stats": {"maxHP": 4606, "hpAbility": 0, "attackPower": 2449, "atkAbility": 0, "defensePower": 125, "healPower": 12120, "healAbility": 0}, "currentStar": 5, "needs_review": false}
+
+Name: 후유 | Reason: Invalid HP (57). 
+Data: {"studentName": "후유", "bondRank": 9, "currentLevel": 1, "skills": {"ex": "1", "basic": "1", "enh": "1", "sub": "1"}, "weapon": {"level": null, "star": 0}, "equipment": {"slot1": {"tier": 0, "level": 0}, "slot2": {"tier": 0, "level": 0}, "slot3": {"tier": 0, "level": 0}, "slot4": {"tier": 0}}, "stats": {"maxHP": 57, "hpAbility": 0, "attackPower": 294, "atkAbility": 0, "defensePower": 16, "healPower": 1423, "healAbility": 0}, "currentStar": 3, "needs_review": false}
+
+Name: 히나(수영복) | Reason: Invalid Level (731). 
+Data: {"studentName": "히나(수영복)", "bondRank": 23, "currentLevel": 731, "skills": {"ex": "MAX", "basic": "5", "enh": "4", "sub": "9"}, "weapon": {"level": 1, "star": 1}, "equipment": {"slot1": {"tier": 5, "level": 45}, "slot2": {"tier": 5, "level": 45}, "slot3": {"tier": 5, "level": 45}, "slot4": {"tier": 1}}, "stats": {"maxHP": 5982, "hpAbility": 0, "attackPower": 7081, "atkAbility": 0, "defensePower": 362, "healPower": 5087, "healAbility": 0}, "currentStar": 5, "needs_review": false}
+

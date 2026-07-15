@@ -1,0 +1,2 @@
+Total students processed: 147
+Total anomalies found: 0

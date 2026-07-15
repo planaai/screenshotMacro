@@ -1,10 +1,12 @@
 # -*- mode: python ; coding: utf-8 -*-
+from PyInstaller.utils.hooks import collect_dynamic_libs
 
+all_binaries = collect_dynamic_libs('onnxruntime')
 
 a = Analysis(
     ['gui_app.py'],
     pathex=[],
-    binaries=[],
+    binaries=all_binaries,
     datas=[('assets', 'assets'), ('students.json', '.'), ('models', 'models')],
     hiddenimports=['scipy._external.array_api_compat.numpy.fft', 'scipy._external.array_api_compat.numpy.linalg', 'scipy._lib.array_api_compat.numpy.fft', 'scipy._lib.array_api_compat.numpy.linalg', 'scipy.special._cdflib'],
     hookspath=[],

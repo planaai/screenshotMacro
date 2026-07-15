@@ -215,7 +215,7 @@ def match_student_name(extracted_name):
 ROI_CONFIG = {
     "studentName": (85, 835, 350, 45),
     "bondRank": (50, 835, 60, 40),
-    "currentLevel": (20, 880, 100, 40),
+    "currentLevel": (20, 880, 120, 40),
     "stars_area": (390, 840, 150, 40),
     "skill_ex": (1000, 580, 120, 60),
     "skill_basic": (1180, 580, 120, 60),
@@ -227,10 +227,10 @@ ROI_CONFIG = {
     "equip_2": (1140, 820, 130, 130),
     "equip_3": (1280, 820, 130, 130),
     "equip_4": (1440, 800, 80, 80),
-    "stat_hp": (1130, 350, 220, 40),
-    "stat_attack": (1400, 350, 220, 40),
-    "stat_defense": (1110, 400, 90, 40),
-    "stat_heal": (1400, 400, 220, 40)
+    "stat_hp": (1050, 350, 300, 40),
+    "stat_attack": (1350, 350, 300, 40),
+    "stat_defense": (1050, 400, 300, 40),
+    "stat_heal": (1350, 400, 300, 40)
 }
 
 import sys
@@ -274,7 +274,7 @@ def count_stars(img_crop, is_weapon=False):
             
     return star_count
 
-def extract_text(img, bbox, allowlist=None, scale=1, is_name=False):
+def extract_text(img, bbox, allowlist=None, scale=1, is_name=False, min_length=0):
     x, y, w, h = bbox
     crop = img[y:y+h, x:x+w]
     
@@ -313,7 +313,7 @@ def extract_text(img, bbox, allowlist=None, scale=1, is_name=False):
         text = "".join(c for c in text if c in allowlist)
     
     # If it failed to read or didn't find any numbers when it should have, try inverted threshold
-    needs_retry = not text
+    needs_retry = not text or len(text) < min_length
     
     def has_digit_or_alias(s):
         return any(c.isdigit() or c in 'lIOoSs' for c in s)
@@ -481,7 +481,13 @@ def parse_stat_with_ability(text):
         if ability > 25: ability = 25
         text = text[:match.start()]
     stat_val = parse_number(text)
-    if stat_val: stat = stat_val
+    if stat_val: 
+        # Fix for OCR mistakenly reading the left text '력' as '7' or '1'
+        if stat_val > 100000 and str(stat_val).startswith('7'):
+            stat_val = int(str(stat_val)[1:])
+        elif stat_val > 100000 and str(stat_val).startswith('1'):
+            stat_val = int(str(stat_val)[1:])
+        stat = stat_val
     return stat, ability
 
 def parse_skill(text, is_ex=False):
@@ -501,13 +507,17 @@ def parse_skill(text, is_ex=False):
         
     max_val = 5 if is_ex else 10
     
-    if num > max_val:
+    # If it is read as 31, 71, etc.
+    while num > max_val:
         num_str = str(num)
-        if len(num_str) >= 2 and num_str[-1] == '1':
+        if len(num_str) >= 2 and (num_str[-1] == '1' or num_str[-1] == '7'):
             num = int(num_str[:-1])
-            
-        if num > max_val:
+        else:
             num = max_val
+            break
+            
+    if num > max_val:
+        num = max_val
             
     return str(max(1, num))
 
@@ -686,9 +696,9 @@ def extract_screenshot_data(img_path):
     data["equipment"]["slot4"] = {"tier": tier}
     
     # 2. Detailed Stats OCR
-    hp_stat, hp_ability = parse_stat_with_ability(extract_text(img, ROI_CONFIG["stat_hp"], allowlist=num_allowlist, scale=2))
-    atk_stat, atk_ability = parse_stat_with_ability(extract_text(img, ROI_CONFIG["stat_attack"], allowlist=num_allowlist, scale=2))
-    heal_stat, heal_ability = parse_stat_with_ability(extract_text(img, ROI_CONFIG["stat_heal"], allowlist=num_allowlist, scale=2))
+    hp_stat, hp_ability = parse_stat_with_ability(extract_text(img, ROI_CONFIG["stat_hp"], allowlist=num_allowlist, scale=2, min_length=3))
+    atk_stat, atk_ability = parse_stat_with_ability(extract_text(img, ROI_CONFIG["stat_attack"], allowlist=num_allowlist, scale=2, min_length=3))
+    heal_stat, heal_ability = parse_stat_with_ability(extract_text(img, ROI_CONFIG["stat_heal"], allowlist=num_allowlist, scale=2, min_length=3))
 
     data["stats"] = {
         "maxHP": clamp_stat(hp_stat, 200000),
@@ -720,6 +730,17 @@ WEAPON_MAX_LEVEL_BY_STAR = {0: 0, 1: 30, 2: 40, 3: 50, 4: 60}
 def validate_extracted_data(data):
     """Post-processing to fix common OCR misreads based on game logic constraints."""
     
+    # 0. Fix Level > 90 trailing 1
+    if data.get("currentLevel", 0) > 90:
+        lvl_str = str(data["currentLevel"])
+        if lvl_str.endswith("1"):
+            log_debug(f"[Validation] currentLevel {lvl_str} -> {lvl_str[:-1]} 보정 (name={data.get('studentName')})")
+            data["currentLevel"] = int(lvl_str[:-1])
+            
+        if data["currentLevel"] > 90:
+            log_debug(f"[Validation] currentLevel {data['currentLevel']} -> 90 클램핑 (name={data.get('studentName')})")
+            data["currentLevel"] = 90
+    
     # 1. currentLevel: 9 → 90 보정
     # Lv.9에서 스킬 MAX, 높은 인연 랭크, 5성, 무기 보유는 불가능
     if data.get("currentLevel") == 9:
@@ -748,6 +769,16 @@ def validate_extracted_data(data):
     if w_star > 0 and w_level is None:
         log_debug(f"[Validation] weapon level None → 1 (star={w_star}, name={data.get('studentName')})")
         weapon["level"] = 1
+        
+    # 4. Strict validation check
+    needs_review = False
+    lvl = data.get("currentLevel") or 1
+    hp = data.get("stats", {}).get("maxHP") or 0
+    if lvl > 90:
+        needs_review = True
+    if hp < 1000:
+        needs_review = True
+    data["needs_review"] = needs_review
 
 if __name__ == "__main__":
     import sys
