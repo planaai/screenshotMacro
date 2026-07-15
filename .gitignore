@@ -1,0 +1,36 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# PyInstaller
+build/
+dist/
+
+# User specific data
+macro_screenshots/
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# IDE files
+.vscode/
+.idea/
+
+# Tests and images
+tests/
+*.jpg
+
+# Logs
+logs/
+
+
+
+__pycache__/
+dist/
+build/
+*.zip
+*.tar
+*.tar.gz
