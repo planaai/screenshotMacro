@@ -226,7 +226,7 @@ ROI_CONFIG = {
     "equip_1": (1000, 820, 130, 130),
     "equip_2": (1140, 820, 130, 130),
     "equip_3": (1280, 820, 130, 130),
-    "equip_4": (1440, 800, 80, 80),
+    "equip_4": (1420, 820, 130, 130),
     "stat_hp": (1050, 350, 300, 40),
     "stat_attack": (1350, 350, 300, 40),
     "stat_defense": (1050, 400, 300, 40),
@@ -348,69 +348,28 @@ def extract_equip_text(img, bbox):
     if crop.size == 0:
         return ""
         
-    # The tier badge is at the bottom-left
-    tier_crop = crop[95:130, 15:85]
-    
-    # Check if slot is empty using standard deviation on the tier badge area
-    if np.std(tier_crop) < 35:
-        # Slot is empty, return early to avoid OCR hallucination
-        return ""
+    gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
+    # A locked slot (padlock) has a dark gray background (mean ~120-136)
+    # An equipped or unequipped slot has a brighter background/icon (mean > 170)
+    if np.mean(gray) < 150:
+        return "EMPTY"
         
-    # Check if slot is locked (dark padlock icon in the center)
-    center_crop = crop[45:85, 45:85]
-    cb, cg, cr = cv2.split(center_crop)
-    if np.mean(cb) < 130 and np.mean(cg) < 130 and np.mean(cr) < 130:
-        # Slot is locked, return early
-        return ""
-        
-    def ocr_crop(sub_crop):
-        if sub_crop.size == 0: return ""
-        scaled = cv2.resize(sub_crop, None, fx=4, fy=4, interpolation=cv2.INTER_CUBIC)
+    try:
+        scaled = cv2.resize(crop, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
         gray = cv2.cvtColor(scaled, cv2.COLOR_BGR2GRAY)
+        adjusted = cv2.convertScaleAbs(gray, alpha=1.5, beta=0)
+        res, _ = reader_en(adjusted)
+        if res:
+            texts = [r[1] for r in res]
+            full_text = ' '.join(texts).upper()
+            if "EMPTY" in full_text or "MPTY" in full_text or "PTY" in full_text:
+                return "EMPTY"
+            return full_text
+    except Exception as e:
+        log_debug(f"OCR Exception: {e}")
         
-        # Try inverted threshold
-        _, thresh = cv2.threshold(gray, 120, 255, cv2.THRESH_BINARY_INV)
-        thresh_bgr = cv2.cvtColor(thresh, cv2.COLOR_GRAY2BGR)
-        try:
-            res_inv, _ = reader_en.text_recognizer([thresh_bgr])
-        except:
-            res_inv = None
-            
-        # Try raw grayscale
-        gray_bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
-        try:
-            res_raw, _ = reader_en.text_recognizer([gray_bgr])
-        except:
-            res_raw = None
-        
-        t_inv = res_inv[0][0] if res_inv and len(res_inv) > 0 else ""
-        c_inv = float(res_inv[0][1]) if res_inv and len(res_inv) > 0 else 0.0
-        t_raw = res_raw[0][0] if res_raw and len(res_raw) > 0 else ""
-        c_raw = float(res_raw[0][1]) if res_raw and len(res_raw) > 0 else 0.0
-        
-        # Use confidence to pick the best result, not text length
-        if c_raw > c_inv:
-            return t_raw
-        return t_inv
+    return ""
 
-    # The tier badge is at the bottom-left (already extracted above for empty check)
-    tier_text = ocr_crop(tier_crop)
-    
-    # The Level is at the top-left
-    level_crop = crop[20:60, 25:95]
-    level_text = ocr_crop(level_crop)
-    
-    # If OCR failed to find tier (e.g. T10), try detecting from wider badge area
-    if not re.search(r'[Tt]\s*\d', tier_text):
-        wider_badge = crop[80:130, 0:80]
-        wider_text = ocr_crop(wider_badge)
-        if re.search(r'10', wider_text):
-            tier_text = "T10"
-        elif not tier_text:
-            tier_text = "T"
-            
-    return tier_text + " " + level_text
-    
 def extract_bond_text(img, bbox):
     x, y, w, h = bbox
     crop = img[y:y+h, x:x+w]
@@ -529,71 +488,33 @@ def clamp_stat(val, max_val):
     return int(val_str) if val_str else 0
 
 def parse_equip(text):
-    if not text:
+    if not text or "EMPTY" in text.upper() or "MPTY" in text.upper() or "PTY" in text.upper():
         return {"tier": 0, "level": 0}
-    
+        
     tier = 0
-    # Try to find T1~T10
-    match_t10 = re.search(r'[Tt]\s*10', text)
-    match_t = re.search(r'[Tt]\s*([1-9])', text)
-    if match_t10:
-        tier = 10
-        text = text[:match_t10.start()] + text[match_t10.end():]
-    elif match_t:
-        tier = int(match_t.group(1))
-        text = text[:match_t.start()] + text[match_t.end():]
-        
-    # Remove common 'Lv' misreads like 'L2', 'L0', '40.' (if followed by digits)
-    text = re.sub(r'[Ll][Vv]?', '', text)
-    text = re.sub(r'40\.(?=\d+)', '', text)  # '40.45' -> '45'
-    text = re.sub(r'[Ll]2(?=\d+)', '', text) # 'L230' -> '30'
-    text = re.sub(r'[Ll]0(?=\d+)', '', text) # 'L045' -> '45'
-    text = re.sub(r'^[0-4]0(?=\d{2}$)', '', text) # '4045' -> '45'
-        
-    num = parse_number(text)
-    if (num is None or num == 0) and tier == 0:
-        # If text is not empty, it means edge detection passed and it IS equipped,
-        # but OCR completely failed to parse a number or tier due to image noise (e.g., a necklace string crossing 'Lv.1').
-        # Safe fallback is T1 Lv1, since T0 Lv0 means empty.
-        return {"tier": 1, "level": 1}
-    elif not num:
-        if tier == 0:
-            return {"tier": 0, "level": 0}
-        return {"tier": tier, "level": 1}
-        
-    level = num
+    level = 0
     
-    # If level > 90, maybe it merged tier and level (e.g. 545 -> T5 Lv45)
-    if level > 90 and tier == 0:
-        val_str = str(level)
-        if len(val_str) == 3:
-            tier_guess = int(val_str[0])
-            level_guess = int(val_str[1:])
-            if 1 <= tier_guess <= 9 and 1 <= level_guess <= 90:
-                tier = tier_guess
-                level = level_guess
-        elif len(val_str) > 3:
-            # e.g. 4045 -> just take last 2 digits for level
-            level = int(val_str[-2:])
-            
-    # Cap level at 90
-    if level > 90:
-        level = int(str(level)[-2:])
-        if level > 90:
-            level = 90
-            
-    if tier == 0:
+    # Try to find T1~T10
+    match_t = re.search(r'[Tt]\s*(10|[1-9])', text)
+    if match_t:
+        tier = int(match_t.group(1))
+        
+    # Strictly read the level next to Lv. 
+    # Match variations of L.v, Lv, LV, lV, L2, LY (common OCR misreads for Lv)
+    match_lv = re.search(r'(?:[Ll1I][VvYy2oO]*[:.]?)\s*(\d+)', text)
+    if match_lv:
+        level = int(match_lv.group(1))
+        
+    if tier == 0 and level == 0:
+        return {"tier": 0, "level": 0}
+        
+    # If a low tier item has no T badge (e.g. T1 Lv.15), it only says Lv.15
+    if tier == 0 and level > 0:
         tier = 1
         
-    # Guess tier based on max level cap for that tier if the guessed tier is too low
-    min_tier_for_level = 1
-    if level <= 40:
-        min_tier_for_level = max(1, (level - 1) // 10 + 1)
-    else:
-        min_tier_for_level = max(1, min(10, 4 + (level - 36) // 5))
-        
-    tier = max(tier, min_tier_for_level)
-            
+    if level > 90:
+        level = int(str(level)[:2])
+
     return {"tier": tier, "level": level}
 
 def extract_screenshot_data(img_path):
@@ -636,64 +557,24 @@ def extract_screenshot_data(img_path):
         "level": parse_number(extract_text(img, ROI_CONFIG["weapon_level"], allowlist=num_allowlist, scale=2)),
     }
     
+    t1_text = extract_equip_text(img, ROI_CONFIG["equip_1"])
+    t2_text = extract_equip_text(img, ROI_CONFIG["equip_2"])
+    t3_text = extract_equip_text(img, ROI_CONFIG["equip_3"])
+    t4_text = extract_equip_text(img, ROI_CONFIG["equip_4"])
+    
+    # 3-1. Bond Gear (Slot 4) Extraction using Color
+    # The 4th slot is slightly pinkish if the student has a favorite item.
+    ex, ey, ew, eh = ROI_CONFIG["equip_4"]
+    slot4_crop = img[ey:ey+eh, ex:ex+ew]
+    cb, cg, cr = cv2.split(slot4_crop)
+    has_favorite_item = np.mean(cr) > np.mean(cb) and np.mean(cr) > np.mean(cg)
+    
     data["equipment"] = {
-        "slot1": parse_equip(extract_equip_text(img, ROI_CONFIG["equip_1"])),
-        "slot2": parse_equip(extract_equip_text(img, ROI_CONFIG["equip_2"])),
-        "slot3": parse_equip(extract_equip_text(img, ROI_CONFIG["equip_3"]))
+        "slot1": parse_equip(t1_text),
+        "slot2": parse_equip(t2_text),
+        "slot3": parse_equip(t3_text),
+        "slot4": parse_equip(t4_text) if has_favorite_item else {"tier": 0, "level": 0}
     }
-    
-    # 3-1. Bond Gear (Slot 4) Extraction using Color and Background
-    # Favorite items don't have a standard T-badge, and the original OCR approach
-    # erroneously catches the "Lv.20" padlock badge as "2".
-    # Use center color averaging to robustly detect locked/unlocked state.
-    
-    # First, check if there is ANY badge (T1/T2 cyan badge, or Lv.20 cyan padlock text)
-    badge_roi = (1435, 915, 55, 35)
-    bx, by, bw, bh = badge_roi
-    badge_crop = img[by:by+bh, bx:bx+bw]
-    hsv_badge = cv2.cvtColor(badge_crop, cv2.COLOR_BGR2HSV)
-    cyan_mask = cv2.inRange(hsv_badge, np.array([80, 50, 150]), np.array([120, 255, 255]))
-    cyan_pixels = cv2.countNonZero(cyan_mask)
-    
-    tier = 0
-    if cyan_pixels > 50:
-        # It's either Equipped (T1/T2) or Locked (Padlock). Not empty!
-        # Use proper coordinates for Slot 4 (aligned with Slot 3 spacing)
-        ex, ey, ew, eh = 1420, 820, 130, 130
-        slot4_crop = img[ey:ey+eh, ex:ex+ew]
-        center_crop = slot4_crop[45:85, 45:85]
-        
-        cb, cg, cr = cv2.split(center_crop)
-        avg_b, avg_g, avg_r = np.mean(cb), np.mean(cg), np.mean(cr)
-        
-        if avg_b < 140 and avg_g < 140 and avg_r < 140:
-            tier = 0 # Locked padlock
-        else:
-            # Unlocked item. Use OCR to read the T-badge.
-            # RapidOCR reliably detects "2" or "T2" for Tier 2, but often fails on "1".
-            # We already confirmed it's not a padlock and not empty.
-            gray = cv2.cvtColor(badge_crop, cv2.COLOR_BGR2GRAY)
-            _, thresh = cv2.threshold(gray, 120, 255, cv2.THRESH_BINARY_INV)
-            gray_scaled = cv2.resize(thresh, None, fx=4, fy=4, interpolation=cv2.INTER_CUBIC)
-            bgr_scaled = cv2.cvtColor(gray_scaled, cv2.COLOR_GRAY2BGR)
-            
-            try:
-                # The file might have reader_en or reader, use whatever is globally available for OCR.
-                # Assuming 'reader_en' is available from RapidOCR() at top of extractor.py
-                res, _ = reader_en.text_recognizer([bgr_scaled])
-                text = res[0][0] if res else ""
-            except Exception:
-                text = ""
-                
-            text = text.replace(" ", "")
-            text = "".join(c for c in text if c in 'T12')
-            
-            if "2" in text:
-                tier = 2
-            else:
-                tier = 1
-            
-    data["equipment"]["slot4"] = {"tier": tier}
     
     # 2. Detailed Stats OCR
     hp_stat, hp_ability = parse_stat_with_ability(extract_text(img, ROI_CONFIG["stat_hp"], allowlist=num_allowlist, scale=2, min_length=3))
