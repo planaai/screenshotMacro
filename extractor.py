@@ -19,9 +19,23 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # Load student names
 STUDENT_NAMES = []
 try:
-    response = requests.get("https://localhost:3443/api/students/names", verify=False, timeout=5)
+    response = requests.get("https://api.planaai.kro.kr/api/students", timeout=5)
     if response.status_code == 200:
-        STUDENT_NAMES = response.json()
+        data = response.json()
+        if isinstance(data, dict):
+            # If it's a dict like {"시로코": {...}}
+            STUDENT_NAMES = list(data.keys())
+        elif isinstance(data, list) and len(data) > 0:
+            if isinstance(data[0], dict):
+                # If it's a list of objects
+                k = 'name' if 'name' in data[0] else 'studentName' if 'studentName' in data[0] else 'id' if 'id' in data[0] else list(data[0].keys())[0]
+                STUDENT_NAMES = [str(item.get(k, '')) for item in data if item.get(k)]
+            else:
+                # If it's a list of strings
+                STUDENT_NAMES = [str(x) for x in data]
+        
+        if not STUDENT_NAMES:
+            raise Exception("Server returned empty list or unparseable format")
     else:
         raise Exception(f"Server returned {response.status_code}")
 except Exception as e:
@@ -375,9 +389,7 @@ def extract_bond_text(img, bbox):
     crop = img[y:y+h, x:x+w]
     if crop.size == 0: return ""
     
-    text = extract_text(img, bbox, allowlist='0123456789LvlIOoSs', scale=2)
-    if parse_number(text): return text
-        
+    # 1. Use V-channel thresholding first, which is best for the bond rank heart
     scaled = cv2.resize(crop, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
     hsv = cv2.cvtColor(scaled, cv2.COLOR_BGR2HSV)
     v = hsv[:,:,2]
@@ -386,38 +398,42 @@ def extract_bond_text(img, bbox):
     
     try:
         res, _ = reader_en.text_recognizer([thresh_bgr])
-        if res and len(res) > 0 and parse_number(res[0][0]):
-            return res[0][0]
+        if res and len(res) > 0:
+            text = "".join(res[0][0]).replace(" ", "")
+            text = "".join(c for c in text if c in '0123456789LvlIOoSs')
+            if parse_number(text): 
+                return text
     except:
         pass
         
+    # 2. If it fails, do a wider center crop to avoid heart borders, with a simple white padding
     ch, cw = thresh.shape
-    center = thresh[int(ch*0.2):int(ch*0.8), int(cw*0.30):int(cw*0.70)]
+    center = thresh[int(ch*0.2):int(ch*0.8), int(cw*0.15):int(cw*0.85)]
     if center.size > 0:
         center_inv = cv2.bitwise_not(center)
-        combined = np.full((center.shape[0] + 40, center.shape[1] * 3 + 80), 255, dtype=np.uint8)
+        padded = np.full((center.shape[0] + 40, center.shape[1] + 40), 255, dtype=np.uint8)
         ch_c, cw_c = center_inv.shape
-        combined[20:20+ch_c, 20:20+cw_c] = center_inv
-        combined[20:20+ch_c, 40+cw_c:40+cw_c*2] = center_inv
-        combined[20:20+ch_c, 60+cw_c*2:60+cw_c*3] = center_inv
+        padded[20:20+ch_c, 20:20+cw_c] = center_inv
         
         try:
-            res, _ = reader_en.text_recognizer([cv2.cvtColor(combined, cv2.COLOR_GRAY2BGR)])
+            res, _ = reader_en.text_recognizer([cv2.cvtColor(padded, cv2.COLOR_GRAY2BGR)])
             if res and len(res) > 0:
-                t = res[0][0]
-                if len(t) % 3 == 0: return t[:len(t)//3]
-                elif len(t) > 0: return t[:max(1, len(t)//3)]
+                t = "".join(res[0][0]).replace(" ", "")
+                t = "".join(c for c in t if c in '0123456789LvlIOoSs')
+                if parse_number(t):
+                    return t
         except:
             pass
             
-    return text
+    # 3. Ultimate fallback to raw image
+    return extract_text(img, bbox, allowlist='0123456789LvlIOoSs', scale=2)
 
 def parse_number(text):
     if not text:
         return None
         
     # Replace common OCR misreads for numbers
-    text = text.replace('l', '1').replace('I', '1').replace('O', '0').replace('o', '0').replace('S', '5').replace('s', '5')
+    text = text.replace('l', '1').replace('I', '1').replace('O', '0').replace('o', '0').replace('S', '5').replace('s', '5').replace('z', '2').replace('Z', '2')
     
     numbers = re.findall(r'\d+', text)
     if numbers:
@@ -432,9 +448,9 @@ def parse_stat_with_ability(text):
     if not text: return stat, ability
     
     # Pre-process S/s to 5 before regex since OCR often reads '25' as '2S'
-    text = text.replace('S', '5').replace('s', '5').replace('O', '0').replace('o', '0')
+    text = text.replace('S', '5').replace('s', '5').replace('O', '0').replace('o', '0').replace('z', '2').replace('Z', '2')
     
-    match = re.search(r'[Ll][Vv]?\s*(\d+)', text)
+    match = re.search(r'(?:[LlI][VvYy]*|1[VvYy]+|[Vv])[:.]?\s*(\d+)', text)
     if match:
         ability = int(match.group(1))
         if ability > 25: ability = 25
@@ -501,7 +517,7 @@ def parse_equip(text):
         
     # Strictly read the level next to Lv. 
     # Match variations of L.v, Lv, LV, lV, L2, LY (common OCR misreads for Lv)
-    match_lv = re.search(r'(?:[Ll1I][VvYy2oO]*[:.]?)\s*(\d+)', text)
+    match_lv = re.search(r'(?:[LlI][VvYy]*|1[VvYy]+|[Vv])[:.]?\s*(\d+)', text)
     if match_lv:
         level = int(match_lv.group(1))
         
@@ -541,7 +557,7 @@ def extract_screenshot_data(img_path):
         if cv2.countNonZero(purple_mask) > 500:
             data["studentName"] = "레이"
             
-    num_allowlist = '0123456789LvlIOoSs'
+    num_allowlist = '0123456789LvlIOoSszZ'
     
     data["bondRank"] = parse_number(extract_bond_text(img, ROI_CONFIG["bondRank"]))
     data["currentLevel"] = parse_number(extract_text(img, ROI_CONFIG["currentLevel"], allowlist=num_allowlist, scale=2))
@@ -611,7 +627,21 @@ WEAPON_MAX_LEVEL_BY_STAR = {0: 0, 1: 30, 2: 40, 3: 50, 4: 60}
 def validate_extracted_data(data):
     """Post-processing to fix common OCR misreads based on game logic constraints."""
     
-    # 0. Fix Level > 90 trailing 1
+    # 0-1. Lock skills based on star grade
+    # 1-star: enh and sub are locked (level 1)
+    # 2-star: sub is locked (level 1)
+    current_star = data.get("currentStar") or 0
+    if current_star == 1:
+        if "skills" in data:
+            data["skills"]["enh"] = 1
+            data["skills"]["sub"] = 1
+            log_debug(f"[Validation] 1성 강제 스킬 레벨 조정 (enh=1, sub=1)")
+    elif current_star == 2:
+        if "skills" in data:
+            data["skills"]["sub"] = 1
+            log_debug(f"[Validation] 2성 강제 스킬 레벨 조정 (sub=1)")
+            
+    # 0-2. Fix Level > 90 trailing 1
     if data.get("currentLevel", 0) > 90:
         lvl_str = str(data["currentLevel"])
         if lvl_str.endswith("1"):

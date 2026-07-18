@@ -13,6 +13,8 @@ from PyQt5.QtGui import QFontDatabase, QFont, QPixmap, QPainter, QColor, QIcon, 
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QTimer
 import json
 import macro
+import scanner
+import requests
 
 def get_asset_path(relative_path):
     if hasattr(sys, '_MEIPASS'):
@@ -96,6 +98,7 @@ class Signals(QObject):
     log_msg = pyqtSignal(str)
     batch_done = pyqtSignal()
     macro_done = pyqtSignal(str)
+    scanner_done = pyqtSignal(object)
 
 class ExtractApp(QMainWindow):
     def __init__(self):
@@ -121,6 +124,7 @@ class ExtractApp(QMainWindow):
         self.signals.log_msg.connect(self.append_log)
         self.signals.batch_done.connect(self.on_batch_done)
         self.signals.macro_done.connect(self.on_macro_done_signal)
+        self.signals.scanner_done.connect(self.on_scanner_done_signal)
 
         self.central_widget = GlassWidget()
         self.setCentralWidget(self.central_widget)
@@ -131,9 +135,17 @@ class ExtractApp(QMainWindow):
         self.stacked_widget.setStyleSheet("background: transparent;")
         self.main_layout.addWidget(self.stacked_widget)
         
+        self.init_login_view()
+        self.init_mode_select_view()
+        self.init_scanner_view()
         self.init_dashboard_view()
         
-        self.stacked_widget.setCurrentWidget(self.dash_view)
+        self.detail_view = DetailWindow(self)
+        self.scanner_detail_view = ScannerDetailWindow(self)
+        self.stacked_widget.addWidget(self.detail_view)
+        self.stacked_widget.addWidget(self.scanner_detail_view)
+        
+        self.stacked_widget.setCurrentWidget(self.login_view)
         
         # redirect stdout/stderr
         class EmittingStream(object):
@@ -156,6 +168,10 @@ class ExtractApp(QMainWindow):
             self.signals.log_msg.emit(msg)
             
         self.macro_instance = macro.CaptureMacro(callback_done=on_macro_done, callback_log=on_macro_log)
+
+        def on_scanner_done(result):
+            self.signals.scanner_done.emit(result)
+        self.scanner_instance = scanner.ScannerListener(callback_done=on_scanner_done, callback_log=on_macro_log)
 
     def init_login_view(self):
         self.login_view = QWidget()
@@ -203,9 +219,114 @@ class ExtractApp(QMainWindow):
             QMessageBox.warning(self, "입력 오류", "아이디와 비밀번호를 모두 입력하세요.")
             return
             
-        # test_release에서는 서버 연동을 하지 않으므로 패스
-        self.jwt_token = "dummy_token"
-        self.stacked_widget.setCurrentWidget(self.dash_view)
+        try:
+            resp = requests.post(
+                "https://api.planaai.kro.kr/api/auth/login",
+                json={"username": user, "password": pwd},
+                timeout=5
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                self.jwt_token = data.get("token")
+                user_info = data.get("user", {})
+                nickname = user_info.get("nickname") or user
+                QMessageBox.information(self, "로그인 성공", f"환영합니다, {nickname}님!")
+                self.stacked_widget.setCurrentWidget(self.mode_select_view)
+            else:
+                err_msg = resp.json().get("error", "로그인 실패")
+                QMessageBox.warning(self, "로그인 실패", err_msg)
+        except Exception as e:
+            QMessageBox.critical(self, "로그인 오류", f"서버와 통신 중 오류가 발생했습니다:\n{e}")
+
+    def init_mode_select_view(self):
+        self.mode_select_view = QWidget()
+        layout = QVBoxLayout(self.mode_select_view)
+        layout.setAlignment(Qt.AlignCenter)
+        
+        lbl_title = QLabel("모드 선택")
+        lbl_title.setStyleSheet(f"color: {COLOR_PINK_HOVER}; font-size: 28px; border: none; background: transparent; margin-bottom: 20px;")
+        lbl_title.setAlignment(Qt.AlignCenter)
+        layout.addWidget(lbl_title)
+        
+        card_layout = QHBoxLayout()
+        card_layout.setSpacing(30)
+        
+        btn_scanner = QPushButton("스캐너 모드 (단일)")
+        btn_scanner.setStyleSheet(f"background-color: {GLASS_BG}; color: {COLOR_PINK_HOVER}; border: 3px solid {COLOR_PINK}; border-radius: 20px; font-size: 20px; font-weight: bold; padding: 30px;")
+        btn_scanner.setFixedSize(300, 200)
+        btn_scanner.clicked.connect(lambda: self.stacked_widget.setCurrentWidget(self.scanner_view))
+        
+        btn_macro = QPushButton("매크로 모드 (일괄)")
+        btn_macro.setStyleSheet(f"background-color: {GLASS_BG}; color: {COLOR_PINK_HOVER}; border: 3px solid {COLOR_PINK}; border-radius: 20px; font-size: 20px; font-weight: bold; padding: 30px;")
+        btn_macro.setFixedSize(300, 200)
+        btn_macro.clicked.connect(lambda: self.stacked_widget.setCurrentWidget(self.dash_view))
+        
+        card_layout.addWidget(btn_scanner)
+        card_layout.addWidget(btn_macro)
+        
+        layout.addLayout(card_layout)
+        self.stacked_widget.addWidget(self.mode_select_view)
+
+    def init_scanner_view(self):
+        self.scanner_view = QWidget()
+        layout = QVBoxLayout(self.scanner_view)
+        layout.setContentsMargins(40, 40, 40, 40)
+        layout.setSpacing(20)
+        
+        header = QLabel("스캐너 모드 (단일 추출)")
+        header.setStyleSheet(f"background-color: {GLASS_BG}; color: {COLOR_PINK_HOVER}; font-size: 24px; border: 2px solid {COLOR_PINK}; border-radius: 15px; padding: 15px;")
+        layout.addWidget(header)
+        
+        ctrl_card = QWidget()
+        ctrl_card.setStyleSheet(f"background-color: {GLASS_BG}; border: 2px solid {COLOR_PINK}; border-radius: 15px;")
+        ctrl_layout = QVBoxLayout(ctrl_card)
+        ctrl_layout.setContentsMargins(20, 20, 20, 20)
+        
+        lbl_info = QLabel("▶ 스캐너 모드 시작 버튼을 누르고 게임 창을 띄운 뒤 [F9] 키를 누르면 즉시 캡처 후 검수 창으로 이동합니다.")
+        lbl_info.setStyleSheet("border: none; background: transparent; color: #333; font-size: 18px;")
+        ctrl_layout.addWidget(lbl_info)
+        
+        btn_layout = QHBoxLayout()
+        self.btn_scanner_start = QPushButton("스캐너 캡처 시작 대기 (F9)")
+        self.btn_scanner_start.setStyleSheet(COMMON_STYLE)
+        self.btn_scanner_start.clicked.connect(self.start_scanner_listener)
+        btn_layout.addWidget(self.btn_scanner_start)
+        
+        btn_back = QPushButton("모드 선택으로 돌아가기")
+        btn_back.setStyleSheet(COMMON_STYLE)
+        btn_back.clicked.connect(self.back_to_mode_select)
+        btn_layout.addWidget(btn_back)
+        
+        btn_layout.addStretch()
+        ctrl_layout.addLayout(btn_layout)
+        layout.addWidget(ctrl_card)
+        
+        self.scanner_log_area = QTextEdit()
+        self.scanner_log_area.setReadOnly(True)
+        self.scanner_log_area.setStyleSheet(COMMON_STYLE)
+        layout.addWidget(self.scanner_log_area)
+        
+        self.stacked_widget.addWidget(self.scanner_view)
+
+    def start_scanner_listener(self):
+        self.scanner_log_area.clear()
+        self.scanner_instance.start_listener()
+        
+    def back_to_mode_select(self):
+        self.scanner_instance.stop_listener()
+        self.stacked_widget.setCurrentWidget(self.mode_select_view)
+
+    def back_to_mode_select_from_dash(self):
+        self.macro_instance.is_waiting = False
+        self.stacked_widget.setCurrentWidget(self.mode_select_view)
+
+    def on_scanner_done_signal(self, result):
+        if not result:
+            QMessageBox.warning(self, "추출 실패", "화면 캡처 및 인식에 실패했습니다. 다시 시도해주세요.")
+            return
+            
+        self.scanner_detail_view.load_scanner_data(result)
+        self.stacked_widget.setCurrentWidget(self.scanner_detail_view)
 
     def init_dashboard_view(self):
         self.dash_view = QWidget()
@@ -240,6 +361,11 @@ class ExtractApp(QMainWindow):
         btn_layout.addWidget(self.btn_folder)
         
         btn_layout.addStretch()
+        
+        self.btn_back_macro = QPushButton("홈으로 돌아가기")
+        self.btn_back_macro.setStyleSheet(COMMON_STYLE)
+        self.btn_back_macro.clicked.connect(self.back_to_mode_select_from_dash)
+        btn_layout.addWidget(self.btn_back_macro)
         
         self.btn_macro = QPushButton("매크로 대기 (F8)")
         self.btn_macro.setStyleSheet(COMMON_STYLE)
@@ -288,7 +414,10 @@ class ExtractApp(QMainWindow):
         self.run_sync()
 
     def append_log(self, msg):
-        self.log_area.append(msg)
+        if hasattr(self, 'log_area'):
+            self.log_area.append(msg)
+        if hasattr(self, 'scanner_log_area'):
+            self.scanner_log_area.append(msg)
 
     def run_sync(self):
         if not self.selected_path:
@@ -430,6 +559,11 @@ class OverviewWindow(QMainWindow):
         
         btn_layout.addStretch()
         
+        btn_upload = QPushButton("☁️ 서버에 일괄 업로드")
+        btn_upload.setStyleSheet(COMMON_STYLE)
+        btn_upload.clicked.connect(self.upload_all)
+        btn_layout.addWidget(btn_upload)
+        
         btn_sync = QPushButton("📦 데이터 압축 저장")
         btn_sync.setStyleSheet(COMMON_STYLE)
         btn_sync.clicked.connect(self.save_local_zip)
@@ -462,15 +596,65 @@ class OverviewWindow(QMainWindow):
                 if item: item.setTextAlignment(Qt.AlignCenter)
 
     def upload_all(self):
-        QMessageBox.information(self, "알림", "테스트 릴리스 버전에서는 서버 동기화가 비활성화되어 있습니다. JSON 데이터는 로컬에 추출되었습니다.")
+        if not self.jwt_token:
+            QMessageBox.warning(self, "권한 오류", "로그인이 필요합니다.")
+            return
+            
+        ready_items = [res for res in self.batch_results if res["status"] == "pending" and not res.get("needs_review")]
+        if not ready_items:
+            QMessageBox.information(self, "알림", "업로드할 준비된 항목이 없습니다.\n(검수 필요 상태인 항목은 수정 후 업로드 가능합니다)")
+            return
+            
+        reply = QMessageBox.question(self, "업로드 확인", f"총 {len(ready_items)}명의 데이터를 서버로 전송하시겠습니까?", QMessageBox.Yes | QMessageBox.No)
+        if reply != QMessageBox.Yes:
+            return
+            
+        success_count = 0
+        fail_count = 0
+        
+        headers = {"Authorization": f"Bearer {self.jwt_token}"}
+        
+        for res in ready_items:
+            try:
+                data = res["data"]
+                payload = {
+                    "studentName": data.get("studentName"),
+                    "currentLevel": data.get("currentLevel"),
+                    "currentStar": data.get("currentStar"),
+                    "skills": data.get("skills", {}),
+                    "equipment": data.get("equipment", {}),
+                    "weapon": data.get("weapon", {}),
+                    "stats": data.get("stats", {})
+                }
+                
+                resp = requests.post(
+                    "https://api.planaai.kro.kr/api/import/screenshot",
+                    headers=headers,
+                    json=payload,
+                    timeout=5
+                )
+                
+                if resp.status_code == 200:
+                    res["status"] = "uploaded"
+                    success_count += 1
+                else:
+                    fail_count += 1
+                    print(f"업로드 실패 ({data.get('studentName')}): {resp.text}")
+                    
+            except Exception as e:
+                fail_count += 1
+                print(f"통신 오류 ({res['data'].get('studentName')}): {e}")
+                
+        self.refresh_tree()
+        QMessageBox.information(self, "업로드 완료", f"업로드 완료!\n성공: {success_count}건\n실패: {fail_count}건")
 
     def open_detail(self):
         row = self.table.currentRow()
         if row < 0:
             QMessageBox.warning(self, "선택 오류", "상세 검수할 항목을 선택하세요.")
             return
-        self.detail_window = DetailWindow(self.batch_results, row, self)
-        self.detail_window.show()
+        self.detail_view.load_data(self.batch_results, row)
+        self.stacked_widget.setCurrentWidget(self.detail_view)
 
     def save_local_zip(self):
         ready_count = sum(1 for res in self.batch_results if res["status"] not in ["uploaded", "skipped"])
@@ -535,19 +719,14 @@ class OverviewWindow(QMainWindow):
         self.parent_app.show()
         event.accept()
 
-class DetailWindow(QMainWindow):
-    def __init__(self, batch_results, start_idx, parent_overview):
+class DetailWindow(GlassWidget):
+    def __init__(self, parent_overview):
         super().__init__()
-        self.batch_results = batch_results
-        self.current_idx = start_idx
+        self.batch_results = []
+        self.current_idx = 0
         self.parent_overview = parent_overview
         
-        self.setWindowTitle("상세 검수 창")
-        self.resize(1500, 900)
-        
-        self.central_widget = GlassWidget()
-        self.setCentralWidget(self.central_widget)
-        main_layout = QHBoxLayout(self.central_widget)
+        main_layout = QHBoxLayout(self)
         main_layout.setContentsMargins(20, 20, 20, 20)
         main_layout.setSpacing(20)
         
@@ -654,7 +833,11 @@ class DetailWindow(QMainWindow):
         right_layout.addLayout(action_layout)
         main_layout.addWidget(right_panel, stretch=1)
         
-        self.load_current_index()
+    def load_data(self, batch_results, start_idx):
+        self.batch_results = batch_results
+        self.current_idx = start_idx
+        if self.batch_results:
+            self.load_current_index()
         
     def set_val(self, key, val):
         if val is not None:
@@ -778,7 +961,95 @@ class DetailWindow(QMainWindow):
     def on_save_close(self):
         self.save_current_index()
         self.parent_overview.refresh_tree()
-        self.close()
+        self.parent_overview.stacked_widget.setCurrentWidget(self.parent_overview.dashboard_view)
+
+class ScannerDetailWindow(DetailWindow):
+    def __init__(self, parent_app):
+        super().__init__(parent_app)
+        self.parent_app = parent_app
+        self.jwt_token = parent_app.jwt_token
+        self.single_result = None
+        
+        # Replace action buttons
+        self.replace_action_buttons()
+        
+    def load_scanner_data(self, result):
+        self.single_result = result
+        self.jwt_token = self.parent_app.jwt_token
+        # use DetailWindow's load_data with fake batch
+        self.load_data([result], 0)
+        
+    def replace_action_buttons(self):
+        # Find the action layout which is the last layout in right_layout
+        right_panel = self.layout().itemAt(1).widget()
+        right_layout = right_panel.layout()
+        action_layout = right_layout.itemAt(right_layout.count() - 1).layout()
+        
+        # Clear old buttons
+        while action_layout.count():
+            item = action_layout.takeAt(0)
+            widget = item.widget()
+            if widget:
+                widget.deleteLater()
+                
+        # Add new buttons
+        btn_upload = QPushButton("☁️ 바로 업로드")
+        btn_upload.setStyleSheet(f"background-color: {COLOR_GREEN}; color: white; border-radius: 10px; padding: 10px; font-size: 15px;")
+        btn_upload.clicked.connect(self.on_upload)
+        action_layout.addWidget(btn_upload)
+        
+        btn_cancel = QPushButton("❌ 취소 후 대기 상태로")
+        btn_cancel.setStyleSheet(f"background-color: {COLOR_RED}; color: white; border-radius: 10px; padding: 10px; font-size: 15px;")
+        btn_cancel.clicked.connect(self.on_cancel)
+        action_layout.addWidget(btn_cancel)
+        
+        # Also hide the nav buttons (prev/next)
+        nav_btn_layout = right_layout.itemAt(1).layout()
+        for i in range(nav_btn_layout.count()):
+            w = nav_btn_layout.itemAt(i).widget()
+            if w: w.hide()
+            
+    def on_upload(self):
+        self.save_current_index()
+        if not self.jwt_token:
+            QMessageBox.warning(self, "권한 오류", "로그인이 필요합니다.")
+            return
+            
+        res = self.single_result
+        data = res["data"]
+        
+        headers = {"Authorization": f"Bearer {self.jwt_token}"}
+        payload = {
+            "studentName": data.get("studentName"),
+            "currentLevel": data.get("currentLevel"),
+            "currentStar": data.get("currentStar"),
+            "skills": data.get("skills", {}),
+            "equipment": data.get("equipment", {}),
+            "weapon": data.get("weapon", {}),
+            "stats": data.get("stats", {})
+        }
+        
+        try:
+            resp = requests.post(
+                "https://api.planaai.kro.kr/api/import/screenshot",
+                headers=headers,
+                json=payload,
+                timeout=5
+            )
+            if resp.status_code == 200:
+                QMessageBox.information(self, "업로드 완료", "성공적으로 업로드되었습니다.")
+                self.close_and_wait()
+            else:
+                QMessageBox.warning(self, "업로드 실패", resp.text)
+        except Exception as e:
+            QMessageBox.critical(self, "오류", f"서버 통신 오류: {e}")
+            
+    def on_cancel(self):
+        self.close_and_wait()
+        
+    def close_and_wait(self):
+        self.parent_app.stacked_widget.setCurrentWidget(self.parent_app.scanner_view)
+        self.parent_app.start_scanner_listener()
 
 if __name__ == "__main__":
     import ctypes
