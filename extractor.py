@@ -241,10 +241,10 @@ ROI_CONFIG = {
     "equip_2": (1140, 820, 130, 130),
     "equip_3": (1280, 820, 130, 130),
     "equip_4": (1420, 820, 130, 130),
-    "stat_hp": (1050, 350, 300, 40),
-    "stat_attack": (1350, 350, 300, 40),
-    "stat_defense": (1050, 400, 300, 40),
-    "stat_heal": (1350, 400, 300, 40)
+    "stat_hp": (1120, 350, 230, 40),
+    "stat_attack": (1410, 350, 240, 40),
+    "stat_defense": (1095, 400, 255, 40),
+    "stat_heal": (1410, 400, 240, 40)
 }
 
 import sys
@@ -368,6 +368,12 @@ def extract_equip_text(img, bbox):
     if np.mean(gray) < 150:
         return "EMPTY"
         
+    # An empty slot (e.g., unreleased bond gear or unequipped slot) consists only of 
+    # bright background colors and faint outlines, resulting in very low contrast.
+    # Real items have sharp outlines, shadows, and dark tier badges, giving higher variance.
+    if np.std(gray) < 20:
+        return "EMPTY"
+        
     try:
         scaled = cv2.resize(crop, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
         gray = cv2.cvtColor(scaled, cv2.COLOR_BGR2GRAY)
@@ -457,11 +463,6 @@ def parse_stat_with_ability(text):
         text = text[:match.start()]
     stat_val = parse_number(text)
     if stat_val: 
-        # Fix for OCR mistakenly reading the left text '력' as '7' or '1'
-        if stat_val > 100000 and str(stat_val).startswith('7'):
-            stat_val = int(str(stat_val)[1:])
-        elif stat_val > 100000 and str(stat_val).startswith('1'):
-            stat_val = int(str(stat_val)[1:])
         stat = stat_val
     return stat, ability
 
@@ -500,10 +501,13 @@ def clamp_stat(val, max_val):
     if val is None: return None
     val_str = str(val)
     while len(val_str) > 0 and int(val_str) > max_val:
-        val_str = val_str[:-1]
+        if len(val_str) > 1 and val_str[0] in ('1', '7'):
+            val_str = val_str[1:]
+        else:
+            val_str = val_str[:-1]
     return int(val_str) if val_str else 0
 
-def parse_equip(text):
+def parse_equip(text, is_bond_gear=False):
     if not text or "EMPTY" in text.upper() or "MPTY" in text.upper() or "PTY" in text.upper():
         return {"tier": 0, "level": 0}
         
@@ -524,12 +528,19 @@ def parse_equip(text):
     if tier == 0 and level == 0:
         return {"tier": 0, "level": 0}
         
-    # If a low tier item has no T badge (e.g. T1 Lv.15), it only says Lv.15
-    if tier == 0 and level > 0:
-        tier = 1
-        
-    if level > 90:
-        level = int(str(level)[:2])
+    if not is_bond_gear:
+        # If a low tier item has no T badge (e.g. T1 Lv.15), it only says Lv.15
+        if tier == 0 and level > 0:
+            tier = 1
+            
+        if level > 90:
+            level = int(str(level)[:2])
+    else:
+        # Bond Gears only have Tier, no Level.
+        # If there's no T badge but a level, it's likely reading locked requirement text
+        if tier == 0 and level > 0:
+            return {"tier": 0, "level": 0}
+        level = 0
 
     return {"tier": tier, "level": level}
 
@@ -578,18 +589,11 @@ def extract_screenshot_data(img_path):
     t3_text = extract_equip_text(img, ROI_CONFIG["equip_3"])
     t4_text = extract_equip_text(img, ROI_CONFIG["equip_4"])
     
-    # 3-1. Bond Gear (Slot 4) Extraction using Color
-    # The 4th slot is slightly pinkish if the student has a favorite item.
-    ex, ey, ew, eh = ROI_CONFIG["equip_4"]
-    slot4_crop = img[ey:ey+eh, ex:ex+ew]
-    cb, cg, cr = cv2.split(slot4_crop)
-    has_favorite_item = np.mean(cr) > np.mean(cb) and np.mean(cr) > np.mean(cg)
-    
     data["equipment"] = {
         "slot1": parse_equip(t1_text),
         "slot2": parse_equip(t2_text),
         "slot3": parse_equip(t3_text),
-        "slot4": parse_equip(t4_text) if has_favorite_item else {"tier": 0, "level": 0}
+        "slot4": parse_equip(t4_text, is_bond_gear=True)
     }
     
     # 2. Detailed Stats OCR

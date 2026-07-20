@@ -1,6 +1,17 @@
 import sys
 import os
 
+if hasattr(sys, '_MEIPASS'):
+    os.environ['PATH'] = sys._MEIPASS + os.pathsep + os.environ.get('PATH', '')
+    try:
+        os.add_dll_directory(sys._MEIPASS)
+        ort_capi = os.path.join(sys._MEIPASS, 'onnxruntime', 'capi')
+        if os.path.exists(ort_capi):
+            os.environ['PATH'] = ort_capi + os.pathsep + os.environ.get('PATH', '')
+            os.add_dll_directory(ort_capi)
+    except AttributeError:
+        pass
+
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 import threading
@@ -8,10 +19,11 @@ import extractor
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                              QLabel, QLineEdit, QPushButton, QStackedWidget, QFileDialog, 
                              QTextEdit, QTableWidget, QTableWidgetItem, QHeaderView, QScrollArea,
-                             QFormLayout, QMessageBox, QDialog, QAbstractItemView)
+                             QFormLayout, QMessageBox, QDialog, QAbstractItemView, QProgressBar)
 from PyQt5.QtGui import QFontDatabase, QFont, QPixmap, QPainter, QColor, QIcon, QResizeEvent
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QTimer
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QTimer, QThread
 import json
+import math
 import macro
 import scanner
 import requests
@@ -93,6 +105,121 @@ class GlassWidget(QWidget):
             painter.drawPixmap(x, y, pixmap)
         else:
             painter.fillRect(self.rect(), QColor("#fdf2f8"))
+
+class WaitSpinner(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setFixedSize(40, 40)
+        self.angle = 0
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.rotate)
+        
+    def start(self):
+        self.show()
+        self.timer.start(50)
+        
+    def stop(self):
+        self.hide()
+        self.timer.stop()
+        
+    def rotate(self):
+        self.angle = (self.angle + 30) % 360
+        self.update()
+        
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.translate(self.width() / 2, self.height() / 2)
+        painter.rotate(self.angle)
+        
+        num_dots = 12
+        for i in range(num_dots):
+            painter.setPen(Qt.NoPen)
+            alpha = int(255 - (255 / num_dots) * i)
+            painter.setBrush(QColor(100, 150, 255, alpha))
+            painter.drawEllipse(8, -3, 6, 6)
+            painter.rotate(-360 / num_dots)
+
+class UploadWorker(QThread):
+    progress = pyqtSignal(int, str)
+    finished_upload = pyqtSignal(int, int) # success_count, fail_count
+    
+    def __init__(self, ready_items, jwt_token):
+        super().__init__()
+        self.ready_items = ready_items
+        self.jwt_token = jwt_token
+        
+    def run(self):
+        success_count = 0
+        fail_count = 0
+        headers = {"Authorization": f"Bearer {self.jwt_token}"}
+        
+        for i, res in enumerate(self.ready_items):
+            data = res["data"]
+            name = data.get("studentName", "Unknown")
+            self.progress.emit(i, f"[{i+1}/{len(self.ready_items)}] {name} 데이터 전송 중...")
+            
+            try:
+                payload = {
+                    "studentName": data.get("studentName"),
+                    "currentLevel": data.get("currentLevel"),
+                    "currentStar": data.get("currentStar"),
+                    "skills": data.get("skills", {}),
+                    "equipment": data.get("equipment", {}),
+                    "weapon": data.get("weapon", {}),
+                    "stats": data.get("stats", {})
+                }
+                
+                resp = requests.post(
+                    "https://api.planaai.kro.kr/api/import/screenshot",
+                    headers=headers,
+                    json=payload,
+                    timeout=5
+                )
+                
+                if resp.status_code == 200:
+                    res["status"] = "uploaded"
+                    success_count += 1
+                else:
+                    fail_count += 1
+                    print(f"업로드 실패 ({name}): {resp.text}")
+                    
+            except Exception as e:
+                fail_count += 1
+                print(f"통신 오류 ({name}): {e}")
+                
+        self.progress.emit(len(self.ready_items), "업로드 완료 처리 중...")
+        self.finished_upload.emit(success_count, fail_count)
+
+class UploadProgressDialog(QDialog):
+    def __init__(self, total_items, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("데이터 업로드")
+        self.setFixedSize(350, 150)
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowCloseButtonHint)
+        
+        layout = QVBoxLayout(self)
+        
+        self.spinner = WaitSpinner(self)
+        spinner_layout = QHBoxLayout()
+        spinner_layout.addStretch()
+        spinner_layout.addWidget(self.spinner)
+        spinner_layout.addStretch()
+        layout.addLayout(spinner_layout)
+        
+        self.progress_bar = QProgressBar(self)
+        self.progress_bar.setRange(0, total_items)
+        self.progress_bar.setValue(0)
+        self.progress_bar.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.progress_bar)
+        
+        self.status_label = QLabel("서버 연결 중...", self)
+        self.status_label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.status_label)
+        
+    def update_progress(self, value, text):
+        self.progress_bar.setValue(value)
+        self.status_label.setText(text)
 
 class Signals(QObject):
     log_msg = pyqtSignal(str)
@@ -609,42 +736,19 @@ class OverviewWindow(QMainWindow):
         if reply != QMessageBox.Yes:
             return
             
-        success_count = 0
-        fail_count = 0
+        self.progress_dialog = UploadProgressDialog(len(ready_items), self)
+        self.progress_dialog.spinner.start()
         
-        headers = {"Authorization": f"Bearer {self.jwt_token}"}
+        self.worker = UploadWorker(ready_items, self.jwt_token)
+        self.worker.progress.connect(self.progress_dialog.update_progress)
+        self.worker.finished_upload.connect(self.on_upload_finished)
         
-        for res in ready_items:
-            try:
-                data = res["data"]
-                payload = {
-                    "studentName": data.get("studentName"),
-                    "currentLevel": data.get("currentLevel"),
-                    "currentStar": data.get("currentStar"),
-                    "skills": data.get("skills", {}),
-                    "equipment": data.get("equipment", {}),
-                    "weapon": data.get("weapon", {}),
-                    "stats": data.get("stats", {})
-                }
-                
-                resp = requests.post(
-                    "https://api.planaai.kro.kr/api/import/screenshot",
-                    headers=headers,
-                    json=payload,
-                    timeout=5
-                )
-                
-                if resp.status_code == 200:
-                    res["status"] = "uploaded"
-                    success_count += 1
-                else:
-                    fail_count += 1
-                    print(f"업로드 실패 ({data.get('studentName')}): {resp.text}")
-                    
-            except Exception as e:
-                fail_count += 1
-                print(f"통신 오류 ({res['data'].get('studentName')}): {e}")
-                
+        self.worker.start()
+        self.progress_dialog.exec_()
+        
+    def on_upload_finished(self, success_count, fail_count):
+        self.progress_dialog.spinner.stop()
+        self.progress_dialog.accept()
         self.refresh_tree()
         QMessageBox.information(self, "업로드 완료", f"업로드 완료!\n성공: {success_count}건\n실패: {fail_count}건")
 
@@ -653,8 +757,11 @@ class OverviewWindow(QMainWindow):
         if row < 0:
             QMessageBox.warning(self, "선택 오류", "상세 검수할 항목을 선택하세요.")
             return
-        self.detail_view.load_data(self.batch_results, row)
-        self.stacked_widget.setCurrentWidget(self.detail_view)
+        self.parent_app.detail_view.set_overview(self)
+        self.parent_app.detail_view.load_data(self.batch_results, row)
+        self.parent_app.stacked_widget.setCurrentWidget(self.parent_app.detail_view)
+        self.hide()
+        self.parent_app.show()
 
     def save_local_zip(self):
         ready_count = sum(1 for res in self.batch_results if res["status"] not in ["uploaded", "skipped"])
@@ -720,11 +827,12 @@ class OverviewWindow(QMainWindow):
         event.accept()
 
 class DetailWindow(GlassWidget):
-    def __init__(self, parent_overview):
+    def __init__(self, parent_app):
         super().__init__()
         self.batch_results = []
         self.current_idx = 0
-        self.parent_overview = parent_overview
+        self.parent_app = parent_app
+        self.current_overview = None
         
         main_layout = QHBoxLayout(self)
         main_layout.setContentsMargins(20, 20, 20, 20)
@@ -958,10 +1066,15 @@ class DetailWindow(GlassWidget):
         res["needs_review"] = False
         self.on_next()
         
+    def set_overview(self, overview_win):
+        self.current_overview = overview_win
+
     def on_save_close(self):
         self.save_current_index()
-        self.parent_overview.refresh_tree()
-        self.parent_overview.stacked_widget.setCurrentWidget(self.parent_overview.dashboard_view)
+        if self.current_overview:
+            self.current_overview.refresh_tree()
+            self.parent_app.hide()
+            self.current_overview.show()
 
 class ScannerDetailWindow(DetailWindow):
     def __init__(self, parent_app):
@@ -1021,6 +1134,7 @@ class ScannerDetailWindow(DetailWindow):
         headers = {"Authorization": f"Bearer {self.jwt_token}"}
         payload = {
             "studentName": data.get("studentName"),
+            "bondRank": data.get("bondRank"),
             "currentLevel": data.get("currentLevel"),
             "currentStar": data.get("currentStar"),
             "skills": data.get("skills", {}),
