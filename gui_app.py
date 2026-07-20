@@ -91,6 +91,73 @@ QMessageBox QPushButton:hover {{
 }}
 """
 
+_OriginalQMessageBox = QMessageBox
+
+class CustomMessageBox:
+    Yes = getattr(_OriginalQMessageBox, 'Yes', 16384)
+    No = getattr(_OriginalQMessageBox, 'No', 65536)
+    
+    @staticmethod
+    def _show(parent, title, text, icon_type):
+        dialog = QDialog(parent)
+        dialog.setWindowTitle(title)
+        dialog.setMinimumWidth(350)
+        
+        # We use a QDialog with a custom stylesheet to guarantee it looks right
+        dialog.setStyleSheet(f"QDialog {{ background-color: {GLASS_BG}; border: 2px solid {COLOR_PINK}; border-radius: 10px; }} QLabel {{ color: #333333; font-size: 15px; font-weight: bold; padding: 10px; }} QPushButton {{ background-color: {COLOR_PINK}; color: white; border: none; border-radius: 5px; padding: 8px 20px; font-size: 14px; font-weight: bold; }} QPushButton:hover {{ background-color: {COLOR_PINK_HOVER}; }}")
+        
+        layout = QVBoxLayout(dialog)
+        layout.setContentsMargins(20, 20, 20, 20)
+        
+        lbl_text = QLabel(text)
+        lbl_text.setAlignment(Qt.AlignCenter)
+        lbl_text.setWordWrap(True)
+        layout.addWidget(lbl_text)
+        
+        btn_layout = QHBoxLayout()
+        btn_layout.setAlignment(Qt.AlignCenter)
+        btn_layout.setSpacing(15)
+        
+        if icon_type == "question":
+            btn_yes = QPushButton("예 (Yes)")
+            btn_no = QPushButton("아니오 (No)")
+            btn_yes.setCursor(Qt.PointingHandCursor)
+            btn_no.setCursor(Qt.PointingHandCursor)
+            btn_yes.clicked.connect(lambda: dialog.done(CustomMessageBox.Yes))
+            btn_no.clicked.connect(lambda: dialog.done(CustomMessageBox.No))
+            btn_layout.addWidget(btn_yes)
+            btn_layout.addWidget(btn_no)
+        else:
+            btn_ok = QPushButton("확인 (OK)")
+            btn_ok.setCursor(Qt.PointingHandCursor)
+            btn_ok.clicked.connect(lambda: dialog.done(CustomMessageBox.Yes))
+            btn_layout.addWidget(btn_ok)
+            
+        layout.addLayout(btn_layout)
+        
+        # Remove context help button from title bar
+        dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        
+        return dialog.exec_()
+
+    @staticmethod
+    def information(parent, title, text, *args, **kwargs):
+        return CustomMessageBox._show(parent, title, text, "info")
+
+    @staticmethod
+    def warning(parent, title, text, *args, **kwargs):
+        return CustomMessageBox._show(parent, title, text, "warning")
+
+    @staticmethod
+    def critical(parent, title, text, *args, **kwargs):
+        return CustomMessageBox._show(parent, title, text, "critical")
+
+    @staticmethod
+    def question(parent, title, text, *args, **kwargs):
+        return CustomMessageBox._show(parent, title, text, "question")
+
+QMessageBox = CustomMessageBox
+
 class GlassWidget(QWidget):
     """A widget that draws the Steam screenshot as background."""
     def paintEvent(self, event):
@@ -1176,7 +1243,31 @@ if __name__ == "__main__":
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
     app = QApplication(sys.argv)
+    
+    from PyQt5.QtGui import QPalette, QColor
+    palette = QPalette()
+    palette.setColor(QPalette.Window, QColor("#fdf2f8"))
+    palette.setColor(QPalette.WindowText, Qt.black)
+    palette.setColor(QPalette.Base, QColor(255, 255, 255))
+    palette.setColor(QPalette.AlternateBase, QColor("#fdf2f8"))
+    palette.setColor(QPalette.ToolTipBase, Qt.white)
+    palette.setColor(QPalette.ToolTipText, Qt.black)
+    palette.setColor(QPalette.Text, Qt.black)
+    palette.setColor(QPalette.Button, QColor("#fdf2f8"))
+    palette.setColor(QPalette.ButtonText, Qt.black)
+    palette.setColor(QPalette.BrightText, Qt.red)
+    palette.setColor(QPalette.Link, QColor(42, 130, 218))
+    palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
+    palette.setColor(QPalette.HighlightedText, Qt.black)
+    app.setPalette(palette)
+    
     app.setWindowIcon(QIcon(get_asset_path(r"assets\app_icon.ico")))
+    app.setStyleSheet("""
+        QMessageBox { background-color: #fdf2f8; }
+        QMessageBox QLabel { color: black; font-size: 13px; }
+        QMessageBox QPushButton { background-color: #f9a8d4; color: white; border: none; border-radius: 5px; padding: 5px 15px; font-size: 13px; }
+        QMessageBox QPushButton:hover { background-color: #f472b6; }
+    """)
     window = ExtractApp()
     window.show()
     sys.exit(app.exec_())
