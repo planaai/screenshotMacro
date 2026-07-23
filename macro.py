@@ -62,7 +62,11 @@ class CaptureMacro:
             while self.is_waiting:
                 if keyboard.is_pressed('F8'):
                     self.is_waiting = False
-                    self.run_macro()
+                    try:
+                        self.run_macro()
+                    except Exception as e:
+                        self.log(f"❌ 매크로 실행 중 오류 발생: {e}")
+                        self.is_running = False
                     break
                 if keyboard.is_pressed('F9'):
                     self.is_waiting = False

@@ -254,11 +254,18 @@ def get_resource_path(relative_path):
         return os.path.join(sys._MEIPASS, relative_path)
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), relative_path)
 
-reader_ko = RapidOCR(
-    rec_model_path=get_resource_path("models/korean_PP-OCRv3_rec_infer.onnx"),
-    rec_keys_path=get_resource_path("models/korean_dict.txt")
-)
-reader_en = RapidOCR()
+_ocr_init_ok = True
+try:
+    reader_ko = RapidOCR(
+        rec_model_path=get_resource_path("models/korean_PP-OCRv3_rec_infer.onnx"),
+        rec_keys_path=get_resource_path("models/korean_dict.txt")
+    )
+    reader_en = RapidOCR()
+except Exception as e:
+    log_debug(f"[CRITICAL] RapidOCR initialization failed: {e}")
+    _ocr_init_ok = False
+    reader_ko = None
+    reader_en = None
 
 def count_stars(img_crop, is_weapon=False):
     hsv = cv2.cvtColor(img_crop, cv2.COLOR_BGR2HSV)
@@ -571,7 +578,13 @@ def extract_screenshot_data(img_path):
     num_allowlist = '0123456789LvlIOoSszZ'
     
     data["bondRank"] = parse_number(extract_bond_text(img, ROI_CONFIG["bondRank"]))
+    if data["bondRank"] is None:
+        data["bondRank"] = 0
+        
     data["currentLevel"] = parse_number(extract_text(img, ROI_CONFIG["currentLevel"], allowlist=num_allowlist, scale=2))
+    if data["currentLevel"] is None:
+        data["currentLevel"] = 0
+        log_debug("[Warning] currentLevel OCR failed, defaulting to 0")
     
     data["skills"] = {
         "ex": parse_skill(extract_text(img, ROI_CONFIG["skill_ex"]), is_ex=True),
@@ -583,6 +596,8 @@ def extract_screenshot_data(img_path):
     data["weapon"] = {
         "level": parse_number(extract_text(img, ROI_CONFIG["weapon_level"], allowlist=num_allowlist, scale=2)),
     }
+    if data["weapon"]["level"] is None:
+        data["weapon"]["level"] = 0
     
     t1_text = extract_equip_text(img, ROI_CONFIG["equip_1"])
     t2_text = extract_equip_text(img, ROI_CONFIG["equip_2"])
@@ -646,13 +661,14 @@ def validate_extracted_data(data):
             log_debug(f"[Validation] 2성 강제 스킬 레벨 조정 (sub=1)")
             
     # 0-2. Fix Level > 90 trailing 1
-    if data.get("currentLevel", 0) > 90:
+    current_level = data.get("currentLevel") or 0
+    if current_level > 90:
         lvl_str = str(data["currentLevel"])
         if lvl_str.endswith("1"):
             log_debug(f"[Validation] currentLevel {lvl_str} -> {lvl_str[:-1]} 보정 (name={data.get('studentName')})")
             data["currentLevel"] = int(lvl_str[:-1])
             
-        if data["currentLevel"] > 90:
+        if (data.get("currentLevel") or 0) > 90:
             log_debug(f"[Validation] currentLevel {data['currentLevel']} -> 90 클램핑 (name={data.get('studentName')})")
             data["currentLevel"] = 90
     
