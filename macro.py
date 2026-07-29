@@ -35,8 +35,8 @@ class CaptureMacro:
         return img
         
     def get_name_roi(self, img):
-        # Resize to 1920x1080 to match extractor's ROI precisely
-        img_resized = cv2.resize(img, (1920, 1080))
+        # Resize to 1920x1080 to match extractor's ROI precisely (with wide monitor stitching support)
+        img_resized = extractor.preprocess_image(img)
         # ROI for student name (matches extractor ROI)
         x, y, w, h = (120, 840, 300, 40)
         roi = img_resized[y:y+h, x:x+w]
@@ -106,10 +106,10 @@ class CaptureMacro:
         
         screen_w, screen_h = pyautogui.size()
         # The '>' arrow button in Blue Archive student info screen is at the right edge.
-        # Based on actual screenshot analysis (2560x1440 capture):
-        #   Arrow center at approximately x=97.7% of width, y=47.2% of height
-        next_x = int(screen_w * 0.977)
-        next_y = int(screen_h * 0.472)
+        # It is pinned to the right edge of the screen, not the right panel.
+        # Adjusted to 95.0% to move the click slightly further left.
+        next_x = int(screen_w * 0.95)
+        next_y = int(screen_h * 0.5)
         
         count = 0
         try:

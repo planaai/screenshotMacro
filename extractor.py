@@ -18,6 +18,9 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Load student names
 STUDENT_NAMES = []
+script_dir = os.path.dirname(os.path.abspath(__file__))
+json_path = os.path.join(script_dir, 'students.json')
+
 try:
     response = requests.get("https://api.planaai.kro.kr/api/students", timeout=5)
     if response.status_code == 200:
@@ -36,14 +39,29 @@ try:
         
         if not STUDENT_NAMES:
             raise Exception("Server returned empty list or unparseable format")
+            
+        # Compare and update local json
+        local_names = []
+        if os.path.exists(json_path):
+            try:
+                with open(json_path, 'r', encoding='utf-8') as f:
+                    local_names = json.load(f)
+            except:
+                pass
+                
+        if local_names != STUDENT_NAMES:
+            try:
+                with open(json_path, 'w', encoding='utf-8') as f:
+                    json.dump(STUDENT_NAMES, f, ensure_ascii=False, indent=2)
+            except Exception as e:
+                print("Could not save updated students.json:", e)
+
     else:
         raise Exception(f"Server returned {response.status_code}")
 except Exception as e:
     print("Could not load students from server, falling back to local:", e)
     try:
-        # Fallback to local students.json based on current directory or script directory
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        json_path = os.path.join(script_dir, 'students.json')
+        # Fallback to local students.json
         with open(json_path, 'r', encoding='utf-8') as f:
             STUDENT_NAMES = json.load(f)
     except Exception as e2:
@@ -153,7 +171,7 @@ def match_student_name(extracted_name):
     log_debug(f"Raw OCR Output: '{extracted_name}'")
     
     # Remove all non-alphanumeric/Korean characters
-    clean_ex = re.sub(r'[^가-힣a-zA-Z0-9]', '', extracted_name)
+    clean_ex = re.sub(r'[^가-힣a-zA-Z0-9�]', '', extracted_name)
     if not clean_ex: 
         log_debug("Cleaned name is empty.")
         return ""
@@ -164,6 +182,8 @@ def match_student_name(extracted_name):
         "순": "슌",
         "숨": "슌",
         "슘": "슌",
+        "춘": "슌",
+        "": "슌",
         "스프미": "스즈미",
         "치하로": "치히로",
         "소구호미사키": "쇼쿠호미사키",
@@ -178,7 +198,9 @@ def match_student_name(extracted_name):
     exact_fallbacks = {
         "레이": "케이",
         "켜이": "케이",
-        "웨이": "케이"
+        "웨이": "케이",
+        "소": "슌",
+        "춘": "슌"
     }
     if clean_ex in exact_fallbacks:
         clean_ex = exact_fallbacks[clean_ex]
@@ -227,9 +249,9 @@ def match_student_name(extracted_name):
 
 # Bounding Box: (x, y, w, h) based on 1920x1080 resolution
 ROI_CONFIG = {
-    "studentName": (85, 835, 350, 45),
+    "studentName": (85, 810, 350, 70),
     "bondRank": (50, 835, 60, 40),
-    "currentLevel": (20, 880, 120, 40),
+    "currentLevel": (20, 870, 120, 50),
     "stars_area": (390, 840, 150, 40),
     "skill_ex": (1000, 580, 120, 60),
     "skill_basic": (1180, 580, 120, 60),
@@ -273,7 +295,7 @@ def count_stars(img_crop, is_weapon=False):
         # Yellow for student stars
         lower_color = np.array([15, 100, 100])
         upper_color = np.array([40, 255, 255])
-        expected_w = 21.0
+        expected_w = 24.0
     else:
         # Cyan/Blue for weapon stars
         lower_color = np.array([80, 100, 100])
@@ -321,7 +343,7 @@ def extract_text(img, bbox, allowlist=None, scale=1, is_name=False, min_length=0
     if is_name:
         korean_parts = []
         for part in parts:
-            if re.search(r'[가-힣]', part):
+            if re.search(r'[가-힣�]', part):
                 korean_parts.append(part)
         text = "".join(korean_parts).replace(" ", "")
         text = re.sub(r'^[0-9\+\-\}\{\[\]\(\)\!\@\#\$\%\^\&\*\'\"]+', '', text)
@@ -551,6 +573,141 @@ def parse_equip(text, is_bond_gear=False):
 
     return {"tier": tier, "level": level}
 
+def get_calibrated_rois(img):
+    h, w = img.shape[:2]
+    # Ensure height is 1080 for ROI calculations
+    if h != 1080:
+        w = int(w * 1080 / h)
+        
+    if w <= 1930:
+        return ROI_CONFIG
+        
+    extra_w = w - 1920
+    
+    # 4 UI Blocks based on exact Flex-box layout ratios:
+    # 1. Left Panel (Name, Level, Stars, Bond)
+    dx_left = int(extra_w * 0.234)
+    # 2. Stats Left Column (HP, DEF)
+    dx_stats_left = int(extra_w * 0.370)
+    # 3. Stats Right Column (ATK, HEAL)
+    dx_stats_right = int(extra_w * 0.476)
+    # 4. Right Panel (Skills, Weapon, Equip)
+    dx_right_panel = int(extra_w * 0.640)
+    
+    # Vertical shift: Y-axis also slightly shifts up in wide aspect ratios
+    dy_stats = int(-25 * extra_w / 640)
+    dy_equip = int(80 * extra_w / 640)
+    dy_weapon = int(30 * extra_w / 640)
+    
+    calibrated = {}
+    for key, (x, y, bw, bh) in ROI_CONFIG.items():
+        if x < 960:
+            calibrated[key] = (x + dx_left, y + dy_stats, bw, bh)
+        elif key in ["stat_hp", "stat_defense"]:
+            calibrated[key] = (x + dx_stats_left, y + dy_stats, bw, bh)
+        elif key in ["stat_attack", "stat_heal"]:
+            calibrated[key] = (x + dx_stats_right, y + dy_stats, bw, bh)
+        elif key == "weapon_level":
+            calibrated[key] = (x + int(290 * extra_w / 640), y + dy_weapon, 120, bh)
+        elif key == "weapon_stars_area":
+            calibrated[key] = (x + int(460 * extra_w / 640), y + dy_weapon, 120, bh)
+        elif key == "equip_1":
+            calibrated[key] = (x + int(340 * extra_w / 640), y + dy_equip - 10, bw, 145)
+        elif key == "equip_2":
+            calibrated[key] = (x + int(356 * extra_w / 640), y + dy_equip - 10, bw, 145)
+        elif key == "equip_3":
+            calibrated[key] = (x + int(384 * extra_w / 640), y + dy_equip - 10, bw, 145)
+        elif key == "equip_4":
+            calibrated[key] = (x + int(420 * extra_w / 640), y + dy_equip - 10, bw, 145)
+        else:
+            calibrated[key] = (x + dx_right_panel, y, bw, bh)
+            
+    return calibrated
+
+_cached_align_offsets = None
+
+def preprocess_image(img):
+    """
+    와이드 모니터 또는 창 모드(해상도 변경 등)로 인해 UI 위치가 어긋난 경우,
+    OCR을 통해 기준점(Anchor)을 동적으로 찾아 완벽한 1920x1080 캔버스에 재조립합니다.
+    """
+    global _cached_align_offsets
+    h, w = img.shape[:2]
+    
+    if w == 1920 and h == 1080:
+        return img
+        
+    if _cached_align_offsets is not None:
+        dx_left, dx_right, dy = _cached_align_offsets
+    else:
+        dx_left, dx_right, dy = 0, 0, 0
+        
+        # 1. Find Left Anchor (STRIKER, SPECIAL, FRONT 등)
+        left_crop = img[700:1080, :w//2]
+        res, _ = reader_ko(left_crop)
+        if res:
+            for line in res:
+                bbox, text, conf = line
+                if 'STRIKER' in text or 'SPECIAL' in text:
+                    abs_x = bbox[0][0]
+                    abs_y = bbox[0][1] + 700
+                    dx_left = int(abs_x - 558)
+                    dy = int(abs_y - 840)
+                    break
+                elif 'FRONT' in text or 'MIDDLE' in text or 'BACK' in text:
+                    abs_x = bbox[0][0]
+                    abs_y = bbox[0][1] + 700
+                    dx_left = int(abs_x - 75)
+                    dy = int(abs_y - 1014)
+                    break
+                    
+        # 2. Find Right Anchor (치유력, 방어력 등 고정 스탯 텍스트)
+        right_crop = img[200:600, w//2:]
+        res, _ = reader_ko(right_crop)
+        if res:
+            for line in res:
+                bbox, text, conf = line
+                if '치유력' in text:
+                    abs_x = bbox[0][0] + w//2
+                    dx_right = int(abs_x - 1410)
+                    break
+                elif '방어력' in text:
+                    abs_x = bbox[0][0] + w//2
+                    dx_right = int(abs_x - 1095)
+                    break
+                    
+        # Fallback for known 2560x1080 21:9 shifted layout
+        if dx_left == 0 and dx_right == 0 and w > 1920:
+            dx_left, dx_right, dy = 150, 305, -21
+            
+        _cached_align_offsets = (dx_left, dx_right, dy)
+        print(f"[Auto-Align] Computed offsets: dx_left={dx_left}, dx_right={dx_right}, dy={dy}")
+        
+    canvas = np.zeros((1080, 1920, 3), dtype=np.uint8)
+    
+    y_c_start = max(0, -dy)
+    y_c_end = min(1080, h - dy)
+    y_i_start = y_c_start + dy
+    y_i_end = y_c_end + dy
+    
+    x_c_left_start = max(0, -dx_left)
+    x_c_left_end = min(960, w - dx_left)
+    x_i_left_start = x_c_left_start + dx_left
+    x_i_left_end = x_c_left_end + dx_left
+    
+    if y_c_end > y_c_start and x_c_left_end > x_c_left_start:
+        canvas[y_c_start:y_c_end, x_c_left_start:x_c_left_end] = img[y_i_start:y_i_end, x_i_left_start:x_i_left_end]
+        
+    x_c_right_start = max(960, -dx_right)
+    x_c_right_end = min(1920, w - dx_right)
+    x_i_right_start = x_c_right_start + dx_right
+    x_i_right_end = x_c_right_end + dx_right
+    
+    if y_c_end > y_c_start and x_c_right_end > x_c_right_start:
+        canvas[y_c_start:y_c_end, x_c_right_start:x_c_right_end] = img[y_i_start:y_i_end, x_i_right_start:x_i_right_end]
+        
+    return canvas
+
 def extract_screenshot_data(img_path):
     print(f"Processing image: {img_path}")
     img = cv2.imdecode(np.fromfile(img_path, dtype=np.uint8), cv2.IMREAD_COLOR)
@@ -559,50 +716,55 @@ def extract_screenshot_data(img_path):
         print("Failed to load image.")
         return None
         
-    # Resize to 1920x1080 for consistent ROI
-    img = cv2.resize(img, (1920, 1080))
+    h, w = img.shape[:2]
+    if h != 1080:
+        new_w = int(w * 1080 / h)
+        img = cv2.resize(img, (new_w, 1080), interpolation=cv2.INTER_CUBIC)
+        
+    rois = get_calibrated_rois(img)
     
     data = {}
     
     # 1. OCR Extraction
-    data["studentName"] = match_student_name(extract_text(img, ROI_CONFIG["studentName"], scale=3, is_name=True))
+    data["studentName"] = match_student_name(extract_text(img, rois["studentName"], scale=3, is_name=True))
     
     # Disambiguate '케이' vs '레이' using Attack Type color (Mystic=Blue vs Sonic=Purple)
     if data["studentName"] == "케이":
-        atk_type_crop = img[940:990, 300:400]
-        hsv_crop = cv2.cvtColor(atk_type_crop, cv2.COLOR_BGR2HSV)
-        purple_mask = cv2.inRange(hsv_crop, np.array([125, 50, 50]), np.array([165, 255, 255]))
-        if cv2.countNonZero(purple_mask) > 500:
-            data["studentName"] = "레이"
+        atk_type_crop = img[rois["studentName"][1]+60:rois["studentName"][1]+110, rois["studentName"][0]+215:rois["studentName"][0]+315]
+        if atk_type_crop.shape[0] > 0 and atk_type_crop.shape[1] > 0:
+            hsv_crop = cv2.cvtColor(atk_type_crop, cv2.COLOR_BGR2HSV)
+            purple_mask = cv2.inRange(hsv_crop, np.array([125, 50, 50]), np.array([165, 255, 255]))
+            if cv2.countNonZero(purple_mask) > 500:
+                data["studentName"] = "레이"
             
     num_allowlist = '0123456789LvlIOoSszZ'
     
-    data["bondRank"] = parse_number(extract_bond_text(img, ROI_CONFIG["bondRank"]))
+    data["bondRank"] = parse_number(extract_bond_text(img, rois["bondRank"]))
     if data["bondRank"] is None:
         data["bondRank"] = 0
         
-    data["currentLevel"] = parse_number(extract_text(img, ROI_CONFIG["currentLevel"], allowlist=num_allowlist, scale=2))
+    data["currentLevel"] = parse_number(extract_text(img, rois["currentLevel"], allowlist=num_allowlist, scale=2))
     if data["currentLevel"] is None:
         data["currentLevel"] = 0
         log_debug("[Warning] currentLevel OCR failed, defaulting to 0")
     
     data["skills"] = {
-        "ex": parse_skill(extract_text(img, ROI_CONFIG["skill_ex"]), is_ex=True),
-        "basic": parse_skill(extract_text(img, ROI_CONFIG["skill_basic"]), is_ex=False),
-        "enh": parse_skill(extract_text(img, ROI_CONFIG["skill_enh"]), is_ex=False),
-        "sub": parse_skill(extract_text(img, ROI_CONFIG["skill_sub"]), is_ex=False)
+        "ex": parse_skill(extract_text(img, rois["skill_ex"]), is_ex=True),
+        "basic": parse_skill(extract_text(img, rois["skill_basic"]), is_ex=False),
+        "enh": parse_skill(extract_text(img, rois["skill_enh"]), is_ex=False),
+        "sub": parse_skill(extract_text(img, rois["skill_sub"]), is_ex=False)
     }
     
     data["weapon"] = {
-        "level": parse_number(extract_text(img, ROI_CONFIG["weapon_level"], allowlist=num_allowlist, scale=2)),
+        "level": parse_number(extract_text(img, rois["weapon_level"], allowlist=num_allowlist, scale=2)),
     }
     if data["weapon"]["level"] is None:
         data["weapon"]["level"] = 0
     
-    t1_text = extract_equip_text(img, ROI_CONFIG["equip_1"])
-    t2_text = extract_equip_text(img, ROI_CONFIG["equip_2"])
-    t3_text = extract_equip_text(img, ROI_CONFIG["equip_3"])
-    t4_text = extract_equip_text(img, ROI_CONFIG["equip_4"])
+    t1_text = extract_equip_text(img, rois["equip_1"])
+    t2_text = extract_equip_text(img, rois["equip_2"])
+    t3_text = extract_equip_text(img, rois["equip_3"])
+    t4_text = extract_equip_text(img, rois["equip_4"])
     
     data["equipment"] = {
         "slot1": parse_equip(t1_text),
@@ -612,26 +774,26 @@ def extract_screenshot_data(img_path):
     }
     
     # 2. Detailed Stats OCR
-    hp_stat, hp_ability = parse_stat_with_ability(extract_text(img, ROI_CONFIG["stat_hp"], allowlist=num_allowlist, scale=2, min_length=3))
-    atk_stat, atk_ability = parse_stat_with_ability(extract_text(img, ROI_CONFIG["stat_attack"], allowlist=num_allowlist, scale=2, min_length=3))
-    heal_stat, heal_ability = parse_stat_with_ability(extract_text(img, ROI_CONFIG["stat_heal"], allowlist=num_allowlist, scale=2, min_length=3))
+    hp_stat, hp_ability = parse_stat_with_ability(extract_text(img, rois["stat_hp"], allowlist=num_allowlist, scale=2, min_length=3))
+    atk_stat, atk_ability = parse_stat_with_ability(extract_text(img, rois["stat_attack"], allowlist=num_allowlist, scale=2, min_length=3))
+    heal_stat, heal_ability = parse_stat_with_ability(extract_text(img, rois["stat_heal"], allowlist=num_allowlist, scale=2, min_length=3))
 
     data["stats"] = {
         "maxHP": clamp_stat(hp_stat, 200000),
         "hpAbility": hp_ability,
         "attackPower": clamp_stat(atk_stat, 25000),
         "atkAbility": atk_ability,
-        "defensePower": clamp_stat(parse_number(extract_text(img, ROI_CONFIG["stat_defense"], allowlist=num_allowlist, scale=2)), 10000),
+        "defensePower": clamp_stat(parse_number(extract_text(img, rois["stat_defense"], allowlist=num_allowlist, scale=2)), 10000),
         "healPower": clamp_stat(heal_stat, 35000),
         "healAbility": heal_ability
     }
     
     # 3. Star Counting (OpenCV)
-    stars_x, stars_y, stars_w, stars_h = ROI_CONFIG["stars_area"]
+    stars_x, stars_y, stars_w, stars_h = rois["stars_area"]
     stars_crop = img[stars_y:stars_y+stars_h, stars_x:stars_x+stars_w]
     data["currentStar"] = count_stars(stars_crop, is_weapon=False)
     
-    w_stars_x, w_stars_y, w_stars_w, w_stars_h = ROI_CONFIG["weapon_stars_area"]
+    w_stars_x, w_stars_y, w_stars_w, w_stars_h = rois["weapon_stars_area"]
     w_stars_crop = img[w_stars_y:w_stars_y+w_stars_h, w_stars_x:w_stars_x+w_stars_w]
     data["weapon"]["star"] = count_stars(w_stars_crop, is_weapon=True)
     

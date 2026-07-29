@@ -27,6 +27,67 @@ import math
 import macro
 import scanner
 import requests
+import subprocess
+import time
+
+APP_VERSION = "v1.0.0"
+GITHUB_REPO = "planaai/screenshotMacro"
+
+class UpdateCheckerThread(QThread):
+    update_available = pyqtSignal(str, str, str)
+    error_occurred = pyqtSignal(str)
+
+    def run(self):
+        try:
+            url = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
+            resp = requests.get(url, timeout=5)
+            if resp.status_code == 200:
+                data = resp.json()
+                latest_version = data.get("tag_name", "")
+                if latest_version and latest_version != APP_VERSION:
+                    assets = data.get("assets", [])
+                    download_url = ""
+                    for asset in assets:
+                        if asset.get("name", "").endswith(".exe"):
+                            download_url = asset.get("browser_download_url", "")
+                            break
+                    if not download_url and assets:
+                        download_url = assets[0].get("browser_download_url", "")
+                    
+                    if download_url:
+                        self.update_available.emit(latest_version, download_url, data.get("body", ""))
+        except Exception as e:
+            self.error_occurred.emit(str(e))
+
+class DownloadUpdateThread(QThread):
+    progress = pyqtSignal(int)
+    finished = pyqtSignal(str)
+    error = pyqtSignal(str)
+    
+    def __init__(self, url, save_path):
+        super().__init__()
+        self.url = url
+        self.save_path = save_path
+        
+    def run(self):
+        try:
+            response = requests.get(self.url, stream=True, timeout=10)
+            response.raise_for_status()
+            total_size = int(response.headers.get('content-length', 0))
+            
+            with open(self.save_path, 'wb') as f:
+                if total_size == 0:
+                    f.write(response.content)
+                    self.progress.emit(100)
+                else:
+                    downloaded = 0
+                    for data in response.iter_content(chunk_size=4096):
+                        downloaded += len(data)
+                        f.write(data)
+                        self.progress.emit(int(100 * downloaded / total_size))
+            self.finished.emit(self.save_path)
+        except Exception as e:
+            self.error.emit(str(e))
 
 def get_asset_path(relative_path):
     if hasattr(sys, '_MEIPASS'):
@@ -366,6 +427,67 @@ class ExtractApp(QMainWindow):
         def on_scanner_done(result):
             self.signals.scanner_done.emit(result)
         self.scanner_instance = scanner.ScannerListener(callback_done=on_scanner_done, callback_log=on_macro_log)
+
+        # Check for updates
+        self.update_checker = UpdateCheckerThread()
+        self.update_checker.update_available.connect(self.on_update_available)
+        self.update_checker.start()
+
+    def on_update_available(self, version, download_url, notes):
+        reply = QMessageBox.question(
+            self,
+            "업데이트 알림",
+            f"새 버전({version})이 출시되었습니다. 다운로드하시겠습니까?\n\n{notes}"
+        )
+        if reply == CustomMessageBox.Yes:
+            self.start_download_update(download_url)
+
+    def start_download_update(self, url):
+        self.update_progress = QProgressDialog("업데이트 다운로드 중...", "취소", 0, 100, self)
+        self.update_progress.setWindowTitle("다운로드")
+        self.update_progress.setWindowModality(Qt.WindowModal)
+        self.update_progress.setMinimumDuration(0)
+        self.update_progress.show()
+        
+        save_path = os.path.join(os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.abspath("."), "Plana_AI_Extractor_Update.exe")
+        
+        self.download_thread = DownloadUpdateThread(url, save_path)
+        self.download_thread.progress.connect(self.update_progress.setValue)
+        self.download_thread.finished.connect(self.on_download_finished)
+        self.download_thread.error.connect(self.on_download_error)
+        self.download_thread.start()
+
+    def on_download_error(self, err):
+        if hasattr(self, 'update_progress'):
+            self.update_progress.close()
+        QMessageBox.critical(self, "오류", f"다운로드 실패: {err}")
+
+    def on_download_finished(self, save_path):
+        if hasattr(self, 'update_progress'):
+            self.update_progress.close()
+        QMessageBox.information(
+            self,
+            "업데이트 완료",
+            "다운로드가 완료되었습니다. 앱을 재시작하여 업데이트를 적용합니다."
+        )
+        self.apply_update(save_path)
+
+    def apply_update(self, new_exe_path):
+        current_exe = sys.executable
+        if not getattr(sys, 'frozen', False):
+            QMessageBox.information(self, "안내", "개발 환경이므로 자동 교체를 건너뜁니다.")
+            return
+
+        bat_path = os.path.join(os.path.dirname(current_exe), "update.bat")
+        with open(bat_path, "w", encoding="ansi") as f:
+            f.write('@echo off\n')
+            f.write('timeout /t 2 /nobreak >nul\n')
+            f.write(f'move /y "{new_exe_path}" "{current_exe}"\n')
+            f.write(f'start "" "{current_exe}"\n')
+            f.write('del "%~f0"\n')
+
+        subprocess.Popen(bat_path, shell=True, creationflags=subprocess.CREATE_NO_WINDOW)
+        sys.exit(0)
 
     def init_login_view(self):
         self.login_view = QWidget()
@@ -746,6 +868,12 @@ class OverviewWindow(QMainWindow):
         self.refresh_tree()
         
         btn_layout = QHBoxLayout()
+        
+        btn_back = QPushButton("◀ 이전 (캡처 화면으로)")
+        btn_back.setStyleSheet(COMMON_STYLE)
+        btn_back.clicked.connect(self.close)
+        btn_layout.addWidget(btn_back)
+        
         btn_detail = QPushButton("🔍 선택 항목 상세 검수")
         btn_detail.setStyleSheet(COMMON_STYLE)
         btn_detail.clicked.connect(self.open_detail)
@@ -890,6 +1018,7 @@ class OverviewWindow(QMainWindow):
             QMessageBox.critical(self, "오류", f"저장 실패: {e}")
 
     def closeEvent(self, event):
+        self.parent_app.stacked_widget.setCurrentWidget(self.parent_app.dash_view)
         self.parent_app.show()
         event.accept()
 
@@ -995,6 +1124,11 @@ class DetailWindow(GlassWidget):
         
         # Action Bar
         action_layout = QHBoxLayout()
+        btn_back = QPushButton("◀ 이전 (요약으로)")
+        btn_back.setStyleSheet("background-color: #6b7280; color: white; border-radius: 10px; padding: 10px; font-size: 15px;")
+        btn_back.clicked.connect(self.on_cancel_detail)
+        action_layout.addWidget(btn_back)
+
         btn_save = QPushButton("💾 저장 후 목록으로")
         btn_save.setStyleSheet(f"background-color: {COLOR_GREEN}; color: white; border-radius: 10px; padding: 10px; font-size: 15px;")
         btn_save.clicked.connect(self.on_save_close)
@@ -1143,6 +1277,11 @@ class DetailWindow(GlassWidget):
             self.parent_app.hide()
             self.current_overview.show()
 
+    def on_cancel_detail(self):
+        if self.current_overview:
+            self.parent_app.hide()
+            self.current_overview.show()
+
 class ScannerDetailWindow(DetailWindow):
     def __init__(self, parent_app):
         super().__init__(parent_app)
@@ -1178,8 +1317,8 @@ class ScannerDetailWindow(DetailWindow):
         btn_upload.clicked.connect(self.on_upload)
         action_layout.addWidget(btn_upload)
         
-        btn_cancel = QPushButton("❌ 취소 후 대기 상태로")
-        btn_cancel.setStyleSheet(f"background-color: {COLOR_RED}; color: white; border-radius: 10px; padding: 10px; font-size: 15px;")
+        btn_cancel = QPushButton("◀ 이전 (캡처 화면으로)")
+        btn_cancel.setStyleSheet("background-color: #6b7280; color: white; border-radius: 10px; padding: 10px; font-size: 15px;")
         btn_cancel.clicked.connect(self.on_cancel)
         action_layout.addWidget(btn_cancel)
         

@@ -1,0 +1,31 @@
+                             QLabel, QLineEdit, QPushButton, QStackedWidget, QFileDialog, 
+QPushButton {{
+QPushButton:hover {{
+QPushButton:disabled {{
+QMessageBox QPushButton {{
+QMessageBox QPushButton:hover {{
+        dialog.setStyleSheet(f"QDialog {{ background-color: {GLASS_BG}; border: 2px solid {COLOR_PINK}; border-radius: 10px; }} QLabel {{ color: #333333; font-size: 15px; font-weight: bold; padding: 10px; }} QPushButton {{ background-color: {COLOR_PINK}; color: white; border: none; border-radius: 5px; padding: 8px 20px; font-size: 14px; font-weight: bold; }} QPushButton:hover {{ background-color: {COLOR_PINK_HOVER}; }}")
+            btn_yes = QPushButton("예 (Yes)")
+            btn_no = QPushButton("아니오 (No)")
+            btn_ok = QPushButton("확인 (OK)")
+        btn_login = QPushButton("로그인")
+        btn_scanner = QPushButton("스캐너 모드 (단일)")
+        btn_macro = QPushButton("매크로 모드 (일괄)")
+        self.btn_scanner_start = QPushButton("스캐너 캡처 시작 대기 (F9)")
+        btn_back = QPushButton("모드 선택으로 돌아가기")
+        self.btn_file = QPushButton("단일 파일 선택")
+        self.btn_folder = QPushButton("폴더 선택 (일괄)")
+        self.btn_back_macro = QPushButton("홈으로 돌아가기")
+        self.btn_macro = QPushButton("매크로 대기 (F8)")
+        self.btn_run = QPushButton("일괄 추출 시작 ▶")
+        btn_detail = QPushButton("🔍 선택 항목 상세 검수")
+        btn_upload = QPushButton("☁️ 서버에 일괄 업로드")
+        btn_sync = QPushButton("📦 데이터 압축 저장")
+        btn_prev = QPushButton("◀ 이전")
+        btn_next = QPushButton("다음 ▶")
+        btn_save = QPushButton("💾 저장 후 목록으로")
+        btn_skip = QPushButton("⏭️ 건너뛰기")
+        btn_upload = QPushButton("☁️ 바로 업로드")
+        btn_cancel = QPushButton("❌ 취소 후 대기 상태로")
+        QMessageBox QPushButton { background-color: #f9a8d4; color: white; border: none; border-radius: 5px; padding: 5px 15px; font-size: 13px; }
+        QMessageBox QPushButton:hover { background-color: #f472b6; }
