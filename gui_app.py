@@ -48,9 +48,14 @@ class UpdateCheckerThread(QThread):
                     assets = data.get("assets", [])
                     download_url = ""
                     for asset in assets:
-                        if asset.get("name", "").endswith(".exe"):
+                        if asset.get("name", "").endswith(".zip"):
                             download_url = asset.get("browser_download_url", "")
                             break
+                    if not download_url:
+                        for asset in assets:
+                            if asset.get("name", "").endswith(".exe"):
+                                download_url = asset.get("browser_download_url", "")
+                                break
                     if not download_url and assets:
                         download_url = assets[0].get("browser_download_url", "")
                     
@@ -449,7 +454,9 @@ class ExtractApp(QMainWindow):
         self.update_progress.setMinimumDuration(0)
         self.update_progress.show()
         
-        save_path = os.path.join(os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.abspath("."), "Plana_AI_Extractor_Update.exe")
+        is_zip = url.lower().endswith('.zip')
+        ext = ".zip" if is_zip else ".exe"
+        save_path = os.path.join(os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.abspath("."), f"Plana_AI_Extractor_Update{ext}")
         
         self.download_thread = DownloadUpdateThread(url, save_path)
         self.download_thread.progress.connect(self.update_progress.setValue)
@@ -478,13 +485,38 @@ class ExtractApp(QMainWindow):
             QMessageBox.information(self, "안내", "개발 환경이므로 자동 교체를 건너뜁니다.")
             return
 
-        bat_path = os.path.join(os.path.dirname(current_exe), "update.bat")
-        with open(bat_path, "w", encoding="ansi") as f:
-            f.write('@echo off\n')
-            f.write('timeout /t 2 /nobreak >nul\n')
-            f.write(f'move /y "{new_exe_path}" "{current_exe}"\n')
-            f.write(f'start "" "{current_exe}"\n')
-            f.write('del "%~f0"\n')
+        current_dir = os.path.dirname(current_exe)
+        bat_path = os.path.join(current_dir, "update.bat")
+
+        if new_exe_path.lower().endswith('.zip'):
+            import zipfile
+            import shutil
+            extract_dir = os.path.join(current_dir, "_update_temp")
+            if os.path.exists(extract_dir):
+                shutil.rmtree(extract_dir, ignore_errors=True)
+            with zipfile.ZipFile(new_exe_path, 'r') as zip_ref:
+                zip_ref.extractall(extract_dir)
+            
+            source_dir = extract_dir
+            items = os.listdir(extract_dir)
+            if len(items) == 1 and os.path.isdir(os.path.join(extract_dir, items[0])):
+                source_dir = os.path.join(extract_dir, items[0])
+                
+            with open(bat_path, "w", encoding="ansi") as f:
+                f.write('@echo off\n')
+                f.write('timeout /t 2 /nobreak >nul\n')
+                f.write(f'xcopy /y /e /h /c /i "{source_dir}\\*" "{current_dir}\\"\n')
+                f.write(f'start "" "{current_exe}"\n')
+                f.write(f'rmdir /s /q "{extract_dir}"\n')
+                f.write(f'del "{new_exe_path}"\n')
+                f.write('del "%~f0"\n')
+        else:
+            with open(bat_path, "w", encoding="ansi") as f:
+                f.write('@echo off\n')
+                f.write('timeout /t 2 /nobreak >nul\n')
+                f.write(f'move /y "{new_exe_path}" "{current_exe}"\n')
+                f.write(f'start "" "{current_exe}"\n')
+                f.write('del "%~f0"\n')
 
         subprocess.Popen(bat_path, shell=True, creationflags=subprocess.CREATE_NO_WINDOW)
         sys.exit(0)
