@@ -30,7 +30,7 @@ import requests
 import subprocess
 import time
 
-APP_VERSION = "v1.0.0"
+APP_VERSION = "1.4"
 GITHUB_REPO = "planaai/screenshotMacro"
 
 class UpdateCheckerThread(QThread):
