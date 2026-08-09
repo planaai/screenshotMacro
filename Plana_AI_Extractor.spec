@@ -1,12 +1,41 @@
 # -*- mode: python ; coding: utf-8 -*-
+import os
+import glob
+from PyInstaller.utils.hooks import collect_all
 
+datas = [('assets', 'assets'), ('students.json', '.'), ('models', 'models')]
+binaries = []
+hiddenimports = [
+    'scipy._external.array_api_compat.numpy.fft',
+    'scipy._external.array_api_compat.numpy.linalg',
+    'scipy._lib.array_api_compat.numpy.fft',
+    'scipy._lib.array_api_compat.numpy.linalg',
+    'scipy.special._cdflib',
+]
+
+# Collect onnxruntime
+tmp_ret = collect_all('onnxruntime')
+datas += tmp_ret[0]
+hiddenimports += tmp_ret[2]
+
+import onnxruntime
+ort_capi_dir = os.path.join(os.path.dirname(onnxruntime.__file__), 'capi')
+for ext in ('*.dll', '*.pyd'):
+    for f in glob.glob(os.path.join(ort_capi_dir, ext)):
+        binaries.append((f, '.'))
+
+# Collect rapidocr_onnxruntime
+tmp_ret = collect_all('rapidocr_onnxruntime')
+datas += tmp_ret[0]
+binaries += tmp_ret[1]
+hiddenimports += tmp_ret[2]
 
 a = Analysis(
     ['gui_app.py'],
     pathex=[],
-    binaries=[],
-    datas=[('assets', 'assets'), ('students.json', '.'), ('models', 'models')],
-    hiddenimports=['scipy._external.array_api_compat.numpy.fft', 'scipy._external.array_api_compat.numpy.linalg', 'scipy._lib.array_api_compat.numpy.fft', 'scipy._lib.array_api_compat.numpy.linalg', 'scipy.special._cdflib'],
+    binaries=binaries,
+    datas=datas,
+    hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
