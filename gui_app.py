@@ -1,5 +1,20 @@
 import sys
 import os
+import ctypes
+
+def check_python_environment():
+    exec_path = sys.executable.lower()
+    prefix = getattr(sys, 'base_prefix', '').lower()
+    if "windowsapps" in exec_path or "windowsapps" in prefix:
+        msg = (
+            "Windows Store에서 설치된 Python 환경이 감지되었습니다.\n\n"
+            "Microsoft Store 버전 Python은 권한 및 경로 문제로 인해 프로그램이 정상 동작하지 않을 수 있습니다.\n"
+            "프로그램을 종료합니다. 반드시 python.org 에서 공식 설치 파일을 다운로드하여 환경을 재구성해 주시기 바랍니다."
+        )
+        ctypes.windll.user32.MessageBoxW(0, msg, "환경 오류", 0x10)
+        sys.exit(1)
+
+check_python_environment()
 
 if hasattr(sys, '_MEIPASS'):
     os.environ['PATH'] = sys._MEIPASS + os.pathsep + os.environ.get('PATH', '')

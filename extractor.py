@@ -278,6 +278,16 @@ def get_resource_path(relative_path):
 
 _ocr_init_ok = True
 try:
+    from pathlib import Path
+    import rapidocr_onnxruntime.rapid_ocr_api as _rapid_ocr_api
+    if getattr(sys, 'frozen', False):
+        _frozen_rapid_dir = os.path.join(sys._MEIPASS, 'rapidocr_onnxruntime')
+        _rapid_ocr_api.root_dir = Path(_frozen_rapid_dir)
+        log_debug(f"[PyInstaller] RapidOCR root_dir patched → {_frozen_rapid_dir}")
+except Exception as e:
+    log_debug(f"[PyInstaller] RapidOCR monkey-patch failed: {e}")
+
+try:
     reader_ko = RapidOCR(
         rec_model_path=get_resource_path("models/korean_PP-OCRv3_rec_infer.onnx"),
         rec_keys_path=get_resource_path("models/korean_dict.txt")
