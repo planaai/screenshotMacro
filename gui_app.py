@@ -19,8 +19,7 @@ import extractor
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                              QLabel, QLineEdit, QPushButton, QStackedWidget, QFileDialog, 
                              QTextEdit, QTableWidget, QTableWidgetItem, QHeaderView, QScrollArea,
-                             QFormLayout, QMessageBox, QDialog, QAbstractItemView, QProgressBar,
-                             QProgressDialog)
+                             QFormLayout, QMessageBox, QDialog, QAbstractItemView, QProgressBar)
 from PyQt5.QtGui import QFontDatabase, QFont, QPixmap, QPainter, QColor, QIcon, QResizeEvent
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QTimer, QThread
 import json
@@ -31,7 +30,7 @@ import requests
 import subprocess
 import time
 
-APP_VERSION = "1.4"
+APP_VERSION = "1.5"
 GITHUB_REPO = "planaai/screenshotMacro"
 
 class UpdateCheckerThread(QThread):
