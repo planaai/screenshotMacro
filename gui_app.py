@@ -59,7 +59,9 @@ class UpdateCheckerThread(QThread):
             if resp.status_code == 200:
                 data = resp.json()
                 latest_version = data.get("tag_name", "")
-                if latest_version and latest_version != APP_VERSION:
+                clean_latest = latest_version.lower().replace("v", "").replace("ver.", "").strip()
+                clean_current = APP_VERSION.lower().replace("v", "").replace("ver.", "").strip()
+                if latest_version and clean_latest != clean_current:
                     assets = data.get("assets", [])
                     download_url = ""
                     for asset in assets:
@@ -503,6 +505,13 @@ class ExtractApp(QMainWindow):
         current_dir = os.path.dirname(current_exe)
         bat_path = os.path.join(current_dir, "update.bat")
 
+        self.extract_progress = QProgressDialog("업데이트 파일 압축 해제 중... 잠시만 기다려주세요.", None, 0, 0, self)
+        self.extract_progress.setWindowTitle("업데이트 적용")
+        self.extract_progress.setWindowModality(Qt.WindowModal)
+        self.extract_progress.setCancelButton(None)
+        self.extract_progress.show()
+        QApplication.processEvents()
+
         if new_exe_path.lower().endswith('.zip'):
             import zipfile
             import shutil
@@ -519,8 +528,18 @@ class ExtractApp(QMainWindow):
                 
             with open(bat_path, "w", encoding="ansi") as f:
                 f.write('@echo off\n')
+                f.write('title Plana AI Extractor 업데이트\n')
+                f.write('color 0b\n')
+                f.write('echo ==========================================\n')
+                f.write('echo    업데이트를 적용하는 중입니다...\n')
+                f.write('echo    창을 닫지 마세요!\n')
+                f.write('echo ==========================================\n')
+                f.write('echo.\n')
+                f.write(':retry\n')
                 f.write('timeout /t 2 /nobreak >nul\n')
-                f.write(f'xcopy /y /e /h /c /i "{source_dir}\\*" "{current_dir}\\"\n')
+                f.write(f'xcopy /y /e /h /c /i "{source_dir}\\*" "{current_dir}\\" >nul 2>&1\n')
+                f.write('if errorlevel 1 goto retry\n')
+                f.write('echo 업데이트 완료! 앱을 재시작합니다.\n')
                 f.write(f'start "" "{current_exe}"\n')
                 f.write(f'rmdir /s /q "{extract_dir}"\n')
                 f.write(f'del "{new_exe_path}"\n')
@@ -528,12 +547,19 @@ class ExtractApp(QMainWindow):
         else:
             with open(bat_path, "w", encoding="ansi") as f:
                 f.write('@echo off\n')
+                f.write('title Plana AI Extractor 업데이트\n')
+                f.write('color 0b\n')
+                f.write('echo 업데이트를 적용하는 중입니다... 창을 닫지 마세요!\n')
+                f.write(':retry\n')
                 f.write('timeout /t 2 /nobreak >nul\n')
-                f.write(f'move /y "{new_exe_path}" "{current_exe}"\n')
+                f.write(f'move /y "{new_exe_path}" "{current_exe}" >nul 2>&1\n')
+                f.write('if errorlevel 1 goto retry\n')
+                f.write('echo 업데이트 완료! 앱을 재시작합니다.\n')
                 f.write(f'start "" "{current_exe}"\n')
                 f.write('del "%~f0"\n')
 
-        subprocess.Popen(bat_path, shell=True, creationflags=subprocess.CREATE_NO_WINDOW)
+        self.extract_progress.close()
+        subprocess.Popen(bat_path, shell=True)
         sys.exit(0)
 
     def init_login_view(self):
