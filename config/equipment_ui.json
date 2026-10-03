@@ -1,0 +1,90 @@
+{
+  "_comment": "equipment_scanner.py \uc804\uc6a9. \ubaa8\ub4e0 \uc88c\ud45c\ub294 16:9 \uac8c\uc784 \ud654\uba74 \uae30\uc900 \uc0c1\ub300\uac12(0~1). points=[x,y], regions=[x,y,w,h]. \ub808\ud37c\ub7f0\uc2a4 \ucea1\ucc98 1024x576 \uae30\uc900 \uc2e4\uce21.",
+  "points": {
+    "equipment_button": [
+      0.88,
+      0.828
+    ],
+    "slot_1": [
+      0.097,
+      0.292
+    ],
+    "slot_2": [
+      0.097,
+      0.455
+    ],
+    "slot_3": [
+      0.097,
+      0.618
+    ],
+    "main_slot_4": [
+      0.783,
+      0.828
+    ],
+    "equipment_menu_close": [
+      0.936,
+      0.144
+    ],
+    "favorite_popup_close": [
+      0.852,
+      0.165
+    ]
+  },
+  "regions": {
+    "equipment_button_search": [
+      0.8,
+      0.757,
+      0.173,
+      0.133
+    ],
+    "equipment_menu_title": [
+      0.42,
+      0.107,
+      0.163,
+      0.073
+    ],
+    "detail_panel": [
+      0.16,
+      0.207,
+      0.383,
+      0.523
+    ],
+    "detail_tier_badge": [
+      0.262,
+      0.33,
+      0.063,
+      0.057
+    ],
+    "detail_level": [
+      0.318,
+      0.33,
+      0.078,
+      0.057
+    ],
+    "favorite_tier_badge": [
+      0.409,
+      0.545,
+      0.051,
+      0.066
+    ],
+    "popup_detect_area": [
+      0.121,
+      0.118,
+      0.763,
+      0.763
+    ]
+  },
+  "timing": {
+    "click_hold_sec": 0.12,
+    "min_settle_sec": 0.45,
+    "stable_timeout_sec": 2.5,
+    "menu_open_timeout_sec": 3.0,
+    "popup_timeout_sec": 1.5,
+    "close_timeout_sec": 2.0,
+    "poll_interval_sec": 0.12
+  },
+  "thresholds": {
+    "stable_mean_diff": 1.5,
+    "changed_mean_diff": 6.0
+  }
+}

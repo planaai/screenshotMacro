@@ -321,7 +321,7 @@ class UploadWorker(QThread):
                 }
                 
                 resp = requests.post(
-                    "https://api.planaai.kro.kr/api/import/screenshot",
+                    "https://api.plan4ai.fyi/api/import/screenshot",
                     headers=headers,
                     json=payload,
                     timeout=5
@@ -332,7 +332,7 @@ class UploadWorker(QThread):
                     success_count += 1
                 else:
                     fail_count += 1
-                    print(f"업로드 실패 ({name}): {resp.text}")
+                    print(f"업로드 실패 ({name}): [HTTP {resp.status_code}] {resp.text}")
                     
             except Exception as e:
                 fail_count += 1
@@ -610,7 +610,7 @@ class ExtractApp(QMainWindow):
             
         try:
             resp = requests.post(
-                "https://api.planaai.kro.kr/api/auth/login",
+                "https://api.plan4ai.fyi/api/auth/login",
                 json={"username": user, "password": pwd},
                 timeout=5
             )
@@ -650,11 +650,44 @@ class ExtractApp(QMainWindow):
         btn_macro.setFixedSize(300, 200)
         btn_macro.clicked.connect(lambda: self.stacked_widget.setCurrentWidget(self.dash_view))
         
+        btn_calibrate = QPushButton("기본 좌표 조정")
+        btn_calibrate.setStyleSheet(f"background-color: {GLASS_BG}; color: {COLOR_PINK_HOVER}; border: 3px solid {COLOR_PINK}; border-radius: 20px; font-size: 20px; font-weight: bold; padding: 15px;")
+        btn_calibrate.setFixedSize(300, 90)
+        btn_calibrate.clicked.connect(self.open_calibration_tool)
+        
+        btn_calibrate_eq = QPushButton("장비 좌표 조정")
+        btn_calibrate_eq.setStyleSheet(f"background-color: {GLASS_BG}; color: {COLOR_PINK_HOVER}; border: 3px solid {COLOR_PINK}; border-radius: 20px; font-size: 20px; font-weight: bold; padding: 15px;")
+        btn_calibrate_eq.setFixedSize(300, 90)
+        btn_calibrate_eq.clicked.connect(self.open_equip_calibration_tool)
+        
+        calib_layout = QVBoxLayout()
+        calib_layout.addWidget(btn_calibrate)
+        calib_layout.addWidget(btn_calibrate_eq)
+        
         card_layout.addWidget(btn_scanner)
         card_layout.addWidget(btn_macro)
+        card_layout.addLayout(calib_layout)
         
         layout.addLayout(card_layout)
         self.stacked_widget.addWidget(self.mode_select_view)
+
+    def open_calibration_tool(self):
+        config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config", "coordinates.json")
+        try:
+            from scripts.calibrate import CalibrationTool
+            self.calib_tool = CalibrationTool(config_file)
+            self.calib_tool.show()
+        except ImportError as e:
+            QMessageBox.critical(self, "오류", f"캘리브레이션 스크립트 오류:\n{e}")
+
+    def open_equip_calibration_tool(self):
+        config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config", "equipment_ui.json")
+        try:
+            from scripts.calibrate import CalibrationTool
+            self.calib_tool_eq = CalibrationTool(config_file)
+            self.calib_tool_eq.show()
+        except ImportError as e:
+            QMessageBox.critical(self, "오류", f"캘리브레이션 스크립트 오류:\n{e}")
 
     def init_scanner_view(self):
         self.scanner_view = QWidget()
@@ -1032,12 +1065,12 @@ class OverviewWindow(QMainWindow):
         self.parent_app.show()
 
     def save_local_zip(self):
-        ready_count = sum(1 for res in self.batch_results if res["status"] not in ["uploaded", "skipped"])
-        if ready_count == 0:
-            QMessageBox.information(self, "알림", "저장할 준비된 항목이 없습니다.")
+        total_count = len(self.batch_results)
+        if total_count == 0:
+            QMessageBox.information(self, "알림", "저장할 데이터가 없습니다.")
             return
             
-        reply = QMessageBox.question(self, "압축 저장 확인", f"총 {ready_count}명의 데이터, 이미지 및 로그를 압축 저장하시겠습니까?\n(검수 필요 항목도 함께 저장됩니다)", QMessageBox.Yes | QMessageBox.No)
+        reply = QMessageBox.question(self, "압축 저장 확인", f"총 {total_count}명의 데이터(검수 필요/건너뜀 포함), 이미지 및 로그를 모두 압축 저장하시겠습니까?", QMessageBox.Yes | QMessageBox.No)
         if reply != QMessageBox.Yes:
             return
             
@@ -1048,15 +1081,14 @@ class OverviewWindow(QMainWindow):
         export_data = []
         image_paths = []
         for res in self.batch_results:
-            if res["status"] in ["uploaded", "skipped"]:
-                continue
-            
             data_copy = res["data"].copy()
             data_copy["needs_review"] = res.get("needs_review", False)
+            data_copy["status"] = res.get("status", "pending")
             export_data.append(data_copy)
             
             image_paths.append(res["path"])
-            res["status"] = "uploaded"
+            if res["status"] not in ["uploaded", "skipped"]:
+                res["status"] = "uploaded"
             
         try:
             import tarfile
@@ -1107,11 +1139,30 @@ class DetailWindow(GlassWidget):
         main_layout.setContentsMargins(20, 20, 20, 20)
         main_layout.setSpacing(20)
         
-        # Left side: Image
+        # Left side: Image and Crops
+        left_panel = QWidget()
+        left_panel.setStyleSheet("background: transparent;")
+        left_layout = QVBoxLayout(left_panel)
+        left_layout.setContentsMargins(0, 0, 0, 0)
+        left_layout.setSpacing(10)
+        
         self.lbl_img = QLabel()
         self.lbl_img.setAlignment(Qt.AlignCenter)
         self.lbl_img.setStyleSheet(f"background-color: {GLASS_BG}; border: 2px solid {COLOR_PINK}; border-radius: 10px;")
-        main_layout.addWidget(self.lbl_img, stretch=2)
+        left_layout.addWidget(self.lbl_img, stretch=4)
+        
+        crops_layout = QHBoxLayout()
+        self.crop_labels = []
+        for i in range(4):
+            lbl = QLabel()
+            lbl.setAlignment(Qt.AlignCenter)
+            lbl.setStyleSheet(f"background-color: {GLASS_BG}; border: 1px solid {COLOR_PINK}; border-radius: 5px;")
+            lbl.setMinimumHeight(60)
+            crops_layout.addWidget(lbl)
+            self.crop_labels.append(lbl)
+            
+        left_layout.addLayout(crops_layout, stretch=1)
+        main_layout.addWidget(left_panel, stretch=2)
         
         # Right side: Form
         right_panel = QWidget()
@@ -1278,6 +1329,17 @@ class DetailWindow(GlassWidget):
         self.set_val("stats.healPower", st.get("healPower"))
         self.set_val("stats.healAbility", st.get("healAbility"))
 
+        for i, lbl in enumerate(self.crop_labels, 1):
+            slot_data = eq.get(f"slot{i}")
+            if isinstance(slot_data, dict):
+                crop_path = slot_data.get("crop")
+                if crop_path and os.path.exists(crop_path):
+                    pixmap = QPixmap(crop_path)
+                    lbl.setPixmap(pixmap.scaled(150, 100, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+                    continue
+            lbl.clear()
+            lbl.setText(f"슬롯{i} 없음")
+
     def safe_int(self, key):
         val = self.entries[key].text().strip()
         if not val: return None
@@ -1359,7 +1421,6 @@ class ScannerDetailWindow(DetailWindow):
     def __init__(self, parent_app):
         super().__init__(parent_app)
         self.parent_app = parent_app
-        self.jwt_token = parent_app.jwt_token
         self.single_result = None
         
         # Replace action buttons
@@ -1403,14 +1464,15 @@ class ScannerDetailWindow(DetailWindow):
             
     def on_upload(self):
         self.save_current_index()
-        if not self.jwt_token:
+        jwt_token = self.parent_app.jwt_token
+        if not jwt_token:
             QMessageBox.warning(self, "권한 오류", "로그인이 필요합니다.")
             return
             
         res = self.single_result
         data = res["data"]
         
-        headers = {"Authorization": f"Bearer {self.jwt_token}"}
+        headers = {"Authorization": f"Bearer {jwt_token}"}
         payload = {
             "studentName": data.get("studentName"),
             "bondRank": data.get("bondRank"),
@@ -1424,16 +1486,23 @@ class ScannerDetailWindow(DetailWindow):
         
         try:
             resp = requests.post(
-                "https://api.planaai.kro.kr/api/import/screenshot",
+                "https://api.plan4ai.fyi/api/import/screenshot",
                 headers=headers,
                 json=payload,
                 timeout=5
             )
             if resp.status_code == 200:
-                QMessageBox.information(self, "업로드 완료", "성공적으로 업로드되었습니다.")
+                resp_data = resp.json()
+                saved_user = resp_data.get("userId", "?")
+                saved_name = resp_data.get("studentName", "?")
+                QMessageBox.information(self, "업로드 완료", f"성공적으로 업로드되었습니다.\n(저장된 유저ID: {saved_user}, 학생: {saved_name})")
                 self.close_and_wait()
             else:
-                QMessageBox.warning(self, "업로드 실패", resp.text)
+                try:
+                    err_detail = resp.json()
+                except Exception:
+                    err_detail = resp.text
+                QMessageBox.warning(self, "업로드 실패", f"상태코드: {resp.status_code}\n{err_detail}")
         except Exception as e:
             QMessageBox.critical(self, "오류", f"서버 통신 오류: {e}")
             

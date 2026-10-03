@@ -27,3 +27,6 @@ tests/
 logs/
 
 
+.agents/
+*.tar
+extracted_data.tar

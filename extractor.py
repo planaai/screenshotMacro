@@ -13,6 +13,7 @@ import re
 import requests
 import urllib3
 import difflib
+import math
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -22,7 +23,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 json_path = os.path.join(script_dir, 'students.json')
 
 try:
-    response = requests.get("https://api.planaai.kro.kr/api/students", timeout=5)
+    response = requests.get("https://api.plan4ai.fyi/api/students", timeout=5)
     if response.status_code == 200:
         data = response.json()
         if isinstance(data, dict):
@@ -110,18 +111,29 @@ def split_jamo_char(char):
     return None
 
 def char_similarity(c1, c2):
+    if c1 == c2: return 1.0
     j1 = split_jamo_char(c1)
     j2 = split_jamo_char(c2)
     if j1 is None or j2 is None:
-        return 1.0 if c1 == c2 else 0.0
-    score = 0
-    # Chosung match (out of 1)
-    score += 1.0 if j1[0] == j2[0] else 0.0
-    # Jungsung match (out of 1) 
-    score += 1.0 if j1[1] == j2[1] else 0.0
-    # Jongsung match (out of 1)
-    score += 1.0 if j1[2] == j2[2] else 0.0
-    return score / 3.0
+        return 0.0
+    
+    score = 0.0
+    weight = 0.0
+    
+    # Chosung match
+    weight += 1.0
+    if j1[0] == j2[0]: score += 1.0
+    
+    # Jungsung match
+    weight += 1.0
+    if j1[1] == j2[1]: score += 1.0
+    
+    # Jongsung match
+    if j1[2] != 0 or j2[2] != 0:
+        weight += 1.0
+        if j1[2] == j2[2]: score += 1.0
+        
+    return score / weight if weight > 0 else 0.0
 
 import difflib
 
@@ -140,8 +152,8 @@ def name_similarity(ocr_text, candidate):
     # SequenceMatcher ratio to handle missing characters (deletions) naturally
     seq_ratio = difflib.SequenceMatcher(None, ocr_k, name_k).ratio()
     
-    # Severe penalty for length mismatch to prevent short strings from matching long ones
-    if len(name_k) > len(ocr_k) + 1:
+    # Severe penalty for length mismatch to prevent short strings from matching long ones blindly
+    if len(name_k) >= len(ocr_k) + 1 and len(ocr_k) <= 1:
         return max(0.3, seq_ratio - 0.2)
         
     best_score = 0.0
@@ -167,11 +179,18 @@ def match_student_name(extracted_name):
         log_debug("Empty extracted_name or STUDENT_NAMES list.")
         return ""
     
+    # Apply raw OCR exact fallbacks before regex filtering (for completely corrupted readings)
+    raw_ex = extracted_name.strip().lower()
+    if raw_ex == "h":
+        return "노노미"
+    if raw_ex == "10":
+        return "리츠"
+        
     log_debug(f"--- Name Matching Start ---")
     log_debug(f"Raw OCR Output: '{extracted_name}'")
     
-    # Remove all non-alphanumeric/Korean characters
-    clean_ex = re.sub(r'[^가-힣a-zA-Z0-9�]', '', extracted_name)
+    # Keep only Korean, brackets, asterisk
+    clean_ex = re.sub(r'[^가-힣\(\)\*]', '', extracted_name)
     if not clean_ex: 
         log_debug("Cleaned name is empty.")
         return ""
@@ -183,11 +202,27 @@ def match_student_name(extracted_name):
         "숨": "슌",
         "슘": "슌",
         "춘": "슌",
-        "": "슌",
         "스프미": "스즈미",
+        "스트미": "스즈미",
+        "스르미": "스즈미",
+        "즈미": "스즈미",
+        "스즈": "스즈미",
         "치하로": "치히로",
         "소구호미사키": "쇼쿠호미사키",
         "사례루이코": "사텐루이코",
+        "나코": "니코",
+        "너코": "니코",
+        "미라시": "미카",
+        "미라스": "미카",
+        "미라0시": "미카",
+        "피시에": "피나",
+        "로모에": "토모에",
+        "즈코": "시즈코",
+        "시조코": "시즈코",
+        "츠쿠": "츠쿠요",
+        "쿠요": "츠쿠요",
+        "츠구요": "츠쿠요",
+        "우미": "루미",
     }
     for bad, good in ocr_fallbacks.items():
         if clean_ex.startswith(bad):
@@ -200,14 +235,19 @@ def match_student_name(extracted_name):
         "켜이": "케이",
         "웨이": "케이",
         "소": "슌",
-        "춘": "슌"
+        "춘": "슌",
+        "토": "토키",
+        "유": "유즈",
+        "하나": "히나",
+        "하루": "하루나",
+        "니": "니야",
     }
     if clean_ex in exact_fallbacks:
         clean_ex = exact_fallbacks[clean_ex]
             
     log_debug(f"Cleaned String: '{clean_ex}'")
     
-    cleaned_names = {re.sub(r'[^가-힣a-zA-Z0-9]', '', n): n for n in STUDENT_NAMES}
+    cleaned_names = {re.sub(r'[^가-힣\(\)\*]', '', n): n for n in STUDENT_NAMES}
     
     # 1. Exact match
     if clean_ex in cleaned_names:
@@ -240,11 +280,19 @@ def match_student_name(extracted_name):
     # Per-character Jamo matching ratios: 1 wrong vowel out of 3 chars = 8/9 = 0.88
     # 1 wrong consonant = 8/9 = 0.88
     log_debug(f"Best Match Candidate: '{best_match}' with ratio: {best_ratio:.3f}")
-    if best_match and best_ratio >= 0.60:
+    
+    if len(clean_ex) == 1:
+        threshold = 0.90
+    elif len(clean_ex) == 2:
+        threshold = 0.70
+    else:
+        threshold = 0.60
+    
+    if best_match and best_ratio >= threshold:
         log_debug(f"Accepted Match: '{best_match}'")
         return best_match
         
-    log_debug("Match Rejected (Ratio < 0.60)")
+    log_debug(f"Match Rejected (Ratio < {threshold:.2f})")
     return ""
 
 # Bounding Box: (x, y, w, h) based on 1920x1080 resolution
@@ -263,6 +311,10 @@ ROI_CONFIG = {
     "equip_2": (1140, 820, 130, 130),
     "equip_3": (1280, 820, 130, 130),
     "equip_4": (1420, 820, 130, 130),
+    "equip_1_tier": (1065, 885, 65, 65),
+    "equip_2_tier": (1205, 885, 65, 65),
+    "equip_3_tier": (1345, 885, 65, 65),
+    "equip_4_tier": (1485, 885, 65, 65),
     "stat_hp": (1120, 350, 230, 40),
     "stat_attack": (1410, 350, 240, 40),
     "stat_defense": (1095, 400, 255, 40),
@@ -275,6 +327,48 @@ def get_resource_path(relative_path):
     if hasattr(sys, '_MEIPASS'):
         return os.path.join(sys._MEIPASS, relative_path)
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), relative_path)
+
+import json
+def _load_calibrated_roi():
+    config_path = get_resource_path("config/coordinates.json")
+    try:
+        if os.path.exists(config_path):
+            with open(config_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                regions = data.get("regions", {})
+                mapping = {
+                    "student_name": "studentName",
+                    "student_level": "currentLevel",
+                    "student_stars": "stars_area",
+                    "skill_ex_box": "skill_ex",
+                    "skill_basic_box": "skill_basic",
+                    "skill_enhanced_box": "skill_enh",
+                    "skill_sub_box": "skill_sub",
+                    "weapon_box": "weapon_level",
+                    "equip_1_box": "equip_1",
+                    "equip_2_box": "equip_2",
+                    "equip_3_box": "equip_3",
+                    "equip_4_box": "equip_4",
+                    "equip_1_tier_box": "equip_1_tier",
+                    "equip_2_tier_box": "equip_2_tier",
+                    "equip_3_tier_box": "equip_3_tier",
+                    "equip_4_tier_box": "equip_4_tier",
+                    "stat_hp": "stat_hp",
+                    "stat_attack": "stat_attack",
+                    "stat_defense": "stat_defense",
+                    "stat_heal": "stat_heal",
+                    "bond_rank": "bondRank",
+                    "weapon_stars": "weapon_stars_area"
+                }
+                w, h = 1920, 1080
+                for jk, rk in mapping.items():
+                    if jk in regions:
+                        rel = regions[jk]
+                        ROI_CONFIG[rk] = (int(rel["x"]*w), int(rel["y"]*h), int(rel["w"]*w), int(rel["h"]*h))
+    except Exception as e:
+        log_debug(f"[Config] Failed to load coordinates.json: {e}")
+
+_load_calibrated_roi()
 
 _ocr_init_ok = True
 try:
@@ -322,7 +416,7 @@ def count_stars(img_crop, is_weapon=False):
         area = cv2.contourArea(cnt)
         if area > 20:  # Adjust threshold based on star size
             x, y, w, h = cv2.boundingRect(cnt)
-            num = max(1, round(w / expected_w))
+            num = max(1, math.ceil(w / expected_w - 0.15))
             star_count += num
             
     return star_count
@@ -353,10 +447,47 @@ def extract_text(img, bbox, allowlist=None, scale=1, is_name=False, min_length=0
     if is_name:
         korean_parts = []
         for part in parts:
-            if re.search(r'[가-힣�]', part):
+            if re.search(r'[가-힣]', part):
                 korean_parts.append(part)
         text = "".join(korean_parts).replace(" ", "")
-        text = re.sub(r'^[0-9\+\-\}\{\[\]\(\)\!\@\#\$\%\^\&\*\'\"]+', '', text)
+        text = re.sub(r'[^가-힣\(\)\*]', '', text)
+        
+        if not text:
+            gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
+            _, thresh = cv2.threshold(gray, 140, 255, cv2.THRESH_BINARY)
+            thresh_bgr = cv2.cvtColor(thresh, cv2.COLOR_GRAY2BGR)
+            try:
+                retry_res, _ = active_reader.text_recognizer([thresh_bgr])
+                if retry_res and len(retry_res) > 0:
+                    retry_text = retry_res[0][0]
+                    if re.search(r'[가-힣]', retry_text):
+                        text = re.sub(r'[^가-힣]', '', retry_text)
+            except:
+                pass
+                
+        if not text:
+            gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
+            clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
+            enhanced = clahe.apply(gray)
+            enhanced_bgr = cv2.cvtColor(enhanced, cv2.COLOR_GRAY2BGR)
+            try:
+                retry_res, _ = active_reader.text_recognizer([enhanced_bgr])
+                if retry_res and len(retry_res) > 0:
+                    retry_text = retry_res[0][0]
+                    if re.search(r'[가-힣]', retry_text):
+                        text = re.sub(r'[^가-힣]', '', retry_text)
+            except:
+                pass
+                
+        if not text:
+            import datetime
+            fail_dir = os.path.join("logs", "failed_name_crops")
+            if not os.path.exists(fail_dir):
+                os.makedirs(fail_dir)
+            timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+            cv2.imwrite(os.path.join(fail_dir, f"name_fail_{timestamp}.png"), crop)
+            log_debug(f"Name OCR FAILED - crop saved: name_fail_{timestamp}.png")
+            
         log_debug(f"Name OCR raw parts: {parts} -> filtered: '{text}'")
         return text
     
@@ -392,11 +523,26 @@ def extract_text(img, bbox, allowlist=None, scale=1, is_name=False, min_length=0
                 text = retry_text
             elif not text:
                 text = retry_text
+                
+        # Fallback to reader_ko for numbers if still failing
+        if not has_digit_or_alias(text) and not is_name:
+            try:
+                ocr_res, _ = reader_ko.text_recognizer([crop])
+                if ocr_res and len(ocr_res) > 0:
+                    retry_ko = "".join(ocr_res[0][0]).replace(" ", "")
+                    if allowlist:
+                        retry_ko = "".join(c for c in retry_ko if c in allowlist)
+                    if has_digit_or_alias(retry_ko):
+                        text = retry_ko
+            except Exception:
+                pass
+
         
     return text
 
-def extract_equip_text(img, bbox):
-    x, y, w, h = bbox
+def extract_equip_text(img, icon_bbox, tier_bbox=None):
+    if tier_bbox is None: tier_bbox = icon_bbox
+    x, y, w, h = icon_bbox
     crop = img[y:y+h, x:x+w]
     if crop.size == 0:
         return ""
@@ -413,8 +559,11 @@ def extract_equip_text(img, bbox):
     if np.std(gray) < 20:
         return "EMPTY"
         
+    tx, ty, tw, th = tier_bbox
+    tier_crop = img[ty:ty+th, tx:tx+tw]
+        
     try:
-        scaled = cv2.resize(crop, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
+        scaled = cv2.resize(tier_crop, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
         gray = cv2.cvtColor(scaled, cv2.COLOR_BGR2GRAY)
         adjusted = cv2.convertScaleAbs(gray, alpha=1.5, beta=0)
         res, _ = reader_en(adjusted)
@@ -434,11 +583,10 @@ def extract_bond_text(img, bbox):
     crop = img[y:y+h, x:x+w]
     if crop.size == 0: return ""
     
-    # 1. Use V-channel thresholding first, which is best for the bond rank heart
+    # 1. Use Grayscale thresholding for white text on pink heart
     scaled = cv2.resize(crop, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
-    hsv = cv2.cvtColor(scaled, cv2.COLOR_BGR2HSV)
-    v = hsv[:,:,2]
-    _, thresh = cv2.threshold(v, 100, 255, cv2.THRESH_BINARY_INV)
+    gray = cv2.cvtColor(scaled, cv2.COLOR_BGR2GRAY)
+    _, thresh = cv2.threshold(gray, 220, 255, cv2.THRESH_BINARY_INV)
     thresh_bgr = cv2.cvtColor(thresh, cv2.COLOR_GRAY2BGR)
     
     try:
@@ -479,6 +627,7 @@ def parse_number(text):
         
     # Replace common OCR misreads for numbers
     text = text.replace('l', '1').replace('I', '1').replace('O', '0').replace('o', '0').replace('S', '5').replace('s', '5').replace('z', '2').replace('Z', '2')
+    text = text.replace('B', '8').replace('b', '8').replace('q', '9').replace('g', '9')
     
     numbers = re.findall(r'\d+', text)
     if numbers:
@@ -731,6 +880,7 @@ def extract_screenshot_data(img_path):
         new_w = int(w * 1080 / h)
         img = cv2.resize(img, (new_w, 1080), interpolation=cv2.INTER_CUBIC)
         
+    img = preprocess_image(img)
     rois = get_calibrated_rois(img)
     
     data = {}
@@ -747,16 +897,27 @@ def extract_screenshot_data(img_path):
             if cv2.countNonZero(purple_mask) > 500:
                 data["studentName"] = "레이"
             
-    num_allowlist = '0123456789LvlIOoSszZ'
+    num_allowlist = '0123456789LvlIOoSszZBbqg'
     
     data["bondRank"] = parse_number(extract_bond_text(img, rois["bondRank"]))
     if data["bondRank"] is None:
         data["bondRank"] = 0
+    elif data["bondRank"] > 100:
+        br_str = str(data["bondRank"])
+        data["bondRank"] = int(br_str[:2])
+        log_debug(f"[Validation] bondRank {br_str} → {data['bondRank']} 클램핑 (2자리 초과)")
         
-    data["currentLevel"] = parse_number(extract_text(img, rois["currentLevel"], allowlist=num_allowlist, scale=2))
-    if data["currentLevel"] is None:
-        data["currentLevel"] = 0
-        log_debug("[Warning] currentLevel OCR failed, defaulting to 0")
+    lvl_val = parse_number(extract_text(img, rois["currentLevel"], allowlist=num_allowlist, scale=2))
+    if lvl_val is not None:
+        lvl_str = str(lvl_val)
+        if len(lvl_str) > 2:
+            lvl_val = int(lvl_str[:2])
+            log_debug(f"[Validation] currentLevel truncated {lvl_str} -> {lvl_val}")
+    
+    data["currentLevel"] = lvl_val
+    if data["currentLevel"] is None or data["currentLevel"] == 0:
+        data["currentLevel"] = 1
+        log_debug("[Warning] currentLevel OCR failed or read as 0, defaulting to 1")
     
     data["skills"] = {
         "ex": parse_skill(extract_text(img, rois["skill_ex"]), is_ex=True),
@@ -771,10 +932,10 @@ def extract_screenshot_data(img_path):
     if data["weapon"]["level"] is None:
         data["weapon"]["level"] = 0
     
-    t1_text = extract_equip_text(img, rois["equip_1"])
-    t2_text = extract_equip_text(img, rois["equip_2"])
-    t3_text = extract_equip_text(img, rois["equip_3"])
-    t4_text = extract_equip_text(img, rois["equip_4"])
+    t1_text = extract_equip_text(img, rois["equip_1"], rois.get("equip_1_tier", rois["equip_1"]))
+    t2_text = extract_equip_text(img, rois["equip_2"], rois.get("equip_2_tier", rois["equip_2"]))
+    t3_text = extract_equip_text(img, rois["equip_3"], rois.get("equip_3_tier", rois["equip_3"]))
+    t4_text = extract_equip_text(img, rois["equip_4"], rois.get("equip_4_tier", rois["equip_4"]))
     
     data["equipment"] = {
         "slot1": parse_equip(t1_text),
@@ -783,6 +944,17 @@ def extract_screenshot_data(img_path):
         "slot4": parse_equip(t4_text, is_bond_gear=True)
     }
     
+    # 1.5 Load Equipment Scanner Data if exists
+    equip_json_path = img_path.rsplit('.', 1)[0] + "_equip.json"
+    if os.path.exists(equip_json_path):
+        try:
+            with open(equip_json_path, 'r', encoding='utf-8') as f:
+                eq_data = json.load(f)
+                data["equipment"].update(eq_data)
+                log_debug(f"Loaded high-accuracy equipment data from {os.path.basename(equip_json_path)}")
+        except Exception as e:
+            log_debug(f"Failed to load equip json {equip_json_path}: {e}")
+            
     # 2. Detailed Stats OCR
     hp_stat, hp_ability = parse_stat_with_ability(extract_text(img, rois["stat_hp"], allowlist=num_allowlist, scale=2, min_length=3))
     atk_stat, atk_ability = parse_stat_with_ability(extract_text(img, rois["stat_attack"], allowlist=num_allowlist, scale=2, min_length=3))
@@ -833,16 +1005,10 @@ def validate_extracted_data(data):
             log_debug(f"[Validation] 2성 강제 스킬 레벨 조정 (sub=1)")
             
     # 0-2. Fix Level > 90 trailing 1
-    current_level = data.get("currentLevel") or 0
-    if current_level > 90:
-        lvl_str = str(data["currentLevel"])
-        if lvl_str.endswith("1"):
-            log_debug(f"[Validation] currentLevel {lvl_str} -> {lvl_str[:-1]} 보정 (name={data.get('studentName')})")
-            data["currentLevel"] = int(lvl_str[:-1])
-            
-        if (data.get("currentLevel") or 0) > 90:
-            log_debug(f"[Validation] currentLevel {data['currentLevel']} -> 90 클램핑 (name={data.get('studentName')})")
-            data["currentLevel"] = 90
+    # 1. currentLevel: 9 → 90 보정 (clamping is now handled mostly by truncation, but keep 90 clamp)
+    if (data.get("currentLevel") or 0) > 90:
+        log_debug(f"[Validation] currentLevel {data['currentLevel']} -> 90 클램핑 (name={data.get('studentName')})")
+        data["currentLevel"] = 90
     
     # 1. currentLevel: 9 → 90 보정
     # Lv.9에서 스킬 MAX, 높은 인연 랭크, 5성, 무기 보유는 불가능

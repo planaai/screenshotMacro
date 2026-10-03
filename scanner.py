@@ -133,6 +133,25 @@ class ScannerListener:
             # extract_screenshot_data
             data = extractor.extract_screenshot_data(filepath)
             
+            # ==== NEW: 장비 스캔 워크플로우 ====
+            try:
+                import equipment_scanner
+                self.log("🔍 장비 상세 스캔 시작...")
+                if not getattr(self, 'eq_workflow', None):
+                    self.eq_workflow = equipment_scanner.build_default_workflow()
+                eq_result = self.eq_workflow.run()
+                eq_filepath = filepath.rsplit('.', 1)[0] + "_equip.json"
+                with open(eq_filepath, 'w', encoding='utf-8') as f:
+                    import json
+                    json.dump(eq_result.to_extractor_format(), f, ensure_ascii=False, indent=2)
+                if data:
+                    if "equipment" not in data:
+                        data["equipment"] = {}
+                    data["equipment"].update(eq_result.to_extractor_format())
+            except Exception as e:
+                self.log(f"⚠️ 장비 스캔 중 오류 발생: {e}")
+            # ==================================
+            
             result = {
                 "path": filepath,
                 "data": data if data else {},

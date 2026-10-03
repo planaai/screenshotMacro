@@ -1,0 +1,6842 @@
+[
+  {
+    "studentName": "히나타",
+    "bondRank": 43,
+    "currentLevel": 89,
+    "skills": {
+      "ex": "5",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 3
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 45076,
+      "hpAbility": 0,
+      "attackPower": 6357,
+      "atkAbility": 0,
+      "defensePower": 107,
+      "healPower": 5687,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "히나타(수영복)",
+    "bondRank": 43,
+    "currentLevel": 35,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 1
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 21396,
+      "hpAbility": 0,
+      "attackPower": 3283,
+      "atkAbility": 0,
+      "defensePower": 1580,
+      "healPower": 4618,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "미카",
+    "bondRank": 34,
+    "currentLevel": 90,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 3
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 87381,
+      "hpAbility": 0,
+      "attackPower": 6038,
+      "atkAbility": 0,
+      "defensePower": 121,
+      "healPower": 5749,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "아즈사",
+    "bondRank": 26,
+    "currentLevel": 90,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 3
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 44535,
+      "hpAbility": 0,
+      "attackPower": 4529,
+      "atkAbility": 12,
+      "defensePower": 108,
+      "healPower": 5714,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "유우카",
+    "bondRank": 22,
+    "currentLevel": 90,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 1
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 113955,
+      "hpAbility": 17,
+      "attackPower": 2290,
+      "atkAbility": 0,
+      "defensePower": 664,
+      "healPower": 6335,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "히마리",
+    "bondRank": 22,
+    "currentLevel": 90,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 2
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 53541,
+      "hpAbility": 0,
+      "attackPower": 4836,
+      "atkAbility": 0,
+      "defensePower": 599,
+      "healPower": 7021,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "호시노(수영복)",
+    "bondRank": 22,
+    "currentLevel": 87,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 1
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 60914,
+      "hpAbility": 0,
+      "attackPower": 4061,
+      "atkAbility": 0,
+      "defensePower": 2115,
+      "healPower": 6674,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "코하루",
+    "bondRank": 22,
+    "currentLevel": 85,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 2
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 34661,
+      "hpAbility": 0,
+      "attackPower": 4761,
+      "atkAbility": 0,
+      "defensePower": 128,
+      "healPower": 13190,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "와카모",
+    "bondRank": 21,
+    "currentLevel": 87,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 3
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 39256,
+      "hpAbility": 0,
+      "attackPower": 11251,
+      "atkAbility": 0,
+      "defensePower": 105,
+      "healPower": 5594,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "아코",
+    "bondRank": 21,
+    "currentLevel": 87,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 1,
+      "star": 1
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 41082,
+      "hpAbility": 0,
+      "attackPower": 3434,
+      "atkAbility": 0,
+      "defensePower": 101,
+      "healPower": 10277,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "마키",
+    "bondRank": 21,
+    "currentLevel": 87,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 3
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 39807,
+      "hpAbility": 0,
+      "attackPower": 5149,
+      "atkAbility": 0,
+      "defensePower": 435,
+      "healPower": 5442,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "아루",
+    "bondRank": 20,
+    "currentLevel": 90,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 3
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 39877,
+      "hpAbility": 0,
+      "attackPower": 8932,
+      "atkAbility": 0,
+      "defensePower": 109,
+      "healPower": 5694,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "츠루기",
+    "bondRank": 20,
+    "currentLevel": 87,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 2
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 57278,
+      "hpAbility": 0,
+      "attackPower": 8313,
+      "atkAbility": 0,
+      "defensePower": 2141,
+      "healPower": 6113,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "카요코",
+    "bondRank": 20,
+    "currentLevel": 85,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 1
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 32733,
+      "hpAbility": 0,
+      "attackPower": 1636,
+      "atkAbility": 0,
+      "defensePower": 106,
+      "healPower": 5831,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "노아",
+    "bondRank": 20,
+    "currentLevel": 81,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 27001,
+      "hpAbility": 0,
+      "attackPower": 1277,
+      "atkAbility": 0,
+      "defensePower": 99,
+      "healPower": 4341,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "시로코",
+    "bondRank": 20,
+    "currentLevel": 64,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 18610,
+      "hpAbility": 0,
+      "attackPower": 3068,
+      "atkAbility": 0,
+      "defensePower": 82,
+      "healPower": 3778,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "우이",
+    "bondRank": 19,
+    "currentLevel": 87,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 1
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 33383,
+      "hpAbility": 0,
+      "attackPower": 5193,
+      "atkAbility": 0,
+      "defensePower": 102,
+      "healPower": 5792,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "슌",
+    "bondRank": 19,
+    "currentLevel": 90,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 33168,
+      "hpAbility": 0,
+      "attackPower": 4961,
+      "atkAbility": 0,
+      "defensePower": 108,
+      "healPower": 4648,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "히비키",
+    "bondRank": 19,
+    "currentLevel": 88,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 19102,
+      "hpAbility": 0,
+      "attackPower": 3992,
+      "atkAbility": 0,
+      "defensePower": 429,
+      "healPower": 5246,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "하루나(새해)",
+    "bondRank": 19,
+    "currentLevel": 85,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 19815,
+      "hpAbility": 0,
+      "attackPower": 4850,
+      "atkAbility": 0,
+      "defensePower": 100,
+      "healPower": 4638,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "호시노",
+    "bondRank": 19,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 4556,
+      "hpAbility": 0,
+      "attackPower": 310,
+      "atkAbility": 0,
+      "defensePower": 233,
+      "healPower": 1687,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "체리노",
+    "bondRank": 18,
+    "currentLevel": 87,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 3
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 70796,
+      "hpAbility": 0,
+      "attackPower": 3842,
+      "atkAbility": 0,
+      "defensePower": 104,
+      "healPower": 5630,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "모모이",
+    "bondRank": 18,
+    "currentLevel": 87,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 3
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 44363,
+      "hpAbility": 0,
+      "attackPower": 4555,
+      "atkAbility": 0,
+      "defensePower": 109,
+      "healPower": 5387,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "아카네",
+    "bondRank": 18,
+    "currentLevel": 87,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 10,
+      "star": 3
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 49504,
+      "hpAbility": 0,
+      "attackPower": 2237,
+      "atkAbility": 0,
+      "defensePower": 104,
+      "healPower": 7613,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "하스미(체육복)",
+    "bondRank": 18,
+    "currentLevel": 85,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 3
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 27909,
+      "hpAbility": 0,
+      "attackPower": 6692,
+      "atkAbility": 0,
+      "defensePower": 103,
+      "healPower": 5531,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "코타마",
+    "bondRank": 18,
+    "currentLevel": 63,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 2
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 18720,
+      "hpAbility": 0,
+      "attackPower": 1840,
+      "atkAbility": 0,
+      "defensePower": 82,
+      "healPower": 7007,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "유우카(체육복)",
+    "bondRank": 18,
+    "currentLevel": 87,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 60585,
+      "hpAbility": 0,
+      "attackPower": 2526,
+      "atkAbility": 0,
+      "defensePower": 1547,
+      "healPower": 7589,
+      "healAbility": 0
+    },
+    "currentStar": 4,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "노노미",
+    "bondRank": 18,
+    "currentLevel": 76,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 20980,
+      "hpAbility": 0,
+      "attackPower": 4026,
+      "atkAbility": 0,
+      "defensePower": 385,
+      "healPower": 4530,
+      "healAbility": 0
+    },
+    "currentStar": 4,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "후우카(새해)",
+    "bondRank": 18,
+    "currentLevel": 87,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 36416,
+      "hpAbility": 0,
+      "attackPower": 3773,
+      "atkAbility": 0,
+      "defensePower": 408,
+      "healPower": 8022,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "하루나",
+    "bondRank": 18,
+    "currentLevel": 80,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 21315,
+      "hpAbility": 0,
+      "attackPower": 4941,
+      "atkAbility": 0,
+      "defensePower": 96,
+      "healPower": 4387,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "하레",
+    "bondRank": 18,
+    "currentLevel": 51,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 11291,
+      "hpAbility": 0,
+      "attackPower": 1415,
+      "atkAbility": 0,
+      "defensePower": 68,
+      "healPower": 4190,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "나기사",
+    "bondRank": 17,
+    "currentLevel": 90,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 1,
+      "star": 1
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 32485,
+      "hpAbility": 0,
+      "attackPower": 6416,
+      "atkAbility": 0,
+      "defensePower": 1761,
+      "healPower": 10306,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "세리나",
+    "bondRank": 17,
+    "currentLevel": 90,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 1
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 27980,
+      "hpAbility": 0,
+      "attackPower": 3518,
+      "atkAbility": 0,
+      "defensePower": 135,
+      "healPower": 15416,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "이오리",
+    "bondRank": 17,
+    "currentLevel": 90,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 1,
+      "star": 2
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 49947,
+      "hpAbility": 0,
+      "attackPower": 7338,
+      "atkAbility": 0,
+      "defensePower": 113,
+      "healPower": 5497,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "유즈",
+    "bondRank": 17,
+    "currentLevel": 78,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 1
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 28116,
+      "hpAbility": 0,
+      "attackPower": 7454,
+      "atkAbility": 0,
+      "defensePower": 95,
+      "healPower": 5289,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "토키",
+    "bondRank": 17,
+    "currentLevel": 90,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 26260,
+      "hpAbility": 0,
+      "attackPower": 3832,
+      "atkAbility": 0,
+      "defensePower": 109,
+      "healPower": 5103,
+      "healAbility": 0
+    },
+    "currentStar": 4,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "아카리",
+    "bondRank": 17,
+    "currentLevel": 66,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 20221,
+      "hpAbility": 0,
+      "attackPower": 3145,
+      "atkAbility": 0,
+      "defensePower": 86,
+      "healPower": 4187,
+      "healAbility": 0
+    },
+    "currentStar": 4,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "하나에",
+    "bondRank": 17,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 3455,
+      "hpAbility": 0,
+      "attackPower": 236,
+      "atkAbility": 0,
+      "defensePower": 25,
+      "healPower": 3378,
+      "healAbility": 0
+    },
+    "currentStar": 4,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "히나",
+    "bondRank": 17,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 3096,
+      "hpAbility": 0,
+      "attackPower": 415,
+      "atkAbility": 0,
+      "defensePower": 80,
+      "healPower": 1806,
+      "healAbility": 0
+    },
+    "currentStar": 4,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "노도카(온천)",
+    "bondRank": 17,
+    "currentLevel": 89,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 24766,
+      "hpAbility": 0,
+      "attackPower": 2675,
+      "atkAbility": 0,
+      "defensePower": 124,
+      "healPower": 11208,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "치나츠(온천)",
+    "bondRank": 17,
+    "currentLevel": 82,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 32763,
+      "hpAbility": 0,
+      "attackPower": 1403,
+      "atkAbility": 0,
+      "defensePower": 92,
+      "healPower": 4921,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "준코",
+    "bondRank": 17,
+    "currentLevel": 66,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 18592,
+      "hpAbility": 0,
+      "attackPower": 3798,
+      "atkAbility": 0,
+      "defensePower": 86,
+      "healPower": 3782,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "시즈코",
+    "bondRank": 17,
+    "currentLevel": 58,
+    "skills": {
+      "ex": "1",
+      "basic": "6",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 23000,
+      "hpAbility": 0,
+      "attackPower": 1372,
+      "atkAbility": 0,
+      "defensePower": 463,
+      "healPower": 4455,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "후우카",
+    "bondRank": 17,
+    "currentLevel": 55,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 13679,
+      "hpAbility": 0,
+      "attackPower": 1143,
+      "atkAbility": 0,
+      "defensePower": 94,
+      "healPower": 6655,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "코토리",
+    "bondRank": 17,
+    "currentLevel": 51,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 13110,
+      "hpAbility": 0,
+      "attackPower": 1368,
+      "atkAbility": 0,
+      "defensePower": 283,
+      "healPower": 3551,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "마리나",
+    "bondRank": 17,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 4242,
+      "hpAbility": 0,
+      "attackPower": 200,
+      "atkAbility": 0,
+      "defensePower": 27,
+      "healPower": 1801,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "이즈미",
+    "bondRank": 17,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 3082,
+      "hpAbility": 0,
+      "attackPower": 329,
+      "atkAbility": 0,
+      "defensePower": 81,
+      "healPower": 1611,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "네루",
+    "bondRank": 17,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 3099,
+      "hpAbility": 0,
+      "attackPower": 316,
+      "atkAbility": 0,
+      "defensePower": 17,
+      "healPower": 1643,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "후부키",
+    "bondRank": 17,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2853,
+      "hpAbility": 0,
+      "attackPower": 376,
+      "atkAbility": 0,
+      "defensePower": 19,
+      "healPower": 1660,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "츠바키",
+    "bondRank": 16,
+    "currentLevel": 90,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 1
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 87000,
+      "hpAbility": 0,
+      "attackPower": 3453,
+      "atkAbility": 0,
+      "defensePower": 1567,
+      "healPower": 6053,
+      "healAbility": 25
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "세리카",
+    "bondRank": 16,
+    "currentLevel": 64,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 19825,
+      "hpAbility": 0,
+      "attackPower": 3847,
+      "atkAbility": 0,
+      "defensePower": 81,
+      "healPower": 4226,
+      "healAbility": 0
+    },
+    "currentStar": 4,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "하나코",
+    "bondRank": 16,
+    "currentLevel": 55,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 14933,
+      "hpAbility": 0,
+      "attackPower": 1494,
+      "atkAbility": 0,
+      "defensePower": 94,
+      "healPower": 7158,
+      "healAbility": 0
+    },
+    "currentStar": 4,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "아이리",
+    "bondRank": 16,
+    "currentLevel": 2,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 3313,
+      "hpAbility": 0,
+      "attackPower": 278,
+      "atkAbility": 0,
+      "defensePower": 21,
+      "healPower": 2120,
+      "healAbility": 0
+    },
+    "currentStar": 4,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "치세",
+    "bondRank": 16,
+    "currentLevel": 85,
+    "skills": {
+      "ex": "5",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 23426,
+      "hpAbility": 0,
+      "attackPower": 3754,
+      "atkAbility": 0,
+      "defensePower": 105,
+      "healPower": 4424,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "세리카(새해)",
+    "bondRank": 16,
+    "currentLevel": 66,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 21363,
+      "hpAbility": 0,
+      "attackPower": 2087,
+      "atkAbility": 0,
+      "defensePower": 78,
+      "healPower": 4775,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "아야네",
+    "bondRank": 16,
+    "currentLevel": 63,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 15241,
+      "hpAbility": 0,
+      "attackPower": 1054,
+      "atkAbility": 0,
+      "defensePower": 105,
+      "healPower": 6916,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "미모리",
+    "bondRank": 16,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2773,
+      "hpAbility": 0,
+      "attackPower": 164,
+      "atkAbility": 0,
+      "defensePower": 18,
+      "healPower": 1836,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "히후미(수영복)",
+    "bondRank": 16,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "5",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2900,
+      "hpAbility": 0,
+      "attackPower": 445,
+      "atkAbility": 0,
+      "defensePower": 19,
+      "healPower": 1964,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "시로코(라이딩)",
+    "bondRank": 16,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "6",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 3307,
+      "hpAbility": 0,
+      "attackPower": 518,
+      "atkAbility": 0,
+      "defensePower": 18,
+      "healPower": 1743,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "우타하(응원단)",
+    "bondRank": 16,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 3425,
+      "hpAbility": 0,
+      "attackPower": 543,
+      "atkAbility": 0,
+      "defensePower": 22,
+      "healPower": 1663,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "무츠키",
+    "bondRank": 15,
+    "currentLevel": 64,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 17420,
+      "hpAbility": 0,
+      "attackPower": 2169,
+      "atkAbility": 0,
+      "defensePower": 336,
+      "healPower": 4102,
+      "healAbility": 0
+    },
+    "currentStar": 4,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "카요코(새해)",
+    "bondRank": 15,
+    "currentLevel": 87,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 38957,
+      "hpAbility": 0,
+      "attackPower": 1925,
+      "atkAbility": 0,
+      "defensePower": 101,
+      "healPower": 4737,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "미야코",
+    "bondRank": 15,
+    "currentLevel": 78,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 52449,
+      "hpAbility": 0,
+      "attackPower": 1337,
+      "atkAbility": 0,
+      "defensePower": 134,
+      "healPower": 4577,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "아스나",
+    "bondRank": 15,
+    "currentLevel": 76,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 21700,
+      "hpAbility": 0,
+      "attackPower": 3166,
+      "atkAbility": 0,
+      "defensePower": 98,
+      "healPower": 4073,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "하루카",
+    "bondRank": 15,
+    "currentLevel": 73,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 50368,
+      "hpAbility": 0,
+      "attackPower": 1140,
+      "atkAbility": 0,
+      "defensePower": 2144,
+      "healPower": 3992,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "와카모(수영복)",
+    "bondRank": 15,
+    "currentLevel": 2,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 3453,
+      "hpAbility": 0,
+      "attackPower": 691,
+      "atkAbility": 0,
+      "defensePower": 20,
+      "healPower": 1704,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "체리노(온천)",
+    "bondRank": 15,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 3255,
+      "hpAbility": 0,
+      "attackPower": 344,
+      "atkAbility": 0,
+      "defensePower": 19,
+      "healPower": 1911,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "사쿠라코",
+    "bondRank": 15,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2797,
+      "hpAbility": 0,
+      "attackPower": 384,
+      "atkAbility": 0,
+      "defensePower": 19,
+      "healPower": 1647,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "카즈사",
+    "bondRank": 15,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2739,
+      "hpAbility": 0,
+      "attackPower": 348,
+      "atkAbility": 0,
+      "defensePower": 79,
+      "healPower": 1658,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "아스나(바니걸)",
+    "bondRank": 15,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2967,
+      "hpAbility": 0,
+      "attackPower": 348,
+      "atkAbility": 0,
+      "defensePower": 18,
+      "healPower": 1777,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "카린",
+    "bondRank": 15,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2807,
+      "hpAbility": 0,
+      "attackPower": 421,
+      "atkAbility": 0,
+      "defensePower": 20,
+      "healPower": 1837,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "미사키",
+    "bondRank": 15,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "5",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2714,
+      "hpAbility": 0,
+      "attackPower": 785,
+      "atkAbility": 0,
+      "defensePower": 19,
+      "healPower": 1658,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "히요리",
+    "bondRank": 15,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2580,
+      "hpAbility": 0,
+      "attackPower": 302,
+      "atkAbility": 0,
+      "defensePower": 18,
+      "healPower": 1996,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "하스미",
+    "bondRank": 14,
+    "currentLevel": 70,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 18783,
+      "hpAbility": 0,
+      "attackPower": 4184,
+      "atkAbility": 0,
+      "defensePower": 90,
+      "healPower": 4326,
+      "healAbility": 0
+    },
+    "currentStar": 4,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "무츠키(새해)",
+    "bondRank": 14,
+    "currentLevel": 87,
+    "skills": {
+      "ex": "5",
+      "basic": "6",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 41572,
+      "hpAbility": 0,
+      "attackPower": 5339,
+      "atkAbility": 0,
+      "defensePower": 406,
+      "healPower": 4725,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "키리노",
+    "bondRank": 14,
+    "currentLevel": 85,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 37452,
+      "hpAbility": 0,
+      "attackPower": 1450,
+      "atkAbility": 0,
+      "defensePower": 94,
+      "healPower": 4859,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "마리",
+    "bondRank": 14,
+    "currentLevel": 58,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 14937,
+      "hpAbility": 0,
+      "attackPower": 1272,
+      "atkAbility": 0,
+      "defensePower": 1173,
+      "healPower": 5177,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "피나",
+    "bondRank": 14,
+    "currentLevel": 47,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 12384,
+      "hpAbility": 0,
+      "attackPower": 1763,
+      "atkAbility": 0,
+      "defensePower": 271,
+      "healPower": 3094,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "스즈미",
+    "bondRank": 14,
+    "currentLevel": 29,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 9686,
+      "hpAbility": 0,
+      "attackPower": 907,
+      "atkAbility": 0,
+      "defensePower": 49,
+      "healPower": 2540,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "카에데",
+    "bondRank": 14,
+    "currentLevel": 2,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2705,
+      "hpAbility": 0,
+      "attackPower": 196,
+      "atkAbility": 0,
+      "defensePower": 19,
+      "healPower": 2130,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "마시로",
+    "bondRank": 14,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2843,
+      "hpAbility": 0,
+      "attackPower": 458,
+      "atkAbility": 0,
+      "defensePower": 20,
+      "healPower": 1892,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "히후미",
+    "bondRank": 14,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2996,
+      "hpAbility": 0,
+      "attackPower": 346,
+      "atkAbility": 0,
+      "defensePower": 20,
+      "healPower": 1644,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "세나",
+    "bondRank": 14,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2310,
+      "hpAbility": 0,
+      "attackPower": 201,
+      "atkAbility": 0,
+      "defensePower": 18,
+      "healPower": 2149,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "아리스(메이드)",
+    "bondRank": 14,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2841,
+      "hpAbility": 0,
+      "attackPower": 675,
+      "atkAbility": 0,
+      "defensePower": 79,
+      "healPower": 1663,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "사오리",
+    "bondRank": 14,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2693,
+      "hpAbility": 0,
+      "attackPower": 303,
+      "atkAbility": 0,
+      "defensePower": 19,
+      "healPower": 1675,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "미야코(수영복)",
+    "bondRank": 13,
+    "currentLevel": 89,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 49640,
+      "hpAbility": 0,
+      "attackPower": 1720,
+      "atkAbility": 0,
+      "defensePower": 156,
+      "healPower": 4763,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "우타하",
+    "bondRank": 13,
+    "currentLevel": 85,
+    "skills": {
+      "ex": "1",
+      "basic": "6",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 18242,
+      "hpAbility": 0,
+      "attackPower": 3082,
+      "atkAbility": 0,
+      "defensePower": 107,
+      "healPower": 5002,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "히비키(응원단)",
+    "bondRank": 13,
+    "currentLevel": 63,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 13226,
+      "hpAbility": 0,
+      "attackPower": 5887,
+      "atkAbility": 0,
+      "defensePower": 312,
+      "healPower": 3910,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "이즈미(수영복)",
+    "bondRank": 13,
+    "currentLevel": 57,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 14780,
+      "hpAbility": 0,
+      "attackPower": 1984,
+      "atkAbility": 0,
+      "defensePower": 293,
+      "healPower": 4119,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "우이(수영복)",
+    "bondRank": 13,
+    "currentLevel": 21,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 6757,
+      "hpAbility": 0,
+      "attackPower": 1015,
+      "atkAbility": 0,
+      "defensePower": 36,
+      "healPower": 2538,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "마시로(수영복)",
+    "bondRank": 13,
+    "currentLevel": 2,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2689,
+      "hpAbility": 0,
+      "attackPower": 535,
+      "atkAbility": 0,
+      "defensePower": 18,
+      "healPower": 2159,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "시미코",
+    "bondRank": 13,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2603,
+      "hpAbility": 0,
+      "attackPower": 270,
+      "atkAbility": 0,
+      "defensePower": 19,
+      "healPower": 1924,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "하나에(크리스마스)",
+    "bondRank": 13,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2906,
+      "hpAbility": 0,
+      "attackPower": 245,
+      "atkAbility": 0,
+      "defensePower": 75,
+      "healPower": 3419,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "주리",
+    "bondRank": 13,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2606,
+      "hpAbility": 0,
+      "attackPower": 240,
+      "atkAbility": 0,
+      "defensePower": 118,
+      "healPower": 1920,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "아리스",
+    "bondRank": 13,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2492,
+      "hpAbility": 0,
+      "attackPower": 704,
+      "atkAbility": 0,
+      "defensePower": 68,
+      "healPower": 1892,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "치히로",
+    "bondRank": 13,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2614,
+      "hpAbility": 0,
+      "attackPower": 377,
+      "atkAbility": 0,
+      "defensePower": 19,
+      "healPower": 1916,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "하나코(수영복)",
+    "bondRank": 12,
+    "currentLevel": 90,
+    "skills": {
+      "ex": "1",
+      "basic": "6",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 5,
+      "star": 4
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 43908,
+      "hpAbility": 25,
+      "attackPower": 7881,
+      "atkAbility": 25,
+      "defensePower": 109,
+      "healPower": 6042,
+      "healAbility": 25
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "시로코*테러",
+    "bondRank": 12,
+    "currentLevel": 90,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 1
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 56322,
+      "hpAbility": 0,
+      "attackPower": 5361,
+      "atkAbility": 4,
+      "defensePower": 108,
+      "healPower": 5742,
+      "healAbility": 1
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "아즈사(수영복)",
+    "bondRank": 12,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 1
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 5495,
+      "hpAbility": 0,
+      "attackPower": 766,
+      "atkAbility": 0,
+      "defensePower": 17,
+      "healPower": 2276,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "요시미",
+    "bondRank": 12,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2785,
+      "hpAbility": 0,
+      "attackPower": 407,
+      "atkAbility": 0,
+      "defensePower": 19,
+      "healPower": 2101,
+      "healAbility": 0
+    },
+    "currentStar": 4,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "나츠",
+    "bondRank": 12,
+    "currentLevel": 87,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 56422,
+      "hpAbility": 0,
+      "attackPower": 1989,
+      "atkAbility": 0,
+      "defensePower": 2183,
+      "healPower": 4873,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "치나츠",
+    "bondRank": 12,
+    "currentLevel": 51,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 12526,
+      "hpAbility": 0,
+      "attackPower": 968,
+      "atkAbility": 0,
+      "defensePower": 88,
+      "healPower": 7744,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "카호",
+    "bondRank": 12,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2616,
+      "hpAbility": 0,
+      "attackPower": 336,
+      "atkAbility": 0,
+      "defensePower": 19,
+      "healPower": 1655,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "코하루(수영복)",
+    "bondRank": 12,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 3073,
+      "hpAbility": 0,
+      "attackPower": 393,
+      "atkAbility": 0,
+      "defensePower": 18,
+      "healPower": 1963,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "쇼쿠호 미사키",
+    "bondRank": 12,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2408,
+      "hpAbility": 0,
+      "attackPower": 291,
+      "atkAbility": 0,
+      "defensePower": 18,
+      "healPower": 1795,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "호시노(무장)",
+    "bondRank": 1,
+    "currentLevel": 90,
+    "skills": {
+      "ex": "1",
+      "basic": "6",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 3
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 95028,
+      "hpAbility": 25,
+      "attackPower": 3102,
+      "atkAbility": 25,
+      "defensePower": 2744,
+      "healPower": 4538,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "아리스(무장)",
+    "bondRank": 1,
+    "currentLevel": 90,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 1
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 36777,
+      "hpAbility": 2,
+      "attackPower": 8414,
+      "atkAbility": 3,
+      "defensePower": 93,
+      "healPower": 5813,
+      "healAbility": 5
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "미유(수영복)",
+    "bondRank": 1,
+    "currentLevel": 87,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 5,
+      "star": 2
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 36826,
+      "hpAbility": 0,
+      "attackPower": 5136,
+      "atkAbility": 0,
+      "defensePower": 550,
+      "healPower": 7126,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "리오",
+    "bondRank": 1,
+    "currentLevel": 89,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 25059,
+      "hpAbility": 0,
+      "attackPower": 2500,
+      "atkAbility": 0,
+      "defensePower": 593,
+      "healPower": 5007,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "아야네(수영복)",
+    "bondRank": 1,
+    "currentLevel": 19,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 20555,
+      "hpAbility": 0,
+      "attackPower": 968,
+      "atkAbility": 0,
+      "defensePower": 1736,
+      "healPower": 2867,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "세이아",
+    "bondRank": 1,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2188,
+      "hpAbility": 0,
+      "attackPower": 221,
+      "atkAbility": 0,
+      "defensePower": 16,
+      "healPower": 1783,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "리츠",
+    "bondRank": 1,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 3374,
+      "hpAbility": 0,
+      "attackPower": 333,
+      "atkAbility": 0,
+      "defensePower": 98,
+      "healPower": 1989,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "미사카 미코토",
+    "bondRank": 1,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2461,
+      "hpAbility": 0,
+      "attackPower": 320,
+      "atkAbility": 0,
+      "defensePower": 19,
+      "healPower": 1718,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "미치루",
+    "bondRank": 10,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2490,
+      "hpAbility": 0,
+      "attackPower": 369,
+      "atkAbility": 0,
+      "defensePower": 118,
+      "healPower": 1680,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "아스나(교복)",
+    "bondRank": 10,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2855,
+      "hpAbility": 0,
+      "attackPower": 388,
+      "atkAbility": 0,
+      "defensePower": 17,
+      "healPower": 1664,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "준코(새해)",
+    "bondRank": 10,
+    "currentLevel": 70,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": 1
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 17653,
+      "hpAbility": 0,
+      "attackPower": 2716,
+      "atkAbility": 0,
+      "defensePower": 87,
+      "healPower": 3676,
+      "healAbility": 0
+    },
+    "currentStar": 2,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "토모에",
+    "bondRank": 10,
+    "currentLevel": 63,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": 1
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 14332,
+      "hpAbility": 0,
+      "attackPower": 2216,
+      "atkAbility": 0,
+      "defensePower": 78,
+      "healPower": 3557,
+      "healAbility": 0
+    },
+    "currentStar": 2,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "노도카",
+    "bondRank": 10,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": 1
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2708,
+      "hpAbility": 0,
+      "attackPower": 200,
+      "atkAbility": 0,
+      "defensePower": 20,
+      "healPower": 1921,
+      "healAbility": 0
+    },
+    "currentStar": 2,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "츠루기(수영복)",
+    "bondRank": 10,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": 1
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 3643,
+      "hpAbility": 0,
+      "attackPower": 553,
+      "atkAbility": 0,
+      "defensePower": 136,
+      "healPower": 1483,
+      "healAbility": 0
+    },
+    "currentStar": 2,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "유즈(메이드)",
+    "bondRank": 10,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": 1
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 3543,
+      "hpAbility": 0,
+      "attackPower": 395,
+      "atkAbility": 0,
+      "defensePower": 99,
+      "healPower": 1808,
+      "healAbility": 0
+    },
+    "currentStar": 2,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "케이",
+    "bondRank": 9,
+    "currentLevel": 89,
+    "skills": {
+      "ex": "1",
+      "basic": "6",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 22301,
+      "hpAbility": 0,
+      "attackPower": 5480,
+      "atkAbility": 0,
+      "defensePower": 377,
+      "healPower": 4068,
+      "healAbility": 0
+    },
+    "currentStar": 4,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "이즈나(수영복)",
+    "bondRank": 9,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2656,
+      "hpAbility": 0,
+      "attackPower": 263,
+      "atkAbility": 0,
+      "defensePower": 21,
+      "healPower": 1730,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "니코",
+    "bondRank": 8,
+    "currentLevel": 90,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 1
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 27507,
+      "hpAbility": 0,
+      "attackPower": 2865,
+      "atkAbility": 0,
+      "defensePower": 162,
+      "healPower": 4581,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "아코(드레스)",
+    "bondRank": 8,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2716,
+      "hpAbility": 0,
+      "attackPower": 236,
+      "atkAbility": 0,
+      "defensePower": 18,
+      "healPower": 1809,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "모미지",
+    "bondRank": 8,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": 1
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2330,
+      "hpAbility": 0,
+      "attackPower": 1074,
+      "atkAbility": 0,
+      "defensePower": 19,
+      "healPower": 1525,
+      "healAbility": 0
+    },
+    "currentStar": 2,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "오토기",
+    "bondRank": 8,
+    "currentLevel": 90,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": 1,
+      "sub": 1
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 17630,
+      "hpAbility": 0,
+      "attackPower": 4100,
+      "atkAbility": 0,
+      "defensePower": 109,
+      "healPower": 3945,
+      "healAbility": 0
+    },
+    "currentStar": 1,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "사텐 루이코",
+    "bondRank": 8,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": 1,
+      "sub": 1
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 3078,
+      "hpAbility": 0,
+      "attackPower": 253,
+      "atkAbility": 0,
+      "defensePower": 102,
+      "healPower": 1633,
+      "healAbility": 0
+    },
+    "currentStar": 1,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "시즈코(수영복)",
+    "bondRank": 7,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 3078,
+      "hpAbility": 0,
+      "attackPower": 294,
+      "atkAbility": 0,
+      "defensePower": 109,
+      "healPower": 2307,
+      "healAbility": 0
+    },
+    "currentStar": 4,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "카린(교복)",
+    "bondRank": 7,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2576,
+      "hpAbility": 0,
+      "attackPower": 517,
+      "atkAbility": 0,
+      "defensePower": 65,
+      "healPower": 2136,
+      "healAbility": 0
+    },
+    "currentStar": 4,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "츠쿠요",
+    "bondRank": 7,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 3049,
+      "hpAbility": 0,
+      "attackPower": 164,
+      "atkAbility": 0,
+      "defensePower": 27,
+      "healPower": 1831,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "이치카",
+    "bondRank": 6,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2490,
+      "hpAbility": 0,
+      "attackPower": 358,
+      "atkAbility": 0,
+      "defensePower": 19,
+      "healPower": 1664,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "아루(드레스)",
+    "bondRank": 6,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2748,
+      "hpAbility": 0,
+      "attackPower": 487,
+      "atkAbility": 0,
+      "defensePower": 17,
+      "healPower": 1661,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "키라라",
+    "bondRank": 6,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2379,
+      "hpAbility": 0,
+      "attackPower": 329,
+      "atkAbility": 0,
+      "defensePower": 18,
+      "healPower": 1736,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "루미",
+    "bondRank": 6,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2638,
+      "hpAbility": 0,
+      "attackPower": 164,
+      "atkAbility": 0,
+      "defensePower": 23,
+      "healPower": 2648,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "토키(무장)",
+    "bondRank": 6,
+    "currentLevel": 3,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": 1
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 3330,
+      "hpAbility": 0,
+      "attackPower": 351,
+      "atkAbility": 0,
+      "defensePower": 24,
+      "healPower": 2547,
+      "healAbility": 0
+    },
+    "currentStar": 2,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "이부키",
+    "bondRank": 6,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "6",
+      "enh": 1,
+      "sub": 1
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2127,
+      "hpAbility": 0,
+      "attackPower": 252,
+      "atkAbility": 0,
+      "defensePower": 18,
+      "healPower": 1475,
+      "healAbility": 0
+    },
+    "currentStar": 1,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "아츠코(수영복)",
+    "bondRank": 6,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": 1,
+      "sub": 1
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2872,
+      "hpAbility": 0,
+      "attackPower": 249,
+      "atkAbility": 0,
+      "defensePower": 95,
+      "healPower": 2673,
+      "healAbility": 0
+    },
+    "currentStar": 1,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "아츠코",
+    "bondRank": 5,
+    "currentLevel": 90,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 90811,
+      "hpAbility": 0,
+      "attackPower": 2368,
+      "atkAbility": 0,
+      "defensePower": 151,
+      "healPower": 6963,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "카노에",
+    "bondRank": 5,
+    "currentLevel": 89,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 47966,
+      "hpAbility": 0,
+      "attackPower": 6247,
+      "atkAbility": 0,
+      "defensePower": 931,
+      "healPower": 3839,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "마코토",
+    "bondRank": 5,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2109,
+      "hpAbility": 0,
+      "attackPower": 399,
+      "atkAbility": 0,
+      "defensePower": 62,
+      "healPower": 2002,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "이즈나",
+    "bondRank": 4,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2835,
+      "hpAbility": 0,
+      "attackPower": 251,
+      "atkAbility": 0,
+      "defensePower": 22,
+      "healPower": 1624,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "아카리(새해)",
+    "bondRank": 4,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 3652,
+      "hpAbility": 0,
+      "attackPower": 384,
+      "atkAbility": 0,
+      "defensePower": 94,
+      "healPower": 2070,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "네루(교복)",
+    "bondRank": 4,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "2"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2637,
+      "hpAbility": 0,
+      "attackPower": 448,
+      "atkAbility": 0,
+      "defensePower": 16,
+      "healPower": 1776,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "후부키(수영복)",
+    "bondRank": 4,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2570,
+      "hpAbility": 0,
+      "attackPower": 444,
+      "atkAbility": 0,
+      "defensePower": 65,
+      "healPower": 1913,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "렌게(수영복)",
+    "bondRank": 4,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": 1
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2335,
+      "hpAbility": 0,
+      "attackPower": 345,
+      "atkAbility": 0,
+      "defensePower": 19,
+      "healPower": 1523,
+      "healAbility": 0
+    },
+    "currentStar": 2,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "미치루(드레스)",
+    "bondRank": 3,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "6",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 3289,
+      "hpAbility": 0,
+      "attackPower": 330,
+      "atkAbility": 0,
+      "defensePower": 97,
+      "healPower": 3024,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "사야(사복)",
+    "bondRank": 3,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2392,
+      "hpAbility": 0,
+      "attackPower": 257,
+      "atkAbility": 0,
+      "defensePower": 18,
+      "healPower": 1987,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "후유",
+    "bondRank": 3,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2057,
+      "hpAbility": 0,
+      "attackPower": 278,
+      "atkAbility": 0,
+      "defensePower": 16,
+      "healPower": 1423,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "쿠루미",
+    "bondRank": 1,
+    "currentLevel": 90,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 1
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 63398,
+      "hpAbility": 0,
+      "attackPower": 3453,
+      "atkAbility": 0,
+      "defensePower": 938,
+      "healPower": 5526,
+      "healAbility": 0
+    },
+    "currentStar": 5,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "니야",
+    "bondRank": 1,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "6",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2156,
+      "hpAbility": 0,
+      "attackPower": 379,
+      "atkAbility": 0,
+      "defensePower": 64,
+      "healPower": 1962,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "코유키",
+    "bondRank": 1,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "1",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2398,
+      "hpAbility": 0,
+      "attackPower": 424,
+      "atkAbility": 0,
+      "defensePower": 76,
+      "healPower": 1724,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  },
+  {
+    "studentName": "사야",
+    "bondRank": 1,
+    "currentLevel": 1,
+    "skills": {
+      "ex": "5",
+      "basic": "1",
+      "enh": "1",
+      "sub": "1"
+    },
+    "weapon": {
+      "level": 0,
+      "star": 0
+    },
+    "equipment": {
+      "slot1": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot2": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot3": {
+        "tier": 0,
+        "level": 0
+      },
+      "slot4": {
+        "tier": 0,
+        "level": 0
+      }
+    },
+    "stats": {
+      "maxHP": 2563,
+      "hpAbility": 0,
+      "attackPower": 241,
+      "atkAbility": 0,
+      "defensePower": 20,
+      "healPower": 1858,
+      "healAbility": 0
+    },
+    "currentStar": 3,
+    "needs_review": false,
+    "status": "pending"
+  }
+]

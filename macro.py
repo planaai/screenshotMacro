@@ -105,10 +105,9 @@ class CaptureMacro:
         self.log(f"✅ 첫 학생 [{first_name_str}] 확인 완료! 반복 캡처를 시작합니다...")
         
         screen_w, screen_h = pyautogui.size()
-        # The '>' arrow button in Blue Archive student info screen is at the right edge.
-        # It is pinned to the right edge of the screen, not the right panel.
-        # Adjusted to 95.0% to move the click slightly further left.
-        next_x = int(screen_w * 0.95)
+        # The '>' arrow button in Blue Archive student info screen is pinned to the far right edge of the screen.
+        # Adjusted to 98.0% to accurately hit the arrow button and avoid clicking the background or the 'Skill Growth' button.
+        next_x = int(screen_w * 0.98)
         next_y = int(screen_h * 0.5)
         
         count = 0
@@ -128,6 +127,24 @@ class CaptureMacro:
                 cv2.imwrite(filepath, current_img)
                 count += 1
                 self.log(f"📸 캡처 완료: {count}번째 장 저장됨.")
+                
+                # ==== NEW: 장비 스캔 워크플로우 ====
+                try:
+                    import equipment_scanner
+                    self.log("🔍 장비 상세 스캔 시작...")
+                    if not getattr(self, 'eq_workflow', None):
+                        self.eq_workflow = equipment_scanner.build_default_workflow()
+                    eq_result = self.eq_workflow.run()
+                    eq_filepath = filepath.rsplit('.', 1)[0] + "_equip.json"
+                    with open(eq_filepath, 'w', encoding='utf-8') as f:
+                        import json
+                        json.dump(eq_result.to_extractor_format(), f, ensure_ascii=False, indent=2)
+                except BaseException as e:
+                    if type(e).__name__ == "ScanAborted":
+                        self.log("⏹️ [F9] 장비 스캔 중 비상 정지 감지! 캡처를 중단합니다.")
+                        break
+                    self.log(f"⚠️ 장비 스캔 중 오류 발생: {e}")
+                # ==================================
                 
                 # Click next
                 pyautogui.mouseDown(x=next_x, y=next_y)
