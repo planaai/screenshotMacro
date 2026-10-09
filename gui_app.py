@@ -676,10 +676,15 @@ class ExtractApp(QMainWindow):
 
     def open_coordinate_editor(self):
         try:
+            import importlib
+            import ui.coord_editor.canvas
+            import ui.coord_editor.editor_window
+            importlib.reload(ui.coord_editor.canvas)
+            importlib.reload(ui.coord_editor.editor_window)
             from ui.coord_editor.editor_window import CoordinateEditorWindow
             self.coord_editor = CoordinateEditorWindow()
             self.coord_editor.show()
-        except ImportError as e:
+        except Exception as e:
             import traceback
             traceback.print_exc()
             QMessageBox.critical(self, "오류", f"편집기 스크립트 오류:\n{e}")

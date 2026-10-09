@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QGraphicsView, QGraphicsScene, QGraphicsRectItem, QGraphicsEllipseItem
-from PyQt5.QtCore import Qt, QPointF, pyqtSignal, QObject
-from PyQt5.QtGui import QPen, QColor, QPixmap, QBrush, QPainterPath, QPainterPathStroker, QPainter
+from PyQt5.QtCore import Qt, QPointF, QRectF, pyqtSignal, QObject
+from PyQt5.QtGui import QPen, QColor, QPixmap, QBrush, QPainterPath, QPainterPathStroker, QPainter, QFont
 
 class CanvasSignals(QObject):
     item_selected = pyqtSignal(str)
@@ -8,7 +8,7 @@ class CanvasSignals(QObject):
 
 class DraggablePoint(QGraphicsEllipseItem):
     def __init__(self, key, x, y, img_w, img_h, signals):
-        r = 5
+        r = 6
         super().__init__(-r, -r, 2*r, 2*r)
         self.key = key
         self.img_w = img_w
@@ -17,29 +17,53 @@ class DraggablePoint(QGraphicsEllipseItem):
         self.setPos(x * img_w, y * img_h)
         self.setFlags(QGraphicsRectItem.ItemIsSelectable | QGraphicsRectItem.ItemIsMovable | QGraphicsRectItem.ItemSendsGeometryChanges)
         self.setAcceptHoverEvents(True)
-        self.setPen(QPen(QColor(0, 0, 255), 2))
-        self.setBrush(QBrush(QColor(0, 0, 255, 128)))
+
+    def update_geometry(self, x, y):
+        self.setPos(x * self.img_w, y * self.img_h)
+        self.update()
+
+    def mousePressEvent(self, event):
+        super().mousePressEvent(event)
+        self.signals.item_selected.emit(self.key)
 
     def paint(self, painter, option, widget):
+        painter.setRenderHint(QPainter.Antialiasing)
         if self.isSelected():
-            self.setPen(QPen(QColor(0, 255, 0), 3))
-            self.setBrush(QBrush(QColor(0, 255, 0, 128)))
+            painter.setPen(QPen(QColor(0, 255, 128), 3))
+            painter.setBrush(QBrush(QColor(0, 255, 128, 220)))
         else:
-            self.setPen(QPen(QColor(0, 0, 255), 2))
-            self.setBrush(QBrush(QColor(0, 0, 255, 128)))
-        super().paint(painter, option, widget)
-        painter.setPen(QColor(255, 255, 0))
-        painter.drawText(QPointF(10, 10), self.key)
+            painter.setPen(QPen(QColor(0, 140, 255), 2))
+            painter.setBrush(QBrush(QColor(0, 140, 255, 180)))
+        painter.drawEllipse(self.rect())
+
+        # Badge
+        font = QFont("Malgun Gothic", 9, QFont.Bold)
+        painter.setFont(font)
+        metrics = painter.fontMetrics()
+        txt = self.key
+        txt_w = (metrics.horizontalAdvance(txt) if hasattr(metrics, 'horizontalAdvance') else metrics.width(txt)) + 8
+        txt_h = 18
+        badge_rect = QRectF(10, -9, txt_w, txt_h)
+        painter.setBrush(QBrush(QColor(20, 20, 20, 210)))
+        painter.setPen(Qt.NoPen)
+        painter.drawRoundedRect(badge_rect, 3, 3)
+
+        painter.setPen(QColor(0, 255, 128) if self.isSelected() else QColor(255, 255, 255))
+        painter.drawText(badge_rect, Qt.AlignCenter, txt)
 
     def itemChange(self, change, value):
         if change == QGraphicsRectItem.ItemSelectedHasChanged:
-            self.setZValue(1.0 if value else 0.0)
+            self.setZValue(10.0 if value else 1.0)
             if value:
                 self.signals.item_selected.emit(self.key)
         elif change == QGraphicsRectItem.ItemPositionHasChanged:
             pos = value
-            self.signals.item_moved.emit(self.key, [pos.x() / self.img_w, pos.y() / self.img_h])
+            self.signals.item_moved.emit(self.key, [
+                round(pos.x() / self.img_w, 4),
+                round(pos.y() / self.img_h, 4)
+            ])
         return super().itemChange(change, value)
+
 
 class ResizableRect(QGraphicsRectItem):
     def __init__(self, key, x, y, w, h, img_w, img_h, signals):
@@ -51,9 +75,13 @@ class ResizableRect(QGraphicsRectItem):
         self.signals = signals
         self.setFlags(QGraphicsRectItem.ItemIsSelectable | QGraphicsRectItem.ItemIsMovable | QGraphicsRectItem.ItemSendsGeometryChanges)
         self.setAcceptHoverEvents(True)
-        self.setPen(QPen(QColor(255, 0, 0), 2))
         self.handle_size = 10
         self.current_handle = None
+
+    def update_geometry(self, x, y, w, h):
+        self.setPos(x * self.img_w, y * self.img_h)
+        self.setRect(0, 0, max(4, w * self.img_w), max(4, h * self.img_h))
+        self.update()
 
     def hoverMoveEvent(self, event):
         pos = event.pos()
@@ -96,17 +124,19 @@ class ResizableRect(QGraphicsRectItem):
         else:
             self.current_handle = None
         super().mousePressEvent(event)
+        self.signals.item_selected.emit(self.key)
 
     def mouseMoveEvent(self, event):
         if self.current_handle is not None:
             pos = event.pos()
             rect = self.rect()
             if self.current_handle == 'br':
-                rect.setBottomRight(pos)
+                rect.setWidth(max(4, pos.x() - rect.left()))
+                rect.setHeight(max(4, pos.y() - rect.top()))
             elif self.current_handle == 'r':
-                rect.setRight(pos.x())
+                rect.setWidth(max(4, pos.x() - rect.left()))
             elif self.current_handle == 'b':
-                rect.setBottom(pos.y())
+                rect.setHeight(max(4, pos.y() - rect.top()))
             self.setRect(rect)
             self._emit_change()
         else:
@@ -115,21 +145,38 @@ class ResizableRect(QGraphicsRectItem):
     def mouseReleaseEvent(self, event):
         self.current_handle = None
         super().mouseReleaseEvent(event)
+        self._emit_change()
 
     def paint(self, painter, option, widget):
+        painter.setRenderHint(QPainter.Antialiasing)
+        rect = self.rect()
         if self.isSelected():
-            self.setPen(QPen(QColor(0, 255, 0), 3))
-            painter.fillRect(self.rect(), QColor(0, 255, 0, 40))
+            painter.setPen(QPen(QColor(0, 255, 128), 3))
+            painter.fillRect(rect, QColor(0, 255, 128, 45))
         else:
-            self.setPen(QPen(QColor(255, 0, 0), 2))
-            painter.fillRect(self.rect(), QColor(255, 0, 0, 40))
-        super().paint(painter, option, widget)
-        painter.setPen(QColor(255, 255, 0))
-        painter.drawText(self.rect().topLeft() + QPointF(5, 15), self.key)
+            painter.setPen(QPen(QColor(255, 60, 60), 2))
+            painter.fillRect(rect, QColor(255, 60, 60, 30))
+        painter.drawRect(rect)
+
+        # Label badge
+        font = QFont("Malgun Gothic", 9, QFont.Bold)
+        painter.setFont(font)
+        metrics = painter.fontMetrics()
+        txt = self.key
+        txt_w = (metrics.horizontalAdvance(txt) if hasattr(metrics, 'horizontalAdvance') else metrics.width(txt)) + 8
+        txt_h = 18
+        badge_y = rect.top() - txt_h if rect.top() >= txt_h else rect.top()
+        badge_rect = QRectF(rect.left(), badge_y, txt_w, txt_h)
+        painter.setBrush(QBrush(QColor(20, 20, 20, 210)))
+        painter.setPen(Qt.NoPen)
+        painter.drawRoundedRect(badge_rect, 3, 3)
+
+        painter.setPen(QColor(0, 255, 128) if self.isSelected() else QColor(255, 255, 255))
+        painter.drawText(badge_rect, Qt.AlignCenter, txt)
 
     def itemChange(self, change, value):
         if change == QGraphicsRectItem.ItemSelectedHasChanged:
-            self.setZValue(1.0 if value else 0.0)
+            self.setZValue(10.0 if value else 1.0)
             if value:
                 self.signals.item_selected.emit(self.key)
         elif change == QGraphicsRectItem.ItemPositionHasChanged:
@@ -154,7 +201,10 @@ class CoordinateCanvas(QGraphicsView):
         self.scene = QGraphicsScene(self)
         self.setScene(self.scene)
         self.setRenderHint(QPainter.Antialiasing)
-        self.setDragMode(QGraphicsView.ScrollHandDrag)
+        self.setDragMode(QGraphicsView.RubberBandDrag)
+        self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
+        self.setResizeAnchor(QGraphicsView.AnchorUnderMouse)
+        self.setStyleSheet("background-color: #1e1e24; border: 1px solid #444;")
         
         self.signals = CanvasSignals()
         self.img_item = None
@@ -164,7 +214,8 @@ class CoordinateCanvas(QGraphicsView):
         self.scene.clear()
         self.items_dict.clear()
         self.img_item = self.scene.addPixmap(pixmap)
-        self.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
+        self.scene.setSceneRect(0, 0, pixmap.width(), pixmap.height())
+        self.zoom_fit()
 
     def add_item(self, key: str, typ: str, val: list):
         if not self.img_item: return
@@ -178,14 +229,40 @@ class CoordinateCanvas(QGraphicsView):
         self.scene.addItem(item)
         self.items_dict[key] = item
 
+    def set_item_value(self, key: str, val: list):
+        if key not in self.items_dict or not self.img_item:
+            return
+        item = self.items_dict[key]
+        if isinstance(item, ResizableRect) and len(val) >= 4:
+            item.update_geometry(val[0], val[1], val[2], val[3])
+        elif isinstance(item, DraggablePoint) and len(val) >= 2:
+            item.update_geometry(val[0], val[1])
+
     def select_item(self, key: str):
+        selected_obj = None
         for k, item in self.items_dict.items():
             if k == key:
                 item.setSelected(True)
-                # Ensure it's visible
-                self.ensureVisible(item)
+                item.setZValue(10.0)
+                selected_obj = item
             else:
                 item.setSelected(False)
+                item.setZValue(1.0)
+        if selected_obj:
+            self.ensureVisible(selected_obj, 50, 50)
+
+    def zoom_in(self):
+        self.scale(1.2, 1.2)
+
+    def zoom_out(self):
+        self.scale(1 / 1.2, 1 / 1.2)
+
+    def zoom_fit(self):
+        if self.img_item:
+            self.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
+
+    def zoom_100(self):
+        self.resetTransform()
 
     def wheelEvent(self, event):
         zoom_in_factor = 1.15

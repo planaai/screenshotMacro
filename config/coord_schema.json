@@ -7,15 +7,23 @@
   "scenes": {
     "student_info": {
       "label": "학생 정보 화면",
-      "reference_image": "guides/scenes/student_info.png"
+      "reference_image": "guides/scenes/student_info.png",
+      "description": "학생 기본 정보(이름, 레벨, 성급, 스탯, 스킬, 무기) 및 실시간 [장비 성장] 버튼 설정"
+    },
+    "single_scan_equip": {
+      "label": "단일 스캔 장비 (메인 화면)",
+      "reference_image": "guides/scenes/student_info.png",
+      "description": "단일 스크린샷 캡처본 분석 전용: 메인 화면에서 직접 읽는 장비 및 티어 ROI (Fallback)"
     },
     "equipment_modal": {
-      "label": "장비 성장 창",
-      "reference_image": "guides/scenes/equipment_modal.png"
+      "label": "장비 성장 창 (실시간 모달)",
+      "reference_image": "guides/scenes/equipment_modal.png",
+      "description": "실시간/매크로 전용: [장비 성장] 창에서 고정밀로 읽는 장비 슬롯 및 상세 티어 배지"
     },
     "favorite_popup": {
       "label": "애용품 정보 팝업",
-      "reference_image": "guides/scenes/favorite_popup.png"
+      "reference_image": "guides/scenes/favorite_popup.png",
+      "description": "애용품 정보 팝업의 T1/T2 상세 옵션"
     }
   },
   "items": {
@@ -49,57 +57,57 @@
     },
     "equip_1_box": {
       "type": "region",
-      "scene": "student_info",
-      "group": "기본 정보 ROI",
+      "scene": "single_scan_equip",
+      "group": "단일 스캔 장비 슬롯",
       "label": "Equip 1 Box",
       "guide": "guides/equip_1_box.md"
     },
     "equip_2_box": {
       "type": "region",
-      "scene": "student_info",
-      "group": "기본 정보 ROI",
+      "scene": "single_scan_equip",
+      "group": "단일 스캔 장비 슬롯",
       "label": "Equip 2 Box",
       "guide": "guides/equip_2_box.md"
     },
     "equip_3_box": {
       "type": "region",
-      "scene": "student_info",
-      "group": "기본 정보 ROI",
+      "scene": "single_scan_equip",
+      "group": "단일 스캔 장비 슬롯",
       "label": "Equip 3 Box",
       "guide": "guides/equip_3_box.md"
     },
     "equip_4_box": {
       "type": "region",
-      "scene": "student_info",
-      "group": "기본 정보 ROI",
+      "scene": "single_scan_equip",
+      "group": "단일 스캔 장비 슬롯",
       "label": "Equip 4 Box",
       "guide": "guides/equip_4_box.md"
     },
     "equip_1_tier_box": {
       "type": "region",
-      "scene": "student_info",
-      "group": "기본 정보 ROI",
+      "scene": "single_scan_equip",
+      "group": "단일 스캔 티어 텍스트",
       "label": "Equip 1 Tier Box",
       "guide": "guides/equip_1_tier_box.md"
     },
     "equip_2_tier_box": {
       "type": "region",
-      "scene": "student_info",
-      "group": "기본 정보 ROI",
+      "scene": "single_scan_equip",
+      "group": "단일 스캔 티어 텍스트",
       "label": "Equip 2 Tier Box",
       "guide": "guides/equip_2_tier_box.md"
     },
     "equip_3_tier_box": {
       "type": "region",
-      "scene": "student_info",
-      "group": "기본 정보 ROI",
+      "scene": "single_scan_equip",
+      "group": "단일 스캔 티어 텍스트",
       "label": "Equip 3 Tier Box",
       "guide": "guides/equip_3_tier_box.md"
     },
     "equip_4_tier_box": {
       "type": "region",
-      "scene": "student_info",
-      "group": "기본 정보 ROI",
+      "scene": "single_scan_equip",
+      "group": "단일 스캔 티어 텍스트",
       "label": "Equip 4 Tier Box",
       "guide": "guides/equip_4_tier_box.md"
     },
