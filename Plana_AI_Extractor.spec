@@ -3,7 +3,7 @@ import os
 import glob
 from PyInstaller.utils.hooks import collect_all
 
-datas = [('assets', 'assets'), ('students.json', '.'), ('models', 'models')]
+datas = [('assets', 'assets'), ('students.json', '.'), ('models', 'models'), ('config', 'config'), ('guides', 'guides')]
 binaries = []
 hiddenimports = [
     'scipy._external.array_api_compat.numpy.fft',

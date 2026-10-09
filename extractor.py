@@ -295,80 +295,35 @@ def match_student_name(extracted_name):
     log_debug(f"Match Rejected (Ratio < {threshold:.2f})")
     return ""
 
-# Bounding Box: (x, y, w, h) based on 1920x1080 resolution
-ROI_CONFIG = {
-    "studentName": (85, 810, 350, 70),
-    "bondRank": (50, 835, 60, 40),
-    "currentLevel": (20, 870, 120, 50),
-    "stars_area": (390, 840, 150, 40),
-    "skill_ex": (1000, 580, 120, 60),
-    "skill_basic": (1180, 580, 120, 60),
-    "skill_enh": (1340, 580, 120, 60),
-    "skill_sub": (1500, 580, 120, 60),
-    "weapon_level": (1200, 680, 80, 60),
-    "weapon_stars_area": (1500, 750, 160, 40),
-    "equip_1": (1000, 820, 130, 130),
-    "equip_2": (1140, 820, 130, 130),
-    "equip_3": (1280, 820, 130, 130),
-    "equip_4": (1420, 820, 130, 130),
-    "equip_1_tier": (1065, 885, 65, 65),
-    "equip_2_tier": (1205, 885, 65, 65),
-    "equip_3_tier": (1345, 885, 65, 65),
-    "equip_4_tier": (1485, 885, 65, 65),
-    "stat_hp": (1120, 350, 230, 40),
-    "stat_attack": (1410, 350, 240, 40),
-    "stat_defense": (1095, 400, 255, 40),
-    "stat_heal": (1410, 400, 240, 40)
-}
+from core.coordinates import CoordinateService
 
-import sys
-
-def get_resource_path(relative_path):
-    if hasattr(sys, '_MEIPASS'):
-        return os.path.join(sys._MEIPASS, relative_path)
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), relative_path)
-
-import json
-def _load_calibrated_roi():
-    config_path = get_resource_path("config/coordinates.json")
-    try:
-        if os.path.exists(config_path):
-            with open(config_path, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-                regions = data.get("regions", {})
-                mapping = {
-                    "student_name": "studentName",
-                    "student_level": "currentLevel",
-                    "student_stars": "stars_area",
-                    "skill_ex_box": "skill_ex",
-                    "skill_basic_box": "skill_basic",
-                    "skill_enhanced_box": "skill_enh",
-                    "skill_sub_box": "skill_sub",
-                    "weapon_box": "weapon_level",
-                    "equip_1_box": "equip_1",
-                    "equip_2_box": "equip_2",
-                    "equip_3_box": "equip_3",
-                    "equip_4_box": "equip_4",
-                    "equip_1_tier_box": "equip_1_tier",
-                    "equip_2_tier_box": "equip_2_tier",
-                    "equip_3_tier_box": "equip_3_tier",
-                    "equip_4_tier_box": "equip_4_tier",
-                    "stat_hp": "stat_hp",
-                    "stat_attack": "stat_attack",
-                    "stat_defense": "stat_defense",
-                    "stat_heal": "stat_heal",
-                    "bond_rank": "bondRank",
-                    "weapon_stars": "weapon_stars_area"
-                }
-                w, h = 1920, 1080
-                for jk, rk in mapping.items():
-                    if jk in regions:
-                        rel = regions[jk]
-                        ROI_CONFIG[rk] = (int(rel["x"]*w), int(rel["y"]*h), int(rel["w"]*w), int(rel["h"]*h))
-    except Exception as e:
-        log_debug(f"[Config] Failed to load coordinates.json: {e}")
-
-_load_calibrated_roi()
+def get_base_rois():
+    svc = CoordinateService.instance()
+    mapping = {
+        "studentName": "student_name",
+        "bondRank": "bond_rank",
+        "currentLevel": "student_level",
+        "stars_area": "student_stars",
+        "skill_ex": "skill_ex",
+        "skill_basic": "skill_basic",
+        "skill_enh": "skill_enh",
+        "skill_sub": "skill_sub",
+        "weapon_level": "weapon_level",
+        "weapon_stars_area": "weapon_stars_area",
+        "equip_1": "equip_1_box",
+        "equip_2": "equip_2_box",
+        "equip_3": "equip_3_box",
+        "equip_4": "equip_4_box",
+        "equip_1_tier": "equip_1_tier_box",
+        "equip_2_tier": "equip_2_tier_box",
+        "equip_3_tier": "equip_3_tier_box",
+        "equip_4_tier": "equip_4_tier_box",
+        "stat_hp": "stat_hp",
+        "stat_attack": "stat_attack",
+        "stat_defense": "stat_defense",
+        "stat_heal": "stat_heal"
+    }
+    return {k: svc.region_px(v) for k, v in mapping.items()}
 
 _ocr_init_ok = True
 try:
@@ -738,8 +693,9 @@ def get_calibrated_rois(img):
     if h != 1080:
         w = int(w * 1080 / h)
         
+    base_rois = get_base_rois()
     if w <= 1930:
-        return ROI_CONFIG
+        return base_rois
         
     extra_w = w - 1920
     
@@ -759,7 +715,7 @@ def get_calibrated_rois(img):
     dy_weapon = int(30 * extra_w / 640)
     
     calibrated = {}
-    for key, (x, y, bw, bh) in ROI_CONFIG.items():
+    for key, (x, y, bw, bh) in base_rois.items():
         if x < 960:
             calibrated[key] = (x + dx_left, y + dy_stats, bw, bh)
         elif key in ["stat_hp", "stat_defense"]:

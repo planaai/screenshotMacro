@@ -34,7 +34,7 @@ import pyautogui
 logger = logging.getLogger("equipment_scanner")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-LAYOUT_PATH = os.path.join(BASE_DIR, "config", "equipment_ui.json")
+TUNING_PATH = os.path.join(BASE_DIR, "config", "equipment_tuning.json")
 LOG_FILE_PATH = os.path.join(BASE_DIR, "logs", "equipment_scanner.log")
 FAILED_CROP_DIR = os.path.join(BASE_DIR, "logs", "equipment_fail")
 
@@ -504,27 +504,25 @@ class OcrEngine:
 
 @dataclass(frozen=True)
 class UiLayout:
-    points: dict[str, Point]
-    regions: dict[str, Region]
+    svc: "core.coordinates.CoordinateService"
     timing: dict[str, float]
     thresholds: dict[str, float]
 
     @classmethod
-    def load(cls, path: str = LAYOUT_PATH) -> "UiLayout":
-        with open(path, encoding="utf-8") as file:
+    def load(cls, svc: "core.coordinates.CoordinateService", tuning_path: str = TUNING_PATH) -> "UiLayout":
+        with open(tuning_path, encoding="utf-8") as file:
             raw = json.load(file)
         return cls(
-            points={name: tuple(value) for name, value in raw["points"].items()},
-            regions={name: tuple(value) for name, value in raw["regions"].items()},
+            svc=svc,
             timing=raw["timing"],
             thresholds=raw["thresholds"],
         )
 
     def point(self, name: str) -> Point:
-        return self.points[name]
+        return self.svc.point(name)
 
     def region(self, name: str) -> Region:
-        return self.regions[name]
+        return self.svc.region(name)
 
 
 # ============================================================================
@@ -675,7 +673,7 @@ def configure_logging(gui_callback: Optional[Callable[[str], None]] = None,
     logger.propagate = False
 
 
-def build_default_workflow(layout_path: str = LAYOUT_PATH) -> EquipmentScanWorkflow:
+def build_default_workflow(tuning_path: str = TUNING_PATH) -> EquipmentScanWorkflow:
     """실제 게임 환경용 조립. 무거운 의존성(OCR 모델, 학생 목록 요청)은 여기서만 import 한다.
 
     주의: mss 인스턴스는 스레드 종속 -> 워크플로우를 실행할 스레드에서 호출할 것.
@@ -684,8 +682,10 @@ def build_default_workflow(layout_path: str = LAYOUT_PATH) -> EquipmentScanWorkf
     import mss
     import extractor
     from scanner import get_bluearchive_monitor
+    from core.coordinates import CoordinateService
 
-    layout = UiLayout.load(layout_path)
+    svc = CoordinateService.instance()
+    layout = UiLayout.load(svc, tuning_path)
     grabber = mss.mss()
     screen = GameScreen(grabber, get_bluearchive_monitor(grabber), layout.timing["click_hold_sec"])
     reader = EquipmentScreenReader(layout, OcrEngine(extractor.reader_ko, extractor.reader_en))

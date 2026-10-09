@@ -1,0 +1,301 @@
+{
+  "version": 1,
+  "base_resolution": [
+    1920,
+    1080
+  ],
+  "scenes": {
+    "student_info": {
+      "label": "학생 정보 화면",
+      "reference_image": "guides/scenes/student_info.png"
+    },
+    "equipment_modal": {
+      "label": "장비 성장 창",
+      "reference_image": "guides/scenes/equipment_modal.png"
+    },
+    "favorite_popup": {
+      "label": "애용품 정보 팝업",
+      "reference_image": "guides/scenes/favorite_popup.png"
+    }
+  },
+  "items": {
+    "student_name": {
+      "type": "region",
+      "scene": "student_info",
+      "group": "기본 정보 ROI",
+      "label": "Student Name",
+      "guide": "guides/student_name.md"
+    },
+    "bond_rank": {
+      "type": "region",
+      "scene": "student_info",
+      "group": "기본 정보 ROI",
+      "label": "Bond Rank",
+      "guide": "guides/bond_rank.md"
+    },
+    "student_level": {
+      "type": "region",
+      "scene": "student_info",
+      "group": "기본 정보 ROI",
+      "label": "Student Level",
+      "guide": "guides/student_level.md"
+    },
+    "student_stars": {
+      "type": "region",
+      "scene": "student_info",
+      "group": "기본 정보 ROI",
+      "label": "Student Stars",
+      "guide": "guides/student_stars.md"
+    },
+    "equip_1_box": {
+      "type": "region",
+      "scene": "student_info",
+      "group": "기본 정보 ROI",
+      "label": "Equip 1 Box",
+      "guide": "guides/equip_1_box.md"
+    },
+    "equip_2_box": {
+      "type": "region",
+      "scene": "student_info",
+      "group": "기본 정보 ROI",
+      "label": "Equip 2 Box",
+      "guide": "guides/equip_2_box.md"
+    },
+    "equip_3_box": {
+      "type": "region",
+      "scene": "student_info",
+      "group": "기본 정보 ROI",
+      "label": "Equip 3 Box",
+      "guide": "guides/equip_3_box.md"
+    },
+    "equip_4_box": {
+      "type": "region",
+      "scene": "student_info",
+      "group": "기본 정보 ROI",
+      "label": "Equip 4 Box",
+      "guide": "guides/equip_4_box.md"
+    },
+    "equip_1_tier_box": {
+      "type": "region",
+      "scene": "student_info",
+      "group": "기본 정보 ROI",
+      "label": "Equip 1 Tier Box",
+      "guide": "guides/equip_1_tier_box.md"
+    },
+    "equip_2_tier_box": {
+      "type": "region",
+      "scene": "student_info",
+      "group": "기본 정보 ROI",
+      "label": "Equip 2 Tier Box",
+      "guide": "guides/equip_2_tier_box.md"
+    },
+    "equip_3_tier_box": {
+      "type": "region",
+      "scene": "student_info",
+      "group": "기본 정보 ROI",
+      "label": "Equip 3 Tier Box",
+      "guide": "guides/equip_3_tier_box.md"
+    },
+    "equip_4_tier_box": {
+      "type": "region",
+      "scene": "student_info",
+      "group": "기본 정보 ROI",
+      "label": "Equip 4 Tier Box",
+      "guide": "guides/equip_4_tier_box.md"
+    },
+    "equipment_button_search": {
+      "type": "region",
+      "scene": "student_info",
+      "group": "장비 버튼 찾기",
+      "label": "장비 버튼 범위",
+      "guide": "guides/equipment_button_search.md"
+    },
+    "equipment_button": {
+      "type": "point",
+      "scene": "student_info",
+      "group": "장비 버튼",
+      "label": "장비 버튼 클릭",
+      "guide": "guides/equipment_button.md"
+    },
+    "skill_ex": {
+      "type": "region",
+      "scene": "student_info",
+      "group": "고급 ROI (스킬/스탯/매크로)",
+      "label": "Skill Ex",
+      "guide": "guides/skill_ex.md",
+      "advanced": true
+    },
+    "skill_basic": {
+      "type": "region",
+      "scene": "student_info",
+      "group": "고급 ROI (스킬/스탯/매크로)",
+      "label": "Skill Basic",
+      "guide": "guides/skill_basic.md",
+      "advanced": true
+    },
+    "skill_enh": {
+      "type": "region",
+      "scene": "student_info",
+      "group": "고급 ROI (스킬/스탯/매크로)",
+      "label": "Skill Enh",
+      "guide": "guides/skill_enh.md",
+      "advanced": true
+    },
+    "skill_sub": {
+      "type": "region",
+      "scene": "student_info",
+      "group": "고급 ROI (스킬/스탯/매크로)",
+      "label": "Skill Sub",
+      "guide": "guides/skill_sub.md",
+      "advanced": true
+    },
+    "weapon_level": {
+      "type": "region",
+      "scene": "student_info",
+      "group": "고급 ROI (스킬/스탯/매크로)",
+      "label": "Weapon Level",
+      "guide": "guides/weapon_level.md",
+      "advanced": true
+    },
+    "weapon_stars_area": {
+      "type": "region",
+      "scene": "student_info",
+      "group": "고급 ROI (스킬/스탯/매크로)",
+      "label": "Weapon Stars Area",
+      "guide": "guides/weapon_stars_area.md",
+      "advanced": true
+    },
+    "stat_hp": {
+      "type": "region",
+      "scene": "student_info",
+      "group": "고급 ROI (스킬/스탯/매크로)",
+      "label": "Stat Hp",
+      "guide": "guides/stat_hp.md",
+      "advanced": true
+    },
+    "stat_attack": {
+      "type": "region",
+      "scene": "student_info",
+      "group": "고급 ROI (스킬/스탯/매크로)",
+      "label": "Stat Attack",
+      "guide": "guides/stat_attack.md",
+      "advanced": true
+    },
+    "stat_defense": {
+      "type": "region",
+      "scene": "student_info",
+      "group": "고급 ROI (스킬/스탯/매크로)",
+      "label": "Stat Defense",
+      "guide": "guides/stat_defense.md",
+      "advanced": true
+    },
+    "stat_heal": {
+      "type": "region",
+      "scene": "student_info",
+      "group": "고급 ROI (스킬/스탯/매크로)",
+      "label": "Stat Heal",
+      "guide": "guides/stat_heal.md",
+      "advanced": true
+    },
+    "macro_name_compare": {
+      "type": "region",
+      "scene": "student_info",
+      "group": "고급 ROI (스킬/스탯/매크로)",
+      "label": "Macro Name Compare",
+      "guide": "guides/macro_name_compare.md",
+      "advanced": true
+    },
+    "next_student_button": {
+      "type": "point",
+      "scene": "student_info",
+      "group": "고급 ROI (스킬/스탯/매크로)",
+      "label": "Next Student Button",
+      "guide": "guides/next_student_button.md",
+      "advanced": true
+    },
+    "equipment_menu_title": {
+      "type": "region",
+      "scene": "equipment_modal",
+      "group": "장비 상세 패널",
+      "label": "Equipment Menu Title",
+      "guide": "guides/equipment_menu_title.md"
+    },
+    "detail_panel": {
+      "type": "region",
+      "scene": "equipment_modal",
+      "group": "장비 상세 패널",
+      "label": "Detail Panel",
+      "guide": "guides/detail_panel.md"
+    },
+    "detail_tier_badge": {
+      "type": "region",
+      "scene": "equipment_modal",
+      "group": "장비 상세 패널",
+      "label": "Detail Tier Badge",
+      "guide": "guides/detail_tier_badge.md"
+    },
+    "detail_level": {
+      "type": "region",
+      "scene": "equipment_modal",
+      "group": "장비 상세 패널",
+      "label": "Detail Level",
+      "guide": "guides/detail_level.md"
+    },
+    "equipment_menu_close": {
+      "type": "point",
+      "scene": "equipment_modal",
+      "group": "클릭 포인트",
+      "label": "Equipment Menu Close",
+      "guide": "guides/equipment_menu_close.md"
+    },
+    "slot_1": {
+      "type": "point",
+      "scene": "equipment_modal",
+      "group": "클릭 포인트",
+      "label": "Slot 1",
+      "guide": "guides/slot_1.md"
+    },
+    "slot_2": {
+      "type": "point",
+      "scene": "equipment_modal",
+      "group": "클릭 포인트",
+      "label": "Slot 2",
+      "guide": "guides/slot_2.md"
+    },
+    "slot_3": {
+      "type": "point",
+      "scene": "equipment_modal",
+      "group": "클릭 포인트",
+      "label": "Slot 3",
+      "guide": "guides/slot_3.md"
+    },
+    "main_slot_4": {
+      "type": "point",
+      "scene": "equipment_modal",
+      "group": "클릭 포인트",
+      "label": "Main Slot 4",
+      "guide": "guides/main_slot_4.md"
+    },
+    "favorite_tier_badge": {
+      "type": "region",
+      "scene": "favorite_popup",
+      "group": "애용품 팝업",
+      "label": "Favorite Tier Badge",
+      "guide": "guides/favorite_tier_badge.md"
+    },
+    "popup_detect_area": {
+      "type": "region",
+      "scene": "favorite_popup",
+      "group": "애용품 팝업",
+      "label": "Popup Detect Area",
+      "guide": "guides/popup_detect_area.md"
+    },
+    "favorite_popup_close": {
+      "type": "point",
+      "scene": "favorite_popup",
+      "group": "애용품 팝업",
+      "label": "팝업 닫기",
+      "guide": "guides/favorite_popup_close.md"
+    }
+  }
+}

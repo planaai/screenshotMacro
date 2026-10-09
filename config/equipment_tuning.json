@@ -1,0 +1,15 @@
+{
+  "timing": {
+    "click_hold_sec": 0.12,
+    "min_settle_sec": 0.45,
+    "stable_timeout_sec": 2.5,
+    "menu_open_timeout_sec": 3.0,
+    "popup_timeout_sec": 1.5,
+    "close_timeout_sec": 2.0,
+    "poll_interval_sec": 0.12
+  },
+  "thresholds": {
+    "stable_mean_diff": 1.5,
+    "changed_mean_diff": 6.0
+  }
+}

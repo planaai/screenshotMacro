@@ -38,7 +38,8 @@ class CaptureMacro:
         # Resize to 1920x1080 to match extractor's ROI precisely (with wide monitor stitching support)
         img_resized = extractor.preprocess_image(img)
         # ROI for student name (matches extractor ROI)
-        x, y, w, h = (120, 840, 300, 40)
+        from core.coordinates import CoordinateService
+        x, y, w, h = CoordinateService.instance().region_px("macro_name_compare")
         roi = img_resized[y:y+h, x:x+w]
         return cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
         
@@ -106,9 +107,10 @@ class CaptureMacro:
         
         screen_w, screen_h = pyautogui.size()
         # The '>' arrow button in Blue Archive student info screen is pinned to the far right edge of the screen.
-        # Adjusted to 98.0% to accurately hit the arrow button and avoid clicking the background or the 'Skill Growth' button.
-        next_x = int(screen_w * 0.98)
-        next_y = int(screen_h * 0.5)
+        from core.coordinates import CoordinateService
+        nx, ny = CoordinateService.instance().point("next_student_button")
+        next_x = int(screen_w * nx)
+        next_y = int(screen_h * ny)
         
         count = 0
         try:
@@ -132,8 +134,8 @@ class CaptureMacro:
                 try:
                     import equipment_scanner
                     self.log("🔍 장비 상세 스캔 시작...")
-                    if not getattr(self, 'eq_workflow', None):
-                        self.eq_workflow = equipment_scanner.build_default_workflow()
+                    # 핫 리로드 대응 위해 매번 새로 생성
+                    self.eq_workflow = equipment_scanner.build_default_workflow()
                     eq_result = self.eq_workflow.run()
                     eq_filepath = filepath.rsplit('.', 1)[0] + "_equip.json"
                     with open(eq_filepath, 'w', encoding='utf-8') as f:

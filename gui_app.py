@@ -403,6 +403,10 @@ class ExtractApp(QMainWindow):
         self.signals.macro_done.connect(self.on_macro_done_signal)
         self.signals.scanner_done.connect(self.on_scanner_done_signal)
 
+        from core.coordinates import CoordinateService
+        self.coord_svc = CoordinateService.instance()
+        self.coord_svc.on_changed(self.update_active_preset_label)
+
         self.central_widget = GlassWidget()
         self.setCentralWidget(self.central_widget)
         self.main_layout = QVBoxLayout(self.central_widget)
@@ -650,19 +654,18 @@ class ExtractApp(QMainWindow):
         btn_macro.setFixedSize(300, 200)
         btn_macro.clicked.connect(lambda: self.stacked_widget.setCurrentWidget(self.dash_view))
         
-        btn_calibrate = QPushButton("기본 좌표 조정")
+        btn_calibrate = QPushButton("좌표 설정")
         btn_calibrate.setStyleSheet(f"background-color: {GLASS_BG}; color: {COLOR_PINK_HOVER}; border: 3px solid {COLOR_PINK}; border-radius: 20px; font-size: 20px; font-weight: bold; padding: 15px;")
         btn_calibrate.setFixedSize(300, 90)
-        btn_calibrate.clicked.connect(self.open_calibration_tool)
+        btn_calibrate.clicked.connect(self.open_coordinate_editor)
         
-        btn_calibrate_eq = QPushButton("장비 좌표 조정")
-        btn_calibrate_eq.setStyleSheet(f"background-color: {GLASS_BG}; color: {COLOR_PINK_HOVER}; border: 3px solid {COLOR_PINK}; border-radius: 20px; font-size: 20px; font-weight: bold; padding: 15px;")
-        btn_calibrate_eq.setFixedSize(300, 90)
-        btn_calibrate_eq.clicked.connect(self.open_equip_calibration_tool)
+        self.lbl_active_preset = QLabel(f"활성 프리셋: {self.coord_svc.active_preset_name}")
+        self.lbl_active_preset.setStyleSheet("font-size: 14px; font-weight: bold; color: #555;")
+        self.lbl_active_preset.setAlignment(Qt.AlignCenter)
         
         calib_layout = QVBoxLayout()
         calib_layout.addWidget(btn_calibrate)
-        calib_layout.addWidget(btn_calibrate_eq)
+        calib_layout.addWidget(self.lbl_active_preset)
         
         card_layout.addWidget(btn_scanner)
         card_layout.addWidget(btn_macro)
@@ -671,23 +674,19 @@ class ExtractApp(QMainWindow):
         layout.addLayout(card_layout)
         self.stacked_widget.addWidget(self.mode_select_view)
 
-    def open_calibration_tool(self):
-        config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config", "coordinates.json")
+    def open_coordinate_editor(self):
         try:
-            from scripts.calibrate import CalibrationTool
-            self.calib_tool = CalibrationTool(config_file)
-            self.calib_tool.show()
+            from ui.coord_editor.editor_window import CoordinateEditorWindow
+            self.coord_editor = CoordinateEditorWindow()
+            self.coord_editor.show()
         except ImportError as e:
-            QMessageBox.critical(self, "오류", f"캘리브레이션 스크립트 오류:\n{e}")
+            import traceback
+            traceback.print_exc()
+            QMessageBox.critical(self, "오류", f"편집기 스크립트 오류:\n{e}")
 
-    def open_equip_calibration_tool(self):
-        config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config", "equipment_ui.json")
-        try:
-            from scripts.calibrate import CalibrationTool
-            self.calib_tool_eq = CalibrationTool(config_file)
-            self.calib_tool_eq.show()
-        except ImportError as e:
-            QMessageBox.critical(self, "오류", f"캘리브레이션 스크립트 오류:\n{e}")
+    def update_active_preset_label(self):
+        if hasattr(self, 'lbl_active_preset'):
+            self.lbl_active_preset.setText(f"활성 프리셋: {self.coord_svc.active_preset_name}")
 
     def init_scanner_view(self):
         self.scanner_view = QWidget()
