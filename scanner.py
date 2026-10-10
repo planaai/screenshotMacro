@@ -136,9 +136,12 @@ class ScannerListener:
             # ==== NEW: 장비 스캔 워크플로우 ====
             try:
                 import equipment_scanner
+                equipment_scanner.configure_logging(gui_callback=self.log)
                 self.log("🔍 장비 상세 스캔 시작...")
                 if not getattr(self, 'eq_workflow', None):
                     self.eq_workflow = equipment_scanner.build_default_workflow()
+                if hasattr(self.eq_workflow._reader, "_audit"):
+                    self.eq_workflow._reader._audit.begin_capture(filename)
                 eq_result = self.eq_workflow.run()
                 eq_filepath = filepath.rsplit('.', 1)[0] + "_equip.json"
                 with open(eq_filepath, 'w', encoding='utf-8') as f:

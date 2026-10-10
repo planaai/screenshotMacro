@@ -31,19 +31,37 @@ import cv2
 import numpy as np
 import pyautogui
 
+from ocr_audit import NullAuditRecorder, OcrAuditRecorder
+
 logger = logging.getLogger("equipment_scanner")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TUNING_PATH = os.path.join(BASE_DIR, "config", "equipment_tuning.json")
 LOG_FILE_PATH = os.path.join(BASE_DIR, "logs", "equipment_scanner.log")
 FAILED_CROP_DIR = os.path.join(BASE_DIR, "logs", "equipment_fail")
+REVIEW_CROP_DIR = os.path.join(BASE_DIR, "logs", "equipment_review")
 
 REGULAR_SLOT_INDICES = (1, 2, 3)
 FAVORITE_SLOT_INDEX = 4
 MAX_REGULAR_TIER = 10
 MAX_FAVORITE_TIER = 2
 MAX_EQUIPMENT_LEVEL = 99
+MAX_T1_LEVEL = 10
 CONTENT_SIZE = (1920, 1080)
+
+# 블루아카이브 장비 티어별 최대 레벨 매핑
+TIER_MAX_LEVEL = {
+    1: 10,
+    2: 20,
+    3: 30,
+    4: 40,
+    5: 45,
+    6: 50,
+    7: 55,
+    8: 60,
+    9: 65,
+    10: 70,
+}
 
 Point = tuple[float, float]
 Region = tuple[float, float, float, float]
@@ -157,10 +175,10 @@ class EquipmentScanWorkflow:
             result.slots = [self.scan_equipment_slot(index) for index in REGULAR_SLOT_INDICES]
             self._return_to_main_screen(result)
             
-        if not result.menu_error and not result.return_error:
+        if not result.return_error:
             result.favorite = self.handle_favorite_item()
         else:
-            result.favorite = FavoriteScanResult(FavoriteStatus.FAILED, error="장비 모달 조작 실패로 팝업 스캔 스킵")
+            result.favorite = FavoriteScanResult(FavoriteStatus.FAILED, error="장비 모달 닫기 실패로 팝업 스캔 스킵")
             
         _log_summary(result)
         return result
@@ -215,7 +233,7 @@ class EquipmentScanWorkflow:
             _log_recoverable_failure(context, error)
             return FavoriteScanResult(FavoriteStatus.FAILED, error=str(error))
         logger.info("%s [OK] T%d 판별 (OCR=%r)", context, reading.tier, reading.raw_text)
-        return FavoriteScanResult(FavoriteStatus.EQUIPPED, reading.tier, reading.raw_text)
+        return FavoriteScanResult(FavoriteStatus.EQUIPPED, reading.tier, reading.raw_text, crop_path=reading.crop_path)
 
     def _return_to_main_screen(self, result: EquipmentScanResult) -> None:
         try:
@@ -265,20 +283,25 @@ class EquipmentMenuNavigator:
             return
         self._screen.click(self._find_equipment_button(frame))
         self._wait_for(self._reader.is_equipment_menu_open, "menu_open_timeout_sec", "장비 성장 모달")
-        self._sleep(1.0)
+        self._sleep(1.5)
         logger.info("[메뉴] [OK] 장비 성장 모달 진입 확인")
 
     def select_slot(self, slot_index: int) -> np.ndarray:
-        """슬롯 클릭 후 고정 시간(1초)을 대기하여 프레임을 반환한다."""
+        """슬롯 클릭 후 1.5초 대기하여 프레임을 반환한다."""
         self._screen.click(self._layout.point(f"slot_{slot_index}"))
-        self._sleep(1.0)
-        return self._screen.capture()
+        self._sleep(1.5)
+        frame = self._screen.capture()
+        if not self._reader.is_equipment_menu_open(frame):
+            logger.warning("[슬롯 %d] 클릭 후 장비 성장 모달 미검출 -> 재오픈 시도", slot_index)
+            self.open_equipment_menu()
+            frame = self._screen.capture()
+        return frame
 
     def open_favorite_popup(self) -> bool:
-        """메인 화면에서 4번 슬롯 클릭. 1초 대기 후 화면 변화로 팝업 감지."""
+        """메인 화면에서 4번 슬롯 클릭. 1.5초 대기 후 화면 변화로 팝업 감지."""
         before = self._screen.capture()
         self._screen.click(self._layout.point("main_slot_4"))
-        self._sleep(1.0)
+        self._sleep(1.5)
         after = self._screen.capture()
         
         if self._reader.has_region_changed(before, after, "popup_detect_area"):
@@ -290,13 +313,14 @@ class EquipmentMenuNavigator:
 
     def close_favorite_popup(self) -> None:
         self._screen.press_key("esc")
-        self._sleep(1.0)
+        self._sleep(1.5)
 
     def close_equipment_menu(self) -> None:
         if not self._reader.is_equipment_menu_open(self._screen.capture()):
             logger.info("[복귀] 장비 성장 모달 없음 -> 이미 메인 화면")
             return
         self._close_with_fallback("equipment_menu_close", "esc", self._reader.is_equipment_menu_open, "장비 성장 모달")
+        self._sleep(1.5)
 
     def current_frame(self) -> np.ndarray:
         return self._screen.capture()
@@ -313,7 +337,7 @@ class EquipmentMenuNavigator:
 
     def _click_and_settle(self, point_name: str, region_name: str) -> np.ndarray:
         self._screen.click(self._layout.point(point_name))
-        return self._sleep(1.0)
+        return self._sleep(1.5)
 
     def _close_with_fallback(self, close_point: str, fallback_key: str,
                              is_open: Callable[[np.ndarray], bool], ui_name: str) -> None:
@@ -379,9 +403,10 @@ class EquipmentScreenReader:
     MENU_TITLE_KEYWORDS = ("장비", "성장")
     EQUIPMENT_BUTTON_KEYWORD = "성장"
 
-    def __init__(self, layout: "UiLayout", ocr: "OcrEngine"):
+    def __init__(self, layout: "UiLayout", ocr: "OcrEngine", audit: Optional[Any] = None):
         self._layout = layout
         self._ocr = ocr
+        self._audit = audit if audit is not None else NullAuditRecorder()
 
     def is_equipment_menu_open(self, frame: np.ndarray) -> bool:
         return self._title_contains(frame, "equipment_menu_title", self.MENU_TITLE_KEYWORDS)
@@ -401,33 +426,176 @@ class EquipmentScreenReader:
         return None
 
     def read_slot_tier(self, frame: np.ndarray, slot_idx: int) -> TierReading:
-        tier, raw_text, crop_path = self._read_tier(frame, "detail_tier_badge", MAX_REGULAR_TIER, f"slot{slot_idx}")
-        return TierReading(tier, self._read_level(frame), raw_text, crop_path)
+        tag = f"slot{slot_idx}"
+        # 1. 통합 배지 영역 (티어 배지 + 레벨 텍스트 동시 판독 / T1 자동 추론)
+        unified = self._read_slot_unified(frame, slot_idx, tag)
+        if unified is not None:
+            return unified
+
+        # 2. 개별 영역 (detail_tier_badge + detail_level)
+        try:
+            tier, raw_text, crop_path = self._read_tier(frame, "detail_tier_badge", MAX_REGULAR_TIER, tag)
+            level = self._read_level(frame, slot_idx)
+            return TierReading(tier, level, raw_text, crop_path)
+        except TierNotRecognized as error:
+            # 3. 최후 수단: 모달 좌측 레일 슬롯 아이콘(slot_1..3)에서 판독
+            rail_reading = self._read_slot_from_rail(frame, slot_idx, tag)
+            if rail_reading is not None:
+                logger.info("[슬롯 %d] 좌측 레일 아이콘에서 T%d / Lv.%s 판독 성공",
+                            slot_idx, rail_reading.tier, rail_reading.level or "?")
+                return rail_reading
+            raise error
+
+    def _read_slot_unified(self, frame: np.ndarray, slot_idx: int, tag: str) -> Optional[TierReading]:
+        """티어 배지와 레벨 영역을 포괄하는 통합 영역 판독. T1(배지 없이 Lv.만 표기)도 정상 처리."""
+        region = self._get_unified_slot_region()
+        crop = crop_region(frame, region)
+        candidates = list(self._ocr.iter_line_candidates(crop))
+        if not candidates:
+            return None
+
+        found_tier: Optional[int] = None
+        found_tier_text: str = ""
+        found_level: Optional[int] = None
+
+        for text in candidates:
+            if found_tier is None:
+                t = parse_tier_text(text, MAX_REGULAR_TIER)
+                if t is not None:
+                    found_tier = t
+                    found_tier_text = text
+            if found_level is None:
+                lvl = parse_level_text(text)
+                if lvl is not None:
+                    found_level = lvl
+
+        # 티어와 레벨 둘 다 없으면 개별 폴백으로 넘김
+        if found_tier is None and found_level is None:
+            return None
+
+        note = ""
+        # 블루아카이브 규칙: T-배지 없이 Lv.1~10만 존재하는 장비는 T1
+        if found_tier is None and found_level is not None and found_level <= MAX_T1_LEVEL:
+            found_tier = 1
+            found_tier_text = f"Lv.{found_level}"
+            note = "T1_INFERRED_FROM_LEVEL"
+
+        # 티어는 잡혔으나 레벨이 미검출된 경우 개별 영역 시도
+        if found_tier is not None and found_level is None:
+            found_level = self._read_level(frame, slot_idx)
+
+        if found_tier is not None:
+            crop_path = save_crop_for_review(crop, tag)
+            self._audit.record(f"{tag}.tier", "detail_item_badge", crop, candidates, found_tier, "OK", note=note)
+            if found_level is not None:
+                self._audit.record(f"{tag}.level", "detail_item_badge", crop, candidates, found_level, "OK", note=note)
+            return TierReading(found_tier, found_level, found_tier_text, crop_path)
+
+        return None
+
+    def _read_slot_from_rail(self, frame: np.ndarray, slot_idx: int, tag: str) -> Optional[TierReading]:
+        """모달 좌측 레일 슬롯 아이콘을 크롭하여 티어/레벨 판독."""
+        try:
+            sx, sy = self._layout.point(f"slot_{slot_idx}")
+        except Exception:
+            return None
+
+        rail_region = (max(0.0, sx - 0.047), max(0.0, sy - 0.055), 0.095, 0.110)
+        crop = crop_region(frame, rail_region)
+        candidates = list(self._ocr.iter_line_candidates(crop))
+        if not candidates:
+            return None
+
+        found_tier: Optional[int] = None
+        found_tier_text: str = ""
+        found_level: Optional[int] = None
+
+        for text in candidates:
+            if found_tier is None:
+                t = parse_tier_text(text, MAX_REGULAR_TIER)
+                if t is not None:
+                    found_tier = t
+                    found_tier_text = text
+            if found_level is None:
+                lvl = parse_level_text(text)
+                if lvl is not None:
+                    found_level = lvl
+
+        if found_tier is None and found_level is not None and found_level <= MAX_T1_LEVEL:
+            found_tier = 1
+            found_tier_text = f"Lv.{found_level}"
+
+        if found_tier is not None:
+            crop_path = save_crop_for_review(crop, tag)
+            self._audit.record(f"{tag}.tier", f"rail_slot_{slot_idx}", crop, candidates, found_tier, "OK", note="READ_FROM_LEFT_RAIL")
+            if found_level is not None:
+                self._audit.record(f"{tag}.level", f"rail_slot_{slot_idx}", crop, candidates, found_level, "OK", note="READ_FROM_LEFT_RAIL")
+            return TierReading(found_tier, found_level, found_tier_text, crop_path)
+
+        return None
+
+    def _get_unified_slot_region(self) -> Region:
+        try:
+            return self._layout.region("detail_item_badge")
+        except KeyError:
+            pass
+        try:
+            t_reg = self._layout.region("detail_tier_badge")
+            l_reg = self._layout.region("detail_level")
+            min_x = min(t_reg[0], l_reg[0])
+            max_x = max(t_reg[0] + t_reg[2], l_reg[0] + l_reg[2])
+            min_y = min(t_reg[1], l_reg[1], 0.320)
+            max_y = max(t_reg[1] + t_reg[3], l_reg[1] + l_reg[3], 0.425)
+            return (min_x, min_y, max_x - min_x, max_y - min_y)
+        except Exception:
+            return (0.255, 0.320, 0.180, 0.110)
 
     def read_favorite_tier(self, frame: np.ndarray) -> TierReading:
         tier, raw_text, crop_path = self._read_tier(frame, "favorite_tier_badge", MAX_FAVORITE_TIER, "slot4")
         return TierReading(tier, None, raw_text, crop_path)
 
-    def _read_tier(self, frame: np.ndarray, region_name: str, max_tier: int, tag: str) -> tuple[int, str, str]:
+    def _read_tier(self, frame: np.ndarray, region_name: str, max_tier: int, tag: str) -> tuple[int, str, Optional[str]]:
         crop = crop_region(frame, self._layout.region(region_name))
         crop_path = save_crop_for_review(crop, tag)
         candidates = []
+        found_tier: Optional[int] = None
+        found_text: str = ""
         for text in self._ocr.iter_line_candidates(crop):
             candidates.append(text)
             tier = parse_tier_text(text, max_tier)
-            if tier is not None:
-                return tier, text, crop_path
+            if tier is not None and found_tier is None:
+                found_tier = tier
+                found_text = text
+
+        if found_tier is not None:
+            self._audit.record(f"{tag}.tier", region_name, crop, candidates, found_tier, "OK")
+            return found_tier, found_text, crop_path
+
+        self._audit.record(f"{tag}.tier", region_name, crop, candidates, None, "PARSE_FAIL")
         raise TierNotRecognized(
             f"{region_name} 판독 실패 (OCR 후보={candidates}, 크롭={save_failed_crop(crop, region_name)})"
         )
 
-    def _read_level(self, frame: np.ndarray) -> Optional[int]:
+    def _read_level(self, frame: np.ndarray, slot_idx: int = 1) -> Optional[int]:
         crop = crop_region(frame, self._layout.region("detail_level"))
+        candidates = []
+        found_level: Optional[int] = None
         for text in self._ocr.iter_line_candidates(crop):
+            candidates.append(text)
             level = parse_level_text(text)
-            if level is not None:
-                return level
-        logger.debug("레벨 판독 실패 -> 티어만 사용")
+            if level is not None and found_level is None:
+                found_level = level
+
+        if found_level is not None:
+            self._audit.record(f"slot{slot_idx}.level", "detail_level", crop, candidates, found_level, "OK")
+            return found_level
+
+        self._audit.record(f"slot{slot_idx}.level", "detail_level", crop, candidates, None, "PARSE_FAIL")
+        logger.warning(
+            "[레벨] 판독 실패 -> 티어만 사용 (OCR 후보=%s, 크롭=%s)",
+            candidates,
+            save_failed_crop(crop, "detail_level"),
+        )
         return None
 
     def _title_contains(self, frame: np.ndarray, region_name: str, keywords: tuple[str, ...]) -> bool:
@@ -487,10 +655,18 @@ class OcrEngine:
         return self._recognize(self._korean, upscale(crop))
 
     def iter_line_candidates(self, crop: np.ndarray) -> Iterator[str]:
+        for _, text in self.find_english_text(crop):
+            t = text.strip()
+            if t:
+                yield t
         for variant in preprocess_variants(crop):
             text = self._recognize(self._english, variant)
             if text:
                 yield text
+
+    def find_english_text(self, crop: np.ndarray) -> list[tuple[list, str]]:
+        result, _ = self._english(crop)
+        return [(box, text) for box, text, _confidence in (result or [])]
 
     def find_korean_text(self, crop: np.ndarray) -> list[tuple[list, str]]:
         result, _ = self._korean(crop)
@@ -528,20 +704,36 @@ class UiLayout:
 # ============================================================================
 # 5) 순수 함수 - 파싱 / 이미지 유틸
 # ============================================================================
-_DIGIT_ALIASES = str.maketrans({"I": "1", "l": "1", "i": "1", "|": "1", "O": "0", "o": "0", "D": "0"})
-_TIER_PATTERN = re.compile(r"[Tt]([0-9Ili|OoD]{1,2})")
+_DIGIT_ALIASES = str.maketrans({
+    "I": "1", "l": "1", "i": "1", "|": "1",
+    "O": "0", "o": "0", "D": "0",
+    "Z": "7", "z": "7",
+})
+_NOISE_PUNCT = str.maketrans("", "", "()[]{}<>'\":;,`~-_")
+_TIER_PATTERN = re.compile(r"[Tt]([0-9Ili|OoDZz]{1,2})")
 _LEVEL_PATTERN = re.compile(r"[LlI1][Vv][.:,]?([0-9IlOo]{1,2})")
 
 
 def parse_tier_text(text: str, max_tier: int) -> Optional[int]:
-    """'T10', 'TI0', 'T1O', 'T 7' 같은 OCR 문자열에서 1..max_tier 범위의 티어를 뽑는다."""
+    """'T10', 'TI0', 'T1O', 'T 7', '(I)', '(T5)', 'Tl', 'Lv.1', 'Z' 등 OCR 문자열에서 1..max_tier 범위의 티어를 뽑는다."""
     if not text:
         return None
-    compact = re.sub(r"\s+", "", text)
+    cleaned = text.translate(_NOISE_PUNCT).strip()
+    if not cleaned:
+        return None
+    compact = re.sub(r"\s+", "", cleaned)
     match = _TIER_PATTERN.search(compact)
     if match:
         return _longest_valid_tier_prefix(match.group(1), max_tier)
-    return _to_tier(compact, max_tier)
+    tier = _to_tier(compact, max_tier)
+    if tier is not None:
+        return tier
+    # 블루아카이브 규칙: T-배지가 없고 Lv.1~10만 표기된 일반 장비는 T1 기본 장비
+    if max_tier > MAX_FAVORITE_TIER:
+        level = parse_level_text(text)
+        if level is not None and level <= MAX_T1_LEVEL:
+            return 1
+    return None
 
 
 def parse_level_text(text: str) -> Optional[int]:
@@ -626,13 +818,26 @@ def preprocess_variants(crop: np.ndarray) -> Iterator[np.ndarray]:
 def save_failed_crop(image: np.ndarray, tag: str) -> str:
     """판독 실패 증거 보존 (사후 원인 분석용). 저장 실패해도 스캔은 계속된다."""
     try:
-        os.makedirs(FAILED_CROP_DIR, exist_ok=True)
-        stamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S_%f")
-        path = os.path.join(FAILED_CROP_DIR, f"{tag}_{stamp}.png")
-        cv2.imencode(".png", image)[1].tofile(path)
-        return path
+        return _write_timestamped_png(image, FAILED_CROP_DIR, tag)
     except Exception as error:
         return f"<저장 실패: {error!r}>"
+
+
+def save_crop_for_review(image: np.ndarray, tag: str) -> Optional[str]:
+    """GUI 검수 화면용 크롭 저장. 실패 시 None (크롭 미표시) - 스캔은 계속된다."""
+    try:
+        return _write_timestamped_png(image, REVIEW_CROP_DIR, tag)
+    except Exception:
+        logger.warning("[크롭] 리뷰 크롭 저장 실패 (tag=%s)", tag, exc_info=True)
+        return None
+
+
+def _write_timestamped_png(image: np.ndarray, directory: str, tag: str) -> str:
+    os.makedirs(directory, exist_ok=True)
+    stamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+    path = os.path.join(directory, f"{tag}_{stamp}.png")
+    cv2.imencode(".png", image)[1].tofile(path)
+    return path
 
 
 # ============================================================================
@@ -673,7 +878,7 @@ def configure_logging(gui_callback: Optional[Callable[[str], None]] = None,
     logger.propagate = False
 
 
-def build_default_workflow(tuning_path: str = TUNING_PATH) -> EquipmentScanWorkflow:
+def build_default_workflow(tuning_path: str = TUNING_PATH, audit: Optional[Any] = None) -> EquipmentScanWorkflow:
     """실제 게임 환경용 조립. 무거운 의존성(OCR 모델, 학생 목록 요청)은 여기서만 import 한다.
 
     주의: mss 인스턴스는 스레드 종속 -> 워크플로우를 실행할 스레드에서 호출할 것.
@@ -688,7 +893,8 @@ def build_default_workflow(tuning_path: str = TUNING_PATH) -> EquipmentScanWorkf
     layout = UiLayout.load(svc, tuning_path)
     grabber = mss.mss()
     screen = GameScreen(grabber, get_bluearchive_monitor(grabber), layout.timing["click_hold_sec"])
-    reader = EquipmentScreenReader(layout, OcrEngine(extractor.reader_ko, extractor.reader_en))
+    audit_recorder = audit if audit is not None else OcrAuditRecorder()
+    reader = EquipmentScreenReader(layout, OcrEngine(extractor.reader_ko, extractor.reader_en), audit=audit_recorder)
     navigator = EquipmentMenuNavigator(screen, reader, layout, should_abort=lambda: keyboard.is_pressed("F9"))
     return EquipmentScanWorkflow(navigator, reader)
 

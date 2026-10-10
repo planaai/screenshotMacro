@@ -249,6 +249,13 @@
       "label": "Detail Level",
       "guide": "guides/detail_level.md"
     },
+    "detail_item_badge": {
+      "type": "region",
+      "scene": "equipment_modal",
+      "group": "장비 상세 패널",
+      "label": "Detail Item Badge (Tier + Level)",
+      "guide": "guides/detail_item_badge.md"
+    },
     "equipment_menu_close": {
       "type": "point",
       "scene": "equipment_modal",

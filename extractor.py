@@ -1,14 +1,14 @@
+import sys
+import os
 import cv2
 import numpy as np
 
 import warnings
 import logging
-import logging
 warnings.filterwarnings("ignore", category=UserWarning)
 
 from rapidocr_onnxruntime import RapidOCR
 import json
-import os
 import re
 import requests
 import urllib3
@@ -21,6 +21,12 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 STUDENT_NAMES = []
 script_dir = os.path.dirname(os.path.abspath(__file__))
 json_path = os.path.join(script_dir, 'students.json')
+
+def get_resource_path(relative_path: str) -> str:
+    """Return absolute path for a resource, supporting PyInstaller bundles."""
+    if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(script_dir, relative_path)
 
 try:
     response = requests.get("https://api.plan4ai.fyi/api/students", timeout=5)

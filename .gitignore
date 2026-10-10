@@ -2,6 +2,12 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.so
+
+# Caches and testing
+.pytest_cache/
+.coverage
+htmlcov/
 
 # PyInstaller
 build/
@@ -9,15 +15,20 @@ dist/
 
 # User specific data
 macro_screenshots/
+user_data/presets/
 
 # Virtual environment
 venv/
 env/
 .venv/
 
-# IDE files
+# IDE & Editor files
 .vscode/
 .idea/
+*.swp
+*.bak
+*.tmp
+*~
 
 # Tests and images
 tests/
@@ -25,8 +36,16 @@ tests/
 
 # Logs
 logs/
+*.log
 
+# Scratch / temporary workspace
+scratch/
 
-.agents/
+# Archives
 *.tar
+*.tar.gz
+*.zip
 extracted_data.tar
+
+# Agent
+.agents/

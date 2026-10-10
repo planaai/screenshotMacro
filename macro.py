@@ -133,9 +133,12 @@ class CaptureMacro:
                 # ==== NEW: 장비 스캔 워크플로우 ====
                 try:
                     import equipment_scanner
+                    equipment_scanner.configure_logging(gui_callback=self.log)
                     self.log("🔍 장비 상세 스캔 시작...")
                     # 핫 리로드 대응 위해 매번 새로 생성
                     self.eq_workflow = equipment_scanner.build_default_workflow()
+                    if hasattr(self.eq_workflow._reader, "_audit"):
+                        self.eq_workflow._reader._audit.begin_capture(filename)
                     eq_result = self.eq_workflow.run()
                     eq_filepath = filepath.rsplit('.', 1)[0] + "_equip.json"
                     with open(eq_filepath, 'w', encoding='utf-8') as f:
