@@ -290,6 +290,30 @@ class WaitSpinner(QWidget):
             painter.drawEllipse(8, -3, 6, 6)
             painter.rotate(-360 / num_dots)
 
+IMPORT_SCREENSHOT_URL = "https://api.plan4ai.fyi/api/import/screenshot"
+
+def build_upload_payload(data: dict) -> dict:
+    """Build and validate standard payload for screenshot import API."""
+    bond_rank = data.get("bondRank")
+    if bond_rank is not None:
+        try:
+            bond_rank = int(bond_rank)
+            if not (1 <= bond_rank <= 100):
+                bond_rank = None
+        except (ValueError, TypeError):
+            bond_rank = None
+
+    return {
+        "studentName": data.get("studentName"),
+        "bondRank": bond_rank,
+        "currentLevel": data.get("currentLevel"),
+        "currentStar": data.get("currentStar"),
+        "skills": data.get("skills", {}),
+        "equipment": data.get("equipment", {}),
+        "weapon": data.get("weapon", {}),
+        "stats": data.get("stats", {})
+    }
+
 class UploadWorker(QThread):
     progress = pyqtSignal(int, str)
     finished_upload = pyqtSignal(int, int) # success_count, fail_count
@@ -310,18 +334,10 @@ class UploadWorker(QThread):
             self.progress.emit(i, f"[{i+1}/{len(self.ready_items)}] {name} 데이터 전송 중...")
             
             try:
-                payload = {
-                    "studentName": data.get("studentName"),
-                    "currentLevel": data.get("currentLevel"),
-                    "currentStar": data.get("currentStar"),
-                    "skills": data.get("skills", {}),
-                    "equipment": data.get("equipment", {}),
-                    "weapon": data.get("weapon", {}),
-                    "stats": data.get("stats", {})
-                }
+                payload = build_upload_payload(data)
                 
                 resp = requests.post(
-                    "https://api.plan4ai.fyi/api/import/screenshot",
+                    IMPORT_SCREENSHOT_URL,
                     headers=headers,
                     json=payload,
                     timeout=5
@@ -329,13 +345,17 @@ class UploadWorker(QThread):
                 
                 if resp.status_code == 200:
                     res["status"] = "uploaded"
+                    res.pop("error", None)
                     success_count += 1
                 else:
                     fail_count += 1
-                    print(f"업로드 실패 ({name}): [HTTP {resp.status_code}] {resp.text}")
+                    err_msg = f"[HTTP {resp.status_code}] {resp.text}"
+                    res["error"] = err_msg
+                    print(f"업로드 실패 ({name}): {err_msg}")
                     
             except Exception as e:
                 fail_count += 1
+                res["error"] = str(e)
                 print(f"통신 오류 ({name}): {e}")
                 
         self.progress.emit(len(self.ready_items), "업로드 완료 처리 중...")
@@ -1348,7 +1368,7 @@ class DetailWindow(GlassWidget):
         val = self.entries[key].text().strip()
         if not val: return None
         try: return int(val)
-        except: return val
+        except (ValueError, TypeError): return None
 
     def save_current_index(self):
         res = self.batch_results[self.current_idx]
@@ -1477,20 +1497,11 @@ class ScannerDetailWindow(DetailWindow):
         data = res["data"]
         
         headers = {"Authorization": f"Bearer {jwt_token}"}
-        payload = {
-            "studentName": data.get("studentName"),
-            "bondRank": data.get("bondRank"),
-            "currentLevel": data.get("currentLevel"),
-            "currentStar": data.get("currentStar"),
-            "skills": data.get("skills", {}),
-            "equipment": data.get("equipment", {}),
-            "weapon": data.get("weapon", {}),
-            "stats": data.get("stats", {})
-        }
+        payload = build_upload_payload(data)
         
         try:
             resp = requests.post(
-                "https://api.plan4ai.fyi/api/import/screenshot",
+                IMPORT_SCREENSHOT_URL,
                 headers=headers,
                 json=payload,
                 timeout=5
@@ -1498,8 +1509,8 @@ class ScannerDetailWindow(DetailWindow):
             if resp.status_code == 200:
                 resp_data = resp.json()
                 saved_user = resp_data.get("userId", "?")
-                saved_name = resp_data.get("studentName", "?")
-                QMessageBox.information(self, "업로드 완료", f"성공적으로 업로드되었습니다.\n(저장된 유저ID: {saved_user}, 학생: {saved_name})")
+                saved_name = resp_data.get("studentName") or resp_data.get("message") or "?"
+                QMessageBox.information(self, "업로드 완료", f"성공적으로 업로드되었습니다.\n(유저ID: {saved_user}, 내용: {saved_name})")
                 self.close_and_wait()
             else:
                 try:

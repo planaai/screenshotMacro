@@ -861,13 +861,14 @@ def extract_screenshot_data(img_path):
             
     num_allowlist = '0123456789LvlIOoSszZBbqg'
     
-    data["bondRank"] = parse_number(extract_bond_text(img, rois["bondRank"]))
-    if data["bondRank"] is None:
-        data["bondRank"] = 0
-    elif data["bondRank"] > 100:
-        br_str = str(data["bondRank"])
-        data["bondRank"] = int(br_str[:2])
-        log_debug(f"[Validation] bondRank {br_str} → {data['bondRank']} 클램핑 (2자리 초과)")
+    raw_bond = parse_number(extract_bond_text(img, rois["bondRank"]))
+    if raw_bond is not None and raw_bond > 100:
+        br_str = str(raw_bond)
+        raw_bond = int(br_str[:2])
+        log_debug(f"[Validation] bondRank {br_str} → {raw_bond} 클램핑 (2자리 초과)")
+    if raw_bond is not None and raw_bond <= 0:
+        raw_bond = None
+    data["bondRank"] = raw_bond
         
     lvl_val = parse_number(extract_text(img, rois["currentLevel"], allowlist=num_allowlist, scale=2))
     if lvl_val is not None:
@@ -1008,6 +1009,8 @@ def validate_extracted_data(data):
     if lvl > 90:
         needs_review = True
     if hp < 1000:
+        needs_review = True
+    if not data.get("bondRank") or data.get("bondRank") < 1:
         needs_review = True
     data["needs_review"] = needs_review
 

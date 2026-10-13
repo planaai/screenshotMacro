@@ -34,9 +34,10 @@ env/
 tests/
 *.jpg
 
-# Logs
+# Logs and debug outputs
 logs/
 *.log
+debug_output/
 
 # Scratch / temporary workspace
 scratch/
@@ -49,3 +50,11 @@ extracted_data.tar
 
 # Agent
 .agents/
+
+# Markdown documentation (ignore all except README)
+*.md
+**/*.md
+!README.md
+!**/README.md
+!readme.md
+!**/readme.md
