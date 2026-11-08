@@ -303,8 +303,11 @@ def match_student_name(extracted_name):
 
 from core.coordinates import CoordinateService
 
-def get_base_rois():
+def get_base_rois(size=None, preset_name=None):
     svc = CoordinateService.instance()
+    if size is None:
+        size = (2560, 1440)
+    preset = svc.presets.get(preset_name, svc.active_preset()) if preset_name else svc.active_preset()
     mapping = {
         "studentName": "student_name",
         "bondRank": "bond_rank",
@@ -329,7 +332,15 @@ def get_base_rois():
         "stat_defense": "stat_defense",
         "stat_heal": "stat_heal"
     }
-    return {k: svc.region_px(v) for k, v in mapping.items()}
+    def get_reg_px(k):
+        val = preset.values.get(k, [0, 0, 0, 0])
+        if isinstance(val, dict):
+            r = (val.get('x', 0), val.get('y', 0), val.get('w', 0), val.get('h', 0))
+        else:
+            r = tuple(val)
+        return (int(r[0]*size[0]), int(r[1]*size[1]), int(r[2]*size[0]), int(r[3]*size[1]))
+
+    return {k: get_reg_px(v) for k, v in mapping.items()}
 
 _ocr_init_ok = True
 try:
@@ -355,32 +366,55 @@ except Exception as e:
     reader_en = None
 
 def count_stars(img_crop, is_weapon=False):
-    hsv = cv2.cvtColor(img_crop, cv2.COLOR_BGR2HSV)
-    if not is_weapon:
-        # Yellow for student stars
-        lower_color = np.array([15, 100, 100])
-        upper_color = np.array([40, 255, 255])
-        expected_w = 24.0
-    else:
-        # Cyan/Blue for weapon stars
-        lower_color = np.array([80, 100, 100])
-        upper_color = np.array([110, 255, 255])
-        expected_w = 26.0
-        
-    mask = cv2.inRange(hsv, lower_color, upper_color)
-    kernel = np.ones((3,3), np.uint8)
-    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
-    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
-    star_count = 0
-    for cnt in contours:
-        area = cv2.contourArea(cnt)
-        if area > 20:  # Adjust threshold based on star size
-            x, y, w, h = cv2.boundingRect(cnt)
-            num = max(1, math.ceil(w / expected_w - 0.15))
-            star_count += num
+    if (
+        img_crop is None
+        or getattr(img_crop, 'size', 0) == 0
+        or getattr(img_crop, 'ndim', 0) != 3
+        or img_crop.shape[2] not in (3, 4)
+    ):
+        return 0
+
+    if getattr(img_crop, 'dtype', None) != np.uint8:
+        try:
+            img_crop = np.nan_to_num(img_crop, nan=0.0, posinf=255.0, neginf=0.0)
+            img_crop = np.clip(img_crop, 0, 255).astype(np.uint8)
+        except Exception:
+            return 0
+
+    try:
+        hsv = cv2.cvtColor(img_crop, cv2.COLOR_BGR2HSV)
+        crop_h = img_crop.shape[0]
+        scale_factor = crop_h / 39.0 if crop_h > 0 else 1.0
+        if not is_weapon:
+            # Yellow for student stars
+            lower_color = np.array([15, 100, 100])
+            upper_color = np.array([40, 255, 255])
+            expected_w = 24.0 * scale_factor
+        else:
+            # Cyan/Blue for weapon stars
+            lower_color = np.array([80, 100, 100])
+            upper_color = np.array([110, 255, 255])
+            expected_w = 26.0 * scale_factor
             
-    return star_count
+        mask = cv2.inRange(hsv, lower_color, upper_color)
+        kernel = np.ones((3,3), np.uint8)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        
+        star_count = 0
+        for cnt in contours:
+            area = cv2.contourArea(cnt)
+            if area > 20 * (scale_factor ** 2):
+                x, y, w, h = cv2.boundingRect(cnt)
+                if w < 10 * scale_factor:
+                    continue
+                num = max(1, math.ceil(w / expected_w - 0.15))
+                star_count += num
+                
+        return star_count
+    except Exception as e:
+        log_debug(f"count_stars error: {e}")
+        return 0
 
 def extract_text(img, bbox, allowlist=None, scale=1, is_name=False, min_length=0):
     x, y, w, h = bbox
@@ -501,7 +535,28 @@ def extract_text(img, bbox, allowlist=None, scale=1, is_name=False, min_length=0
         
     return text
 
-def extract_equip_text(img, icon_bbox, tier_bbox=None):
+_DIGIT_ALIASES = {
+    'Z': '7', 'z': '7',
+    'O': '0', 'o': '0',
+    'I': '1', 'l': '1', '|': '1', '!': '1',
+    'S': '5', 's': '5',
+    'B': '8', 'b': '8',
+}
+
+def infer_tier_from_level(level: int) -> int:
+    """Infer Blue Archive equipment tier from its level cap."""
+    if level > 65: return 10
+    if level > 60: return 9
+    if level > 55: return 8
+    if level > 50: return 7
+    if level > 45: return 6
+    if level > 40: return 5
+    if level > 30: return 4
+    if level > 20: return 3
+    if level > 10: return 2
+    return 1
+
+def extract_equip_text(img, icon_bbox, tier_bbox=None, is_bond_gear=False):
     if tier_bbox is None: tier_bbox = icon_bbox
     x, y, w, h = icon_bbox
     crop = img[y:y+h, x:x+w]
@@ -511,29 +566,74 @@ def extract_equip_text(img, icon_bbox, tier_bbox=None):
     gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
     # A locked slot (padlock) has a dark gray background (mean ~120-136)
     # An equipped or unequipped slot has a brighter background/icon (mean > 170)
-    if np.mean(gray) < 150:
+    if np.mean(gray) < 130:
         return "EMPTY"
         
     # An empty slot (e.g., unreleased bond gear or unequipped slot) consists only of 
     # bright background colors and faint outlines, resulting in very low contrast.
     # Real items have sharp outlines, shadows, and dark tier badges, giving higher variance.
-    if np.std(gray) < 20:
+    if np.std(gray) < 25:
         return "EMPTY"
         
-    tx, ty, tw, th = tier_bbox
-    tier_crop = img[ty:ty+th, tx:tx+tw]
-        
     try:
-        scaled = cv2.resize(tier_crop, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
-        gray = cv2.cvtColor(scaled, cv2.COLOR_BGR2GRAY)
-        adjusted = cv2.convertScaleAbs(gray, alpha=1.5, beta=0)
-        res, _ = reader_en(adjusted)
-        if res:
-            texts = [r[1] for r in res]
-            full_text = ' '.join(texts).upper()
-            if "EMPTY" in full_text or "MPTY" in full_text or "PTY" in full_text:
-                return "EMPTY"
-            return full_text
+        # 2x cubic interpolation for full equip box to capture Lv and Tier
+        scaled = cv2.resize(crop, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
+        gray_scaled = cv2.cvtColor(scaled, cv2.COLOR_BGR2GRAY)
+        adj = cv2.convertScaleAbs(gray_scaled, alpha=1.5, beta=0)
+        
+        res, _ = reader_en(adj)
+        texts = [r[1] for r in res] if res else []
+        full_text = ' '.join(texts).upper()
+        if any(k in full_text for k in ["EMPTY", "MPTY", "PTY"]):
+            return "EMPTY"
+            
+        parsed = parse_equip(full_text, is_bond_gear=is_bond_gear)
+        
+        # Retry condition: trigger if tier == 0 or level == 0 (bond gear only needs tier)
+        needs_retry = (parsed["tier"] == 0) if is_bond_gear else (parsed["tier"] == 0 or parsed["level"] == 0)
+        if needs_retry:
+            res_raw, _ = reader_en(scaled)
+            if res_raw:
+                raw_texts = [r[1] for r in res_raw]
+                full_text_raw = ' '.join(raw_texts).upper()
+                if any(k in full_text_raw for k in ["EMPTY", "MPTY", "PTY"]):
+                    return "EMPTY"
+                parsed_raw = parse_equip(full_text_raw, is_bond_gear=is_bond_gear)
+                combined_text = f"{full_text} {full_text_raw}".strip()
+                parsed_comb = parse_equip(combined_text, is_bond_gear=is_bond_gear)
+                
+                best_parsed = parsed
+                best_text = full_text
+                for cand_parsed, cand_text in [(parsed_raw, full_text_raw), (parsed_comb, combined_text)]:
+                    s_cand = (2 if cand_parsed["tier"] > 0 else 0) + (1 if cand_parsed["level"] > 0 else 0)
+                    s_best = (2 if best_parsed["tier"] > 0 else 0) + (1 if best_parsed["level"] > 0 else 0)
+                    if s_cand > s_best:
+                        best_parsed = cand_parsed
+                        best_text = cand_text
+                full_text = best_text
+                parsed = best_parsed
+
+        # If tier badge was missed in icon_bbox, check tier_bbox as fallback
+        if parsed["tier"] == 0 and tier_bbox and tier_bbox != icon_bbox:
+            tx, ty, tw, th = tier_bbox
+            t_crop = img[ty:ty+th, tx:tx+tw]
+            if t_crop.size > 0:
+                t_scaled = cv2.resize(t_crop, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
+                t_gray = cv2.cvtColor(t_scaled, cv2.COLOR_BGR2GRAY)
+                t_adj = cv2.convertScaleAbs(t_gray, alpha=1.5, beta=0)
+                t_res, _ = reader_en(t_adj)
+                if t_res:
+                    t_text = ' '.join([r[1] for r in t_res]).upper()
+                    full_text += ' ' + t_text
+                    parsed = parse_equip(full_text, is_bond_gear=is_bond_gear)
+                if parsed["tier"] == 0:
+                    t_res_raw, _ = reader_en(t_scaled)
+                    if t_res_raw:
+                        t_text_raw = ' '.join([r[1] for r in t_res_raw]).upper()
+                        full_text += ' ' + t_text_raw
+                        parsed = parse_equip(full_text, is_bond_gear=is_bond_gear)
+
+        return full_text
     except Exception as e:
         log_debug(f"OCR Exception: {e}")
         
@@ -657,33 +757,52 @@ def clamp_stat(val, max_val):
     return int(val_str) if val_str else 0
 
 def parse_equip(text, is_bond_gear=False):
-    if not text or "EMPTY" in text.upper() or "MPTY" in text.upper() or "PTY" in text.upper():
+    if not text or any(k in text.upper() for k in ["EMPTY", "MPTY", "PTY"]):
         return {"tier": 0, "level": 0}
         
     tier = 0
     level = 0
     
-    # Try to find T1~T10
-    match_t = re.search(r'[Tt]\s*(10|[1-9])', text)
+    # Try to find T1~T10 with digit alias support (e.g. TZ -> T7, T1O -> T10)
+    match_t = re.search(r'[Tt][.\s]*(10|1[Oo0]|[1-9]|[ZzIilSsBb])(?![a-zA-Z])', text)
     if match_t:
-        tier = int(match_t.group(1))
+        raw_t = match_t.group(1)
+        mapped_t = "".join(_DIGIT_ALIASES.get(c, c) for c in raw_t)
+        if mapped_t.isdigit():
+            t_val = int(mapped_t)
+            if 1 <= t_val <= 10:
+                tier = t_val
         
     # Strictly read the level next to Lv. 
-    # Match variations of L.v, Lv, LV, lV, L2, LY (common OCR misreads for Lv)
-    match_lv = re.search(r'(?:[LlI][VvYy]*|1[VvYy]+|[Vv])[:.]?\s*(\d+)', text)
+    # Match variations of L.v, Lv, LV, lV, L2, LY, Ly (common OCR misreads for Lv)
+    match_lv = re.search(r'(?:[LlI][VvYy]*|[Vv])[^0-9a-zA-Z\s]*\s*(\d+)', text)
     if match_lv:
         level = int(match_lv.group(1))
+    elif not is_bond_gear and tier > 0 and match_t:
+        # Standalone numbers as level when tier is already known
+        rem = text[:match_t.start()] + ' ' + text[match_t.end():]
+        nums = re.findall(r'\b\d+\b', rem)
+        for n in nums:
+            val = int(n)
+            if 1 <= val <= 90:
+                level = val
+                break
         
     if tier == 0 and level == 0:
         return {"tier": 0, "level": 0}
         
     if not is_bond_gear:
-        # If a low tier item has no T badge (e.g. T1 Lv.15), it only says Lv.15
-        if tier == 0 and level > 0:
-            tier = 1
-            
         if level > 90:
             level = int(str(level)[:2])
+
+        # Level-cap validation: if level > 10, tier cannot be 1 (T1 max level is 10)
+        if tier == 0 and level > 0:
+            if level <= 10:
+                tier = 1
+            else:
+                tier = infer_tier_from_level(level)
+        elif tier == 1 and level > 10:
+            tier = infer_tier_from_level(level)
     else:
         # Bond Gears only have Tier, no Level.
         # If there's no T badge but a level, it's likely reading locked requirement text
@@ -693,17 +812,21 @@ def parse_equip(text, is_bond_gear=False):
 
     return {"tier": tier, "level": level}
 
-def get_calibrated_rois(img):
+def get_calibrated_rois(img, preset_name=None):
     h, w = img.shape[:2]
-    # Ensure height is 1080 for ROI calculations
-    if h != 1080:
-        w = int(w * 1080 / h)
-        
-    base_rois = get_base_rois()
-    if w <= 1930:
+    base_rois = get_base_rois(size=(w, h), preset_name=preset_name)
+    
+    aspect = w / h if h > 0 else 1.7778
+    if aspect < 1.8:
         return base_rois
         
-    extra_w = w - 1920
+    base_w = 2560 if (w > 2200 or h >= 1400) else 1920
+    extra_w = w - base_w
+    if extra_w <= 10:
+        return base_rois
+        
+    scale_y = h / 1080.0
+    scale_x = base_w / 1920.0
     
     # 4 UI Blocks based on exact Flex-box layout ratios:
     # 1. Left Panel (Name, Level, Stars, Bond)
@@ -716,30 +839,31 @@ def get_calibrated_rois(img):
     dx_right_panel = int(extra_w * 0.640)
     
     # Vertical shift: Y-axis also slightly shifts up in wide aspect ratios
-    dy_stats = int(-25 * extra_w / 640)
-    dy_equip = int(80 * extra_w / 640)
-    dy_weapon = int(30 * extra_w / 640)
+    dy_stats = int(-25 * extra_w / 640 * scale_y)
+    dy_equip = int(80 * extra_w / 640 * scale_y)
+    dy_weapon = int(30 * extra_w / 640 * scale_y)
     
     calibrated = {}
+    mid_x = int(960 * scale_x)
     for key, (x, y, bw, bh) in base_rois.items():
-        if x < 960:
+        if x < mid_x:
             calibrated[key] = (x + dx_left, y + dy_stats, bw, bh)
         elif key in ["stat_hp", "stat_defense"]:
             calibrated[key] = (x + dx_stats_left, y + dy_stats, bw, bh)
         elif key in ["stat_attack", "stat_heal"]:
             calibrated[key] = (x + dx_stats_right, y + dy_stats, bw, bh)
         elif key == "weapon_level":
-            calibrated[key] = (x + int(290 * extra_w / 640), y + dy_weapon, 120, bh)
+            calibrated[key] = (x + int(290 * extra_w / 640), y + dy_weapon, int(120 * scale_x), bh)
         elif key == "weapon_stars_area":
-            calibrated[key] = (x + int(460 * extra_w / 640), y + dy_weapon, 120, bh)
+            calibrated[key] = (x + int(460 * extra_w / 640), y + dy_weapon, int(120 * scale_x), bh)
         elif key == "equip_1":
-            calibrated[key] = (x + int(340 * extra_w / 640), y + dy_equip - 10, bw, 145)
+            calibrated[key] = (x + int(340 * extra_w / 640), y + dy_equip - int(10 * scale_y), bw, int(145 * scale_y))
         elif key == "equip_2":
-            calibrated[key] = (x + int(356 * extra_w / 640), y + dy_equip - 10, bw, 145)
+            calibrated[key] = (x + int(356 * extra_w / 640), y + dy_equip - int(10 * scale_y), bw, int(145 * scale_y))
         elif key == "equip_3":
-            calibrated[key] = (x + int(384 * extra_w / 640), y + dy_equip - 10, bw, 145)
+            calibrated[key] = (x + int(384 * extra_w / 640), y + dy_equip - int(10 * scale_y), bw, int(145 * scale_y))
         elif key == "equip_4":
-            calibrated[key] = (x + int(420 * extra_w / 640), y + dy_equip - 10, bw, 145)
+            calibrated[key] = (x + int(420 * extra_w / 640), y + dy_equip - int(10 * scale_y), bw, int(145 * scale_y))
         else:
             calibrated[key] = (x + dx_right_panel, y, bw, bh)
             
@@ -753,49 +877,72 @@ def preprocess_image(img):
     OCR을 통해 기준점(Anchor)을 동적으로 찾아 완벽한 1920x1080 캔버스에 재조립합니다.
     """
     global _cached_align_offsets
+    if img is None or getattr(img, 'size', 0) == 0 or getattr(img, 'ndim', 0) < 2:
+        return img
+
     h, w = img.shape[:2]
     
-    if w == 1920 and h == 1080:
+    if (w, h) in ((1920, 1080), (2560, 1440)):
         return img
+
+    # Normalize channels to 3-channel BGR
+    if len(img.shape) == 2:
+        img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    elif img.shape[2] == 4:
+        img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
         
     if _cached_align_offsets is not None:
         dx_left, dx_right, dy = _cached_align_offsets
     else:
         dx_left, dx_right, dy = 0, 0, 0
         
-        # 1. Find Left Anchor (STRIKER, SPECIAL, FRONT 등)
-        left_crop = img[700:1080, :w//2]
-        res, _ = reader_ko(left_crop)
-        if res:
-            for line in res:
-                bbox, text, conf = line
-                if 'STRIKER' in text or 'SPECIAL' in text:
-                    abs_x = bbox[0][0]
-                    abs_y = bbox[0][1] + 700
-                    dx_left = int(abs_x - 558)
-                    dy = int(abs_y - 840)
-                    break
-                elif 'FRONT' in text or 'MIDDLE' in text or 'BACK' in text:
-                    abs_x = bbox[0][0]
-                    abs_y = bbox[0][1] + 700
-                    dx_left = int(abs_x - 75)
-                    dy = int(abs_y - 1014)
-                    break
+        # 1. Safe Left Anchor crop (STRIKER, SPECIAL, FRONT 등)
+        y1_l = max(0, min(700, h))
+        y2_l = max(0, min(1080, h))
+        x2_l = max(0, min(w // 2, w))
+        left_crop = img[y1_l:y2_l, 0:x2_l]
+        if left_crop.size > 0 and reader_ko is not None:
+            try:
+                res, _ = reader_ko(left_crop)
+                if res:
+                    for line in res:
+                        bbox, text, conf = line
+                        if 'STRIKER' in text or 'SPECIAL' in text:
+                            abs_x = bbox[0][0]
+                            abs_y = bbox[0][1] + y1_l
+                            dx_left = int(abs_x - 558)
+                            dy = int(abs_y - 840)
+                            break
+                        elif 'FRONT' in text or 'MIDDLE' in text or 'BACK' in text:
+                            abs_x = bbox[0][0]
+                            abs_y = bbox[0][1] + y1_l
+                            dx_left = int(abs_x - 75)
+                            dy = int(abs_y - 1014)
+                            break
+            except Exception:
+                pass
                     
-        # 2. Find Right Anchor (치유력, 방어력 등 고정 스탯 텍스트)
-        right_crop = img[200:600, w//2:]
-        res, _ = reader_ko(right_crop)
-        if res:
-            for line in res:
-                bbox, text, conf = line
-                if '치유력' in text:
-                    abs_x = bbox[0][0] + w//2
-                    dx_right = int(abs_x - 1410)
-                    break
-                elif '방어력' in text:
-                    abs_x = bbox[0][0] + w//2
-                    dx_right = int(abs_x - 1095)
-                    break
+        # 2. Safe Right Anchor crop (치유력, 방어력 등 고정 스탯 텍스트)
+        y1_r = max(0, min(200, h))
+        y2_r = max(0, min(600, h))
+        x1_r = max(0, min(w // 2, w))
+        right_crop = img[y1_r:y2_r, x1_r:w]
+        if right_crop.size > 0 and reader_ko is not None:
+            try:
+                res, _ = reader_ko(right_crop)
+                if res:
+                    for line in res:
+                        bbox, text, conf = line
+                        if '치유력' in text:
+                            abs_x = bbox[0][0] + x1_r
+                            dx_right = int(abs_x - 1410)
+                            break
+                        elif '방어력' in text:
+                            abs_x = bbox[0][0] + x1_r
+                            dx_right = int(abs_x - 1095)
+                            break
+            except Exception:
+                pass
                     
         # Fallback for known 2560x1080 21:9 shifted layout
         if dx_left == 0 and dx_right == 0 and w > 1920:
@@ -829,21 +976,100 @@ def preprocess_image(img):
         
     return canvas
 
-def extract_screenshot_data(img_path):
-    print(f"Processing image: {img_path}")
-    img = cv2.imdecode(np.fromfile(img_path, dtype=np.uint8), cv2.IMREAD_COLOR)
+def extract_screenshot_data(img_path_or_mat, preset_name=None):
+    svc = CoordinateService.instance()
+    
+    if isinstance(img_path_or_mat, str):
+        img_path = img_path_or_mat
+        print(f"Processing image: {img_path}")
+        img = cv2.imdecode(np.fromfile(img_path, dtype=np.uint8), cv2.IMREAD_COLOR)
+    else:
+        img_path = None
+        img = img_path_or_mat
     
     if img is None:
         print("Failed to load image.")
         return None
         
     h, w = img.shape[:2]
-    if h != 1080:
-        new_w = int(w * 1080 / h)
-        img = cv2.resize(img, (new_w, 1080), interpolation=cv2.INTER_CUBIC)
+
+    # Resolve target preset non-destructively
+    if preset_name is not None and preset_name in svc.presets:
+        target_preset = preset_name
+    elif (w, h) == (1920, 1080) and "FHD" in svc.presets:
+        target_preset = "FHD"
+    elif (w, h) == (2560, 1440) and "QHD" in svc.presets:
+        target_preset = "QHD"
+    else:
+        target_preset = svc.active_preset_name
+
+    # Check for Equipment Modal or Favorite Popup scenes
+    try:
+        import equipment_scanner
+        layout = equipment_scanner.UiLayout.load(svc, preset_name=target_preset)
+        screen_reader = equipment_scanner.EquipmentScreenReader(
+            layout, equipment_scanner.OcrEngine(reader_ko, reader_en)
+        )
+        if screen_reader.is_equipment_menu_open(img):
+            modal_data = {
+                "scene": "equipment_modal",
+                "equipment": {
+                    "slot1": {"tier": 0, "level": 0},
+                    "slot2": {"tier": 0, "level": 0},
+                    "slot3": {"tier": 0, "level": 0},
+                    "slot4": {"tier": 0, "level": 0}
+                }
+            }
+            active_slot = screen_reader.detect_active_modal_slot(img)
+            for slot_idx in [1, 2, 3]:
+                try:
+                    if slot_idx == active_slot:
+                        reading = screen_reader.read_slot_tier(img, slot_idx)
+                    else:
+                        reading = screen_reader.read_slot_from_rail(img, slot_idx)
+                    modal_data["equipment"][f"slot{slot_idx}"] = {
+                        "tier": reading.tier or 0,
+                        "level": reading.level or 0
+                    }
+                except Exception as e:
+                    log_debug(f"Modal slot {slot_idx} read error: {e}")
+            return modal_data
+
+        top_crop = img[int(h*0.12):int(h*0.25), int(w*0.35):int(w*0.65)]
+        top_res, _ = reader_ko(top_crop) if reader_ko else (None, None)
+        if top_res and any("애용품" in r[1] for r in top_res):
+            popup_data = {
+                "scene": "favorite_popup",
+                "equipment": {
+                    "slot1": {"tier": 0, "level": 0},
+                    "slot2": {"tier": 0, "level": 0},
+                    "slot3": {"tier": 0, "level": 0},
+                    "slot4": {"tier": 0, "level": 0}
+                }
+            }
+            try:
+                fav_reading = screen_reader.read_favorite_tier(img)
+                popup_data["equipment"]["slot4"] = {
+                    "tier": fav_reading.tier or 0,
+                    "level": fav_reading.level or 0
+                }
+            except Exception as e:
+                log_debug(f"Favorite popup read error: {e}")
+            return popup_data
+    except Exception as e:
+        log_debug(f"Modal/popup scene detection error: {e}")
+
+    # Standard Student Info processing:
+    # Preserve native resolution for standard 16:9 images (2560x1440 and 1920x1080)
+    if (w, h) not in ((2560, 1440), (1920, 1080)):
+        if h != 1080 and h != 1440:
+            target_h = 1440 if target_preset == "QHD" else 1080
+            new_w = int(w * target_h / h)
+            img = cv2.resize(img, (new_w, target_h), interpolation=cv2.INTER_CUBIC)
+        img = preprocess_image(img)
+        h, w = img.shape[:2]
         
-    img = preprocess_image(img)
-    rois = get_calibrated_rois(img)
+    rois = get_calibrated_rois(img, preset_name=target_preset)
     
     data = {}
     
@@ -898,7 +1124,7 @@ def extract_screenshot_data(img_path):
     t1_text = extract_equip_text(img, rois["equip_1"], rois.get("equip_1_tier", rois["equip_1"]))
     t2_text = extract_equip_text(img, rois["equip_2"], rois.get("equip_2_tier", rois["equip_2"]))
     t3_text = extract_equip_text(img, rois["equip_3"], rois.get("equip_3_tier", rois["equip_3"]))
-    t4_text = extract_equip_text(img, rois["equip_4"], rois.get("equip_4_tier", rois["equip_4"]))
+    t4_text = extract_equip_text(img, rois["equip_4"], rois.get("equip_4_tier", rois["equip_4"]), is_bond_gear=True)
     
     data["equipment"] = {
         "slot1": parse_equip(t1_text),
@@ -908,15 +1134,16 @@ def extract_screenshot_data(img_path):
     }
     
     # 1.5 Load Equipment Scanner Data if exists
-    equip_json_path = img_path.rsplit('.', 1)[0] + "_equip.json"
-    if os.path.exists(equip_json_path):
-        try:
-            with open(equip_json_path, 'r', encoding='utf-8') as f:
-                eq_data = json.load(f)
-                data["equipment"].update(eq_data)
-                log_debug(f"Loaded high-accuracy equipment data from {os.path.basename(equip_json_path)}")
-        except Exception as e:
-            log_debug(f"Failed to load equip json {equip_json_path}: {e}")
+    if img_path:
+        equip_json_path = img_path.rsplit('.', 1)[0] + "_equip.json"
+        if os.path.exists(equip_json_path):
+            try:
+                with open(equip_json_path, 'r', encoding='utf-8') as f:
+                    eq_data = json.load(f)
+                    data["equipment"].update(eq_data)
+                    log_debug(f"Loaded high-accuracy equipment data from {os.path.basename(equip_json_path)}")
+            except Exception as e:
+                log_debug(f"Failed to load equip json {equip_json_path}: {e}")
             
     # 2. Detailed Stats OCR
     hp_stat, hp_ability = parse_stat_with_ability(extract_text(img, rois["stat_hp"], allowlist=num_allowlist, scale=2, min_length=3))

@@ -493,6 +493,35 @@ class EquipmentScreenReader:
 
         return None
 
+    SLOT_CATEGORY_KEYWORDS = {
+        1: ("모자", "장갑", "신발", "Hat", "Gloves", "Shoes", "帽子", "グローブ", "シューズ"),
+        2: ("헤어핀", "배지", "가방", "Hairpin", "Badge", "Bag", "ヘアピン", "バッジ", "バッグ"),
+        3: ("시계", "부적", "목걸이", "Watch", "Charm", "Necklace", "腕時計", "お守り", "ネックレス"),
+    }
+
+    def detect_active_modal_slot(self, frame: np.ndarray) -> int:
+        """모달 상세 패널 상단의 카테고리 텍스트(모자/신발/가방 등)를 판독하여 현재 활성화된 슬롯(1~3)을 반환한다."""
+        try:
+            dp = self._layout.region("detail_panel")
+            title_region = (dp[0], dp[1], dp[2], dp[3] * 0.28)
+            crop = crop_region(frame, title_region)
+            korean_items = self._ocr.find_korean_text(crop)
+            for _, text in korean_items:
+                clean_text = text.replace(" ", "")
+                for slot_idx, keywords in self.SLOT_CATEGORY_KEYWORDS.items():
+                    if any(kw in clean_text for kw in keywords):
+                        return slot_idx
+        except Exception:
+            pass
+        return 1
+
+    def read_slot_from_rail(self, frame: np.ndarray, slot_idx: int) -> TierReading:
+        tag = f"slot{slot_idx}"
+        rail_reading = self._read_slot_from_rail(frame, slot_idx, tag)
+        if rail_reading is not None:
+            return rail_reading
+        return TierReading(0, 0, "", None)
+
     def _read_slot_from_rail(self, frame: np.ndarray, slot_idx: int, tag: str) -> Optional[TierReading]:
         """모달 좌측 레일 슬롯 아이콘을 크롭하여 티어/레벨 판독."""
         try:
@@ -500,7 +529,7 @@ class EquipmentScreenReader:
         except Exception:
             return None
 
-        rail_region = (max(0.0, sx - 0.047), max(0.0, sy - 0.055), 0.095, 0.110)
+        rail_region = (max(0.0, sx - 0.055), max(0.0, sy - 0.065), 0.110, 0.130)
         crop = crop_region(frame, rail_region)
         candidates = list(self._ocr.iter_line_candidates(crop))
         if not candidates:
@@ -521,9 +550,16 @@ class EquipmentScreenReader:
                 if lvl is not None:
                     found_level = lvl
 
-        if found_tier is None and found_level is not None and found_level <= MAX_T1_LEVEL:
-            found_tier = 1
-            found_tier_text = f"Lv.{found_level}"
+        if found_tier is None and found_level is not None:
+            if found_level <= MAX_T1_LEVEL:
+                found_tier = 1
+                found_tier_text = f"Lv.{found_level}"
+            else:
+                for t in sorted(TIER_LEVEL_CAPS.keys()):
+                    if found_level <= TIER_LEVEL_CAPS[t]:
+                        found_tier = t
+                        found_tier_text = f"Lv.{found_level}"
+                        break
 
         if found_tier is not None:
             crop_path = save_crop_for_review(crop, tag)
@@ -683,22 +719,30 @@ class UiLayout:
     svc: "core.coordinates.CoordinateService"
     timing: dict[str, float]
     thresholds: dict[str, float]
+    preset_name: Optional[str] = None
 
     @classmethod
-    def load(cls, svc: "core.coordinates.CoordinateService", tuning_path: str = TUNING_PATH) -> "UiLayout":
+    def load(cls, svc: "core.coordinates.CoordinateService", tuning_path: str = TUNING_PATH, preset_name: Optional[str] = None) -> "UiLayout":
         with open(tuning_path, encoding="utf-8") as file:
             raw = json.load(file)
         return cls(
             svc=svc,
             timing=raw["timing"],
             thresholds=raw["thresholds"],
+            preset_name=preset_name,
         )
 
     def point(self, name: str) -> Point:
-        return self.svc.point(name)
+        preset = self.svc.presets.get(self.preset_name, self.svc.active_preset()) if self.preset_name else self.svc.active_preset()
+        val = preset.values.get(name, [0, 0])
+        return tuple(val)
 
     def region(self, name: str) -> Region:
-        return self.svc.region(name)
+        preset = self.svc.presets.get(self.preset_name, self.svc.active_preset()) if self.preset_name else self.svc.active_preset()
+        val = preset.values.get(name, [0, 0, 0, 0])
+        if isinstance(val, dict):
+            return (val.get('x', 0), val.get('y', 0), val.get('w', 0), val.get('h', 0))
+        return tuple(val)
 
 
 # ============================================================================
@@ -711,7 +755,7 @@ _DIGIT_ALIASES = str.maketrans({
 })
 _NOISE_PUNCT = str.maketrans("", "", "()[]{}<>'\":;,`~-_")
 _TIER_PATTERN = re.compile(r"[Tt]([0-9Ili|OoDZz]{1,2})")
-_LEVEL_PATTERN = re.compile(r"[LlI1][Vv][.:,]?([0-9IlOo]{1,2})")
+_LEVEL_PATTERN = re.compile(r"[LlI1][VvyY][.:,]?([0-9IlOo]{1,2})")
 
 
 def parse_tier_text(text: str, max_tier: int) -> Optional[int]:
@@ -769,14 +813,28 @@ def contains_any(text: str, keywords: tuple[str, ...]) -> bool:
 
 
 def crop_region(frame: np.ndarray, region: Region) -> np.ndarray:
+    if frame is None or getattr(frame, 'size', 0) == 0:
+        return np.zeros((0, 0, 3) if frame is not None and frame.ndim == 3 else (0, 0), dtype=np.uint8)
     height, width = frame.shape[:2]
     x, y, w, h = region
-    return frame[int(y * height):int((y + h) * height), int(x * width):int((x + w) * width)]
+    x1 = max(0, min(width, int(round(x * width))))
+    y1 = max(0, min(height, int(round(y * height))))
+    x2 = max(0, min(width, int(round((x + w) * width))))
+    y2 = max(0, min(height, int(round((y + h) * height))))
+    if x2 < x1:
+        x1, x2 = x2, x1
+    if y2 < y1:
+        y1, y2 = y2, y1
+    return frame[y1:y2, x1:x2]
 
 
 def mean_abs_diff(a: np.ndarray, b: np.ndarray) -> float:
-    gray_a = cv2.cvtColor(a, cv2.COLOR_BGR2GRAY)
-    gray_b = cv2.cvtColor(b, cv2.COLOR_BGR2GRAY)
+    if a is None or b is None or getattr(a, 'size', 0) == 0 or getattr(b, 'size', 0) == 0:
+        return 999.0
+    gray_a = cv2.cvtColor(a, cv2.COLOR_BGR2GRAY) if a.ndim == 3 else a
+    gray_b = cv2.cvtColor(b, cv2.COLOR_BGR2GRAY) if b.ndim == 3 else b
+    if gray_a.shape != gray_b.shape:
+        return 999.0
     return float(np.mean(cv2.absdiff(gray_a, gray_b)))
 
 
@@ -878,7 +936,7 @@ def configure_logging(gui_callback: Optional[Callable[[str], None]] = None,
     logger.propagate = False
 
 
-def build_default_workflow(tuning_path: str = TUNING_PATH, audit: Optional[Any] = None) -> EquipmentScanWorkflow:
+def build_default_workflow(tuning_path: str = TUNING_PATH, audit: Optional[Any] = None, grabber: Optional[Any] = None) -> EquipmentScanWorkflow:
     """실제 게임 환경용 조립. 무거운 의존성(OCR 모델, 학생 목록 요청)은 여기서만 import 한다.
 
     주의: mss 인스턴스는 스레드 종속 -> 워크플로우를 실행할 스레드에서 호출할 것.
@@ -891,7 +949,8 @@ def build_default_workflow(tuning_path: str = TUNING_PATH, audit: Optional[Any] 
 
     svc = CoordinateService.instance()
     layout = UiLayout.load(svc, tuning_path)
-    grabber = mss.mss()
+    if grabber is None:
+        grabber = mss.mss()
     screen = GameScreen(grabber, get_bluearchive_monitor(grabber), layout.timing["click_hold_sec"])
     audit_recorder = audit if audit is not None else OcrAuditRecorder()
     reader = EquipmentScreenReader(layout, OcrEngine(extractor.reader_ko, extractor.reader_en), audit=audit_recorder)

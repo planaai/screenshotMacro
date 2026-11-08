@@ -1,5 +1,6 @@
 opencv-python
 numpy
+Pillow
 PyQt5
 rapidocr-onnxruntime
 PyAutoGUI

@@ -15,7 +15,10 @@ dist/
 
 # User specific data
 macro_screenshots/
+extracted_data/
+temp_crops/
 user_data/presets/
+user_data/credentials.json
 
 # Virtual environment
 venv/
@@ -32,15 +35,20 @@ env/
 
 # Tests and images
 tests/
+test_images/
+FHD_test_image/
 *.jpg
+!assets/*.jpg
 
 # Logs and debug outputs
 logs/
 *.log
 debug_output/
+qa_report*.json
 
 # Scratch / temporary workspace
 scratch/
+scripts/
 
 # Archives
 *.tar
@@ -51,10 +59,11 @@ extracted_data.tar
 # Agent
 .agents/
 
-# Markdown documentation (ignore all except README)
+# Markdown documentation (ignore all except README and prompt.md)
 *.md
 **/*.md
 !README.md
 !**/README.md
 !readme.md
 !**/readme.md
+!prompt.md

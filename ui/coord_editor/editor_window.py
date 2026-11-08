@@ -12,7 +12,7 @@ from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QPixmap, QFont
 
 from core.coordinates import CoordinateService, Preset
-from core.paths import get_user_data_dir
+from core.paths import get_user_data_dir, get_bundle_dir
 from .canvas import CoordinateCanvas
 from .preset_dialog import PresetDialog
 
@@ -131,15 +131,15 @@ class CoordinateEditorWindow(QMainWindow):
         self.preset_combo.currentIndexChanged.connect(self.on_preset_combo_changed)
         top_layout.addWidget(self.preset_combo)
         
-        btn_save = QPushButton("➕ 새 프리셋으로 저장")
+        btn_save = QPushButton("새 프리셋으로 저장")
         btn_save.clicked.connect(self.save_as_new)
         top_layout.addWidget(btn_save)
         
-        self.btn_overwrite = QPushButton("💾 덮어쓰기 저장")
+        self.btn_overwrite = QPushButton("덮어쓰기 저장")
         self.btn_overwrite.clicked.connect(self.save_overwrite)
         top_layout.addWidget(self.btn_overwrite)
         
-        btn_apply = QPushButton("✔️ 활성 프리셋 적용")
+        btn_apply = QPushButton("활성 프리셋 적용")
         btn_apply.setStyleSheet("font-weight: bold; color: #2e7d32;")
         btn_apply.clicked.connect(self.apply_preset)
         top_layout.addWidget(btn_apply)
@@ -215,11 +215,11 @@ class CoordinateEditorWindow(QMainWindow):
         toolbar = QHBoxLayout()
         toolbar.setSpacing(8)
 
-        btn_load_img = QPushButton("📁 스크린샷 불러오기")
+        btn_load_img = QPushButton("스크린샷 불러오기")
         btn_load_img.clicked.connect(self.load_image)
         toolbar.addWidget(btn_load_img)
 
-        btn_zoom_fit = QPushButton("🔍 화면 맞춤")
+        btn_zoom_fit = QPushButton("화면 맞춤")
         btn_zoom_fit.clicked.connect(lambda: self.canvas.zoom_fit())
         toolbar.addWidget(btn_zoom_fit)
 
@@ -227,20 +227,20 @@ class CoordinateEditorWindow(QMainWindow):
         btn_zoom_100.clicked.connect(lambda: self.canvas.zoom_100())
         toolbar.addWidget(btn_zoom_100)
 
-        btn_zoom_in = QPushButton("➕ 확대")
+        btn_zoom_in = QPushButton("확대")
         btn_zoom_in.clicked.connect(lambda: self.canvas.zoom_in())
         toolbar.addWidget(btn_zoom_in)
 
-        btn_zoom_out = QPushButton("➖ 축소")
+        btn_zoom_out = QPushButton("축소")
         btn_zoom_out.clicked.connect(lambda: self.canvas.zoom_out())
         toolbar.addWidget(btn_zoom_out)
 
-        self.lbl_resolution = QLabel("해상도: 1920 × 1080")
+        self.lbl_resolution = QLabel("해상도: 1920 x 1080")
         self.lbl_resolution.setStyleSheet("color: #666; font-size: 12px; margin-left: 8px;")
         toolbar.addWidget(self.lbl_resolution)
 
         toolbar.addStretch()
-        lbl_hint = QLabel("💡 마우스 휠: 줌 | 드래그: 이동/크기 | 박스 클릭: 선택")
+        lbl_hint = QLabel("마우스 휠: 줌 | 드래그: 이동/크기 | 박스 클릭: 선택")
         lbl_hint.setStyleSheet("color: #777; font-size: 11px;")
         toolbar.addWidget(lbl_hint)
 
@@ -376,22 +376,22 @@ class CoordinateEditorWindow(QMainWindow):
         dpad_layout = QGridLayout()
         dpad_layout.setSpacing(4)
 
-        btn_up = QPushButton("▲")
+        btn_up = QPushButton("Up")
         btn_up.setFixedWidth(50)
         btn_up.clicked.connect(lambda: self.nudge_position(0, -self.nudge_step))
         dpad_layout.addWidget(btn_up, 0, 1)
 
-        btn_left = QPushButton("◀")
+        btn_left = QPushButton("Left")
         btn_left.setFixedWidth(50)
         btn_left.clicked.connect(lambda: self.nudge_position(-self.nudge_step, 0))
         dpad_layout.addWidget(btn_left, 1, 0)
 
-        btn_down = QPushButton("▼")
+        btn_down = QPushButton("Down")
         btn_down.setFixedWidth(50)
         btn_down.clicked.connect(lambda: self.nudge_position(0, self.nudge_step))
         dpad_layout.addWidget(btn_down, 1, 1)
 
-        btn_right = QPushButton("▶")
+        btn_right = QPushButton("Right")
         btn_right.setFixedWidth(50)
         btn_right.clicked.connect(lambda: self.nudge_position(self.nudge_step, 0))
         dpad_layout.addWidget(btn_right, 1, 2)
@@ -424,7 +424,7 @@ class CoordinateEditorWindow(QMainWindow):
         coord_layout.addWidget(nudge_box)
 
         # Reset button
-        btn_reset_item = QPushButton("↺ 이 항목 기본값(default)으로 복원")
+        btn_reset_item = QPushButton("이 항목 기본값으로 복원")
         btn_reset_item.clicked.connect(self.reset_current_item)
         coord_layout.addWidget(btn_reset_item)
 
@@ -478,13 +478,23 @@ class CoordinateEditorWindow(QMainWindow):
 
         self.on_preset_combo_changed()
 
+    def get_base_preset_name(self) -> str:
+        current = self.preset_combo.currentText()
+        if current == "FHD":
+            return "FHD"
+        return "QHD"
+
+    def get_base_preset(self) -> Preset:
+        base_name = self.get_base_preset_name()
+        return self.svc.presets.get(base_name, self.svc.presets.get("QHD", Preset("QHD", {})))
+
     def on_preset_combo_changed(self):
         name = self.preset_combo.currentText()
         if name:
             preset = self.svc.presets.get(name)
             if preset:
                 self.current_edits = dict(preset.values)
-                self.btn_overwrite.setEnabled(name != "default")
+                self.btn_overwrite.setEnabled(True)
                 self.on_tab_changed()
 
     def on_tab_changed(self):
@@ -494,7 +504,7 @@ class CoordinateEditorWindow(QMainWindow):
         # Update scene banner
         desc = self.svc.schema.get("scenes", {}).get(scene_id, {}).get("description", "")
         if desc:
-            self.scene_banner.setText(f"💡 <b>모드 안내:</b> {desc}")
+            self.scene_banner.setText(f"<b>모드 안내:</b> {desc}")
             self.scene_banner.show()
         else:
             self.scene_banner.hide()
@@ -581,23 +591,29 @@ class CoordinateEditorWindow(QMainWindow):
             self.canvas.load_image(pixmap)
             self.current_img_w = pixmap.width()
             self.current_img_h = pixmap.height()
-            self.lbl_resolution.setText(f"해상도: {self.current_img_w} × {self.current_img_h}")
+            self.lbl_resolution.setText(f"해상도: {self.current_img_w} x {self.current_img_h}")
         else:
-            self.current_img_w = 1920
-            self.current_img_h = 1080
-            self.lbl_resolution.setText("해상도: 1920 × 1080 (기본)")
+            if self.get_base_preset_name() == "FHD":
+                self.current_img_w = 1920
+                self.current_img_h = 1080
+                self.lbl_resolution.setText("해상도: 1920 x 1080 (FHD)")
+            else:
+                self.current_img_w = 2560
+                self.current_img_h = 1440
+                self.lbl_resolution.setText("해상도: 2560 x 1440 (QHD 기본)")
 
         # Populate canvas items for current scene
         self.populate_canvas_items(scene_id)
 
     def populate_canvas_items(self, scene_id):
         items = self.svc.schema.get("items", {})
+        base_preset = self.get_base_preset()
         for key, info in items.items():
             if info.get("scene") == scene_id:
                 typ = info.get("type", "region")
                 val = self.current_edits.get(key)
                 if not val:
-                    val = self.svc.presets.get("default", Preset("default", {})).values.get(key)
+                    val = base_preset.values.get(key)
                 if val:
                     self.canvas.add_item(key, typ, val)
 
@@ -611,7 +627,7 @@ class CoordinateEditorWindow(QMainWindow):
             self.canvas.load_image(pixmap)
             self.current_img_w = pixmap.width()
             self.current_img_h = pixmap.height()
-            self.lbl_resolution.setText(f"해상도: {self.current_img_w} × {self.current_img_h}")
+            self.lbl_resolution.setText(f"해상도: {self.current_img_w} x {self.current_img_h}")
             
             if scene_id:
                 self.populate_canvas_items(scene_id)
@@ -653,7 +669,7 @@ class CoordinateEditorWindow(QMainWindow):
         info = self.svc.schema.get("items", {}).get(key, {})
         val = self.current_edits.get(key)
         if not val:
-            val = self.svc.presets.get("default", Preset("default", {})).values.get(key, [0, 0, 0, 0])
+            val = self.get_base_preset().values.get(key, [0, 0, 0, 0])
 
         typ = info.get("type", "region")
         is_region = (typ == "region")
@@ -691,7 +707,7 @@ class CoordinateEditorWindow(QMainWindow):
                 text += f"가이드 파일: <code>{guide_rel}</code>"
         else:
             text += f"가이드 경로: <code>{guide_rel}</code><br><br>"
-            text += "💡 <b>조정 팁:</b> 드래그하거나 방향키(D-Pad)로 1px씩 정밀 조정할 수 있습니다."
+            text += "<b>조정 팁:</b> 드래그하거나 방향키(D-Pad)로 1px씩 정밀 조정할 수 있습니다."
 
         self.guide_text.setText(text)
 
@@ -752,26 +768,28 @@ class CoordinateEditorWindow(QMainWindow):
     def reset_current_item(self):
         key = self.current_selected_key
         if not key: return
-        default_val = self.svc.presets.get("default", Preset("default", {})).values.get(key)
-        if default_val:
-            self.current_edits[key] = list(default_val)
-            self.canvas.set_item_value(key, list(default_val))
-            self.update_spinboxes_from_val(default_val)
+        base_val = self.get_base_preset().values.get(key)
+        if base_val:
+            self.current_edits[key] = list(base_val)
+            self.canvas.set_item_value(key, list(base_val))
+            self.update_spinboxes_from_val(base_val)
 
     def save_as_new(self):
         dialog = PresetDialog(self.svc, self)
         if dialog.exec_():
             name = dialog.saved_name
+            base_name = self.get_base_preset_name()
+            base_preset = self.get_base_preset()
             
             diff = {}
             for k, v in self.current_edits.items():
-                if self.svc.presets.get("default", Preset("default", {})).values.get(k) != v:
+                if base_preset.values.get(k) != v:
                     diff[k] = v
                     
             data = {
                 "schema_version": 1,
                 "name": name,
-                "base": "default",
+                "base": base_name,
                 "note": dialog.saved_note,
                 "created_at": datetime.datetime.now().isoformat(),
                 "values": diff
@@ -790,16 +808,32 @@ class CoordinateEditorWindow(QMainWindow):
 
     def save_overwrite(self):
         name = self.preset_combo.currentText()
-        if name == "default":
-            QMessageBox.warning(self, "경고", "default 프리셋은 덮어쓸 수 없습니다.")
-            return
-            
         preset = self.svc.presets.get(name)
         if not preset: return
         
+        if name in ("QHD", "FHD"):
+            system_dir = os.path.join(get_bundle_dir(), "config", "presets")
+            path = os.path.join(system_dir, f"{name}.json")
+            data = {}
+            if os.path.exists(path):
+                try:
+                    with open(path, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                except Exception:
+                    pass
+            data["values"] = dict(self.current_edits)
+            data["updated_at"] = datetime.datetime.now().isoformat()
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+            QMessageBox.information(self, "저장 완료", f"'{name}' 프리셋을 덮어썼습니다.")
+            self.svc.load_all_presets()
+            return
+            
+        base_name = self.get_base_preset_name()
+        base_preset = self.get_base_preset()
         diff = {}
         for k, v in self.current_edits.items():
-            if self.svc.presets.get("default", Preset("default", {})).values.get(k) != v:
+            if base_preset.values.get(k) != v:
                 diff[k] = v
                 
         preset_dir = os.path.join(get_user_data_dir(), "presets")

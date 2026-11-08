@@ -34,7 +34,8 @@ import extractor
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                              QLabel, QLineEdit, QPushButton, QStackedWidget, QFileDialog, 
                              QTextEdit, QTableWidget, QTableWidgetItem, QHeaderView, QScrollArea,
-                             QFormLayout, QMessageBox, QDialog, QAbstractItemView, QProgressBar)
+                             QFormLayout, QMessageBox, QDialog, QAbstractItemView, QProgressBar,
+                             QComboBox)
 from PyQt5.QtGui import QFontDatabase, QFont, QPixmap, QPainter, QColor, QIcon, QResizeEvent
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QTimer, QThread
 import json
@@ -44,6 +45,9 @@ import scanner
 import requests
 import subprocess
 import time
+
+from core.credentials import CredentialManager, DEFAULT_MODEL, ALT_MODEL, SUPPORTED_MODELS
+from core.masking import MaskingEmittingStream, mask_api_key, mask_text, set_global_secret_key
 
 APP_VERSION = "1.5.5"
 GITHUB_REPO = "planaai/screenshotMacro"
@@ -398,7 +402,7 @@ class Signals(QObject):
     scanner_done = pyqtSignal(object)
 
 class ExtractApp(QMainWindow):
-    def __init__(self):
+    def __init__(self, credential_manager=None):
         super().__init__()
         self.setWindowTitle("plana.ai 스크린샷 매크로 beta")
         self.setWindowIcon(QIcon(get_asset_path(r"assets\app_icon.ico")))
@@ -407,6 +411,8 @@ class ExtractApp(QMainWindow):
         self.jwt_token = None
         self.selected_path = None
         self.batch_results = []
+        self.credential_manager = credential_manager if credential_manager is not None else CredentialManager()
+        self.cred_mgr = self.credential_manager
         
         # Load Font
         font_id = QFontDatabase.addApplicationFont(FONT_PATH)
@@ -448,18 +454,9 @@ class ExtractApp(QMainWindow):
         
         self.stacked_widget.setCurrentWidget(self.login_view)
         
-        # redirect stdout/stderr
-        class EmittingStream(object):
-            def __init__(self, signal):
-                self.signal = signal
-            def write(self, text):
-                if text.strip():
-                    self.signal.emit(str(text))
-            def flush(self):
-                pass
-                
-        sys.stdout = EmittingStream(self.signals.log_msg)
-        sys.stderr = EmittingStream(self.signals.log_msg)
+        # redirect stdout/stderr with secret key masking
+        sys.stdout = MaskingEmittingStream(self.signals.log_msg)
+        sys.stderr = MaskingEmittingStream(self.signals.log_msg)
 
         # Macro init
         def on_macro_done(save_dir):
@@ -472,7 +469,11 @@ class ExtractApp(QMainWindow):
 
         def on_scanner_done(result):
             self.signals.scanner_done.emit(result)
-        self.scanner_instance = scanner.ScannerListener(callback_done=on_scanner_done, callback_log=on_macro_log)
+        self.scanner_instance = scanner.ScannerListener(
+            callback_done=on_scanner_done,
+            callback_log=on_macro_log,
+            credential_manager=self.credential_manager,
+        )
 
         # Check for updates
         self.update_checker = UpdateCheckerThread()
@@ -675,17 +676,52 @@ class ExtractApp(QMainWindow):
         btn_macro.clicked.connect(lambda: self.stacked_widget.setCurrentWidget(self.dash_view))
         
         btn_calibrate = QPushButton("좌표 설정")
-        btn_calibrate.setStyleSheet(f"background-color: {GLASS_BG}; color: {COLOR_PINK_HOVER}; border: 3px solid {COLOR_PINK}; border-radius: 20px; font-size: 20px; font-weight: bold; padding: 15px;")
-        btn_calibrate.setFixedSize(300, 90)
+        btn_calibrate.setStyleSheet(f"background-color: {GLASS_BG}; color: {COLOR_PINK_HOVER}; border: 3px solid {COLOR_PINK}; border-radius: 16px; font-size: 18px; font-weight: bold; padding: 10px;")
+        btn_calibrate.setFixedSize(300, 55)
         btn_calibrate.clicked.connect(self.open_coordinate_editor)
         
-        self.lbl_active_preset = QLabel(f"활성 프리셋: {self.coord_svc.active_preset_name}")
-        self.lbl_active_preset.setStyleSheet("font-size: 14px; font-weight: bold; color: #555;")
+        # Resolution / Preset Selector Box
+        res_card = QWidget()
+        res_card.setStyleSheet(f"background-color: {GLASS_BG}; border: 2px solid {COLOR_PINK}; border-radius: 12px;")
+        res_card.setFixedWidth(300)
+        res_card_layout = QVBoxLayout(res_card)
+        res_card_layout.setContentsMargins(12, 8, 12, 8)
+        res_card_layout.setSpacing(4)
+        
+        lbl_res_title = QLabel("해상도 / 프리셋")
+        lbl_res_title.setStyleSheet("font-size: 13px; font-weight: bold; color: #555; border: none; background: transparent;")
+        lbl_res_title.setAlignment(Qt.AlignCenter)
+        
+        self.combo_resolution = QComboBox()
+        self.combo_resolution.setStyleSheet(
+            "QComboBox { border: 1px solid #ccc; border-radius: 6px; padding: 4px 8px; font-size: 13px; font-weight: bold; background: white; color: #333; } "
+            "QComboBox::drop-down { border: none; } QComboBox QAbstractItemView { selection-background-color: #ffb6c1; }"
+        )
+        self.update_resolution_combo()
+        self.combo_resolution.currentIndexChanged.connect(self.on_resolution_changed)
+        
+        self.lbl_active_preset = QLabel(f"활성: {self.coord_svc.active_preset_name}")
+        self.lbl_active_preset.setStyleSheet("font-size: 12px; color: #777; border: none; background: transparent;")
         self.lbl_active_preset.setAlignment(Qt.AlignCenter)
         
+        res_card_layout.addWidget(lbl_res_title)
+        res_card_layout.addWidget(self.combo_resolution)
+        res_card_layout.addWidget(self.lbl_active_preset)
+        
+        self.btn_reset_api_key = QPushButton("NIM API 키 삭제")
+        self.btn_clear_api_key = self.btn_reset_api_key
+        self.btn_reset_api_key.setStyleSheet(
+            f"QPushButton {{ background-color: {GLASS_BG}; color: #b91c1c; border: 2px solid {COLOR_RED_HOVER}; border-radius: 12px; font-size: 15px; font-weight: bold; padding: 8px; }} "
+            f"QPushButton:hover {{ background-color: {COLOR_RED}; color: white; }}"
+        )
+        self.btn_reset_api_key.setFixedSize(300, 45)
+        self.btn_reset_api_key.clicked.connect(lambda: self.reset_api_credentials(show_message=True))
+        
         calib_layout = QVBoxLayout()
+        calib_layout.setSpacing(8)
         calib_layout.addWidget(btn_calibrate)
-        calib_layout.addWidget(self.lbl_active_preset)
+        calib_layout.addWidget(res_card)
+        calib_layout.addWidget(self.btn_reset_api_key)
         
         card_layout.addWidget(btn_scanner)
         card_layout.addWidget(btn_macro)
@@ -709,28 +745,164 @@ class ExtractApp(QMainWindow):
             traceback.print_exc()
             QMessageBox.critical(self, "오류", f"편집기 스크립트 오류:\n{e}")
 
+    def update_resolution_combo(self):
+        if not hasattr(self, 'combo_resolution'):
+            return
+        self.combo_resolution.blockSignals(True)
+        self.combo_resolution.clear()
+        
+        presets = list(self.coord_svc.presets.keys())
+        ordered = []
+        if "QHD" in presets:
+            ordered.append("QHD")
+        if "FHD" in presets:
+            ordered.append("FHD")
+        for p in presets:
+            if p not in ordered and p != "default":
+                ordered.append(p)
+                
+        for p in ordered:
+            label = p
+            if p == "QHD":
+                label = "QHD (2560x1440, 기본)"
+            elif p == "FHD":
+                label = "FHD (1920x1080)"
+            self.combo_resolution.addItem(label, p)
+            
+        current = self.coord_svc.active_preset_name
+        idx = self.combo_resolution.findData(current)
+        if idx >= 0:
+            self.combo_resolution.setCurrentIndex(idx)
+        self.combo_resolution.blockSignals(False)
+
+    def on_resolution_changed(self, index):
+        preset_name = self.combo_resolution.currentData()
+        if preset_name and preset_name in self.coord_svc.presets:
+            self.coord_svc.set_active_preset(preset_name)
+
     def update_active_preset_label(self):
         if hasattr(self, 'lbl_active_preset'):
-            self.lbl_active_preset.setText(f"활성 프리셋: {self.coord_svc.active_preset_name}")
+            self.lbl_active_preset.setText(f"활성: {self.coord_svc.active_preset_name}")
+        if hasattr(self, 'combo_resolution'):
+            current = self.coord_svc.active_preset_name
+            idx = self.combo_resolution.findData(current)
+            if idx < 0:
+                self.update_resolution_combo()
+            elif self.combo_resolution.currentIndex() != idx:
+                self.combo_resolution.blockSignals(True)
+                self.combo_resolution.setCurrentIndex(idx)
+                self.combo_resolution.blockSignals(False)
 
     def init_scanner_view(self):
         self.scanner_view = QWidget()
         layout = QVBoxLayout(self.scanner_view)
         layout.setContentsMargins(40, 40, 40, 40)
-        layout.setSpacing(20)
+        layout.setSpacing(15)
         
+        # Header (No emojis)
         header = QLabel("스캐너 모드 (단일 추출)")
         header.setStyleSheet(f"background-color: {GLASS_BG}; color: {COLOR_PINK_HOVER}; font-size: 24px; border: 2px solid {COLOR_PINK}; border-radius: 15px; padding: 15px;")
         layout.addWidget(header)
         
+        # 1. API Credentials & Model Configuration Card
+        cred_card = QWidget()
+        cred_card.setStyleSheet(f"background-color: {GLASS_BG}; border: 2px solid {COLOR_PINK}; border-radius: 15px;")
+        cred_layout = QVBoxLayout(cred_card)
+        cred_layout.setContentsMargins(20, 15, 20, 15)
+        cred_layout.setSpacing(10)
+        
+        lbl_cred_title = QLabel("NVIDIA NIM API 설정")
+        lbl_cred_title.setStyleSheet("font-size: 16px; font-weight: bold; color: #333; border: none; background: transparent;")
+        cred_layout.addWidget(lbl_cred_title)
+        
+        # Row 1: NVIDIA API Key Field + Save Button + Status Badge
+        key_layout = QHBoxLayout()
+        key_layout.setSpacing(10)
+        
+        lbl_key_title = QLabel("API 키:")
+        lbl_key_title.setStyleSheet("font-size: 14px; font-weight: bold; color: #444; border: none; background: transparent; min-width: 65px;")
+        key_layout.addWidget(lbl_key_title)
+        
+        self.input_api_key = QLineEdit()
+        self.entry_api_key = self.input_api_key
+        self.api_key_input = self.input_api_key
+        self.input_api_key.setPlaceholderText("NVIDIA API Key 입력 (nvapi-...)")
+        self.input_api_key.setEchoMode(QLineEdit.Password)
+        self.input_api_key.setStyleSheet(COMMON_STYLE)
+        self.input_api_key.editingFinished.connect(self.save_api_credentials)
+        key_layout.addWidget(self.input_api_key, 4)
+        
+        self.btn_save_key = QPushButton("저장")
+        self.btn_save_credentials = self.btn_save_key
+        self.btn_save_key.setStyleSheet(
+            f"QPushButton {{ background-color: {COLOR_PINK}; color: white; border: none; border-radius: 10px; padding: 10px 20px; font-size: 15px; font-weight: bold; }} "
+            f"QPushButton:hover {{ background-color: {COLOR_PINK_HOVER}; }}"
+        )
+        self.btn_save_key.clicked.connect(self.save_api_credentials)
+        key_layout.addWidget(self.btn_save_key, 1)
+        
+        self.btn_delete_key = QPushButton("삭제")
+        self.btn_delete_key.setStyleSheet(
+            f"QPushButton {{ background-color: {COLOR_RED}; color: white; border: none; border-radius: 10px; padding: 10px 16px; font-size: 15px; font-weight: bold; }} "
+            f"QPushButton:hover {{ background-color: {COLOR_RED_HOVER}; }}"
+        )
+        self.btn_delete_key.clicked.connect(lambda: self.reset_api_credentials(show_message=False))
+        key_layout.addWidget(self.btn_delete_key, 1)
+        
+        self.lbl_key_status = QLabel("API 키: 미설정")
+        self.lbl_api_status = self.lbl_key_status
+        self.lbl_key_status.setStyleSheet("font-size: 13px; font-weight: bold; color: #b91c1c; border: none; background: transparent; min-width: 110px;")
+        self.lbl_key_status.setAlignment(Qt.AlignCenter)
+        key_layout.addWidget(self.lbl_key_status, 1)
+        
+        cred_layout.addLayout(key_layout)
+        
+        # Row 2: Model Selector Dropdown + Model Status Badge
+        model_layout = QHBoxLayout()
+        model_layout.setSpacing(10)
+        
+        lbl_model_title = QLabel("NIM 모델:")
+        lbl_model_title.setStyleSheet("font-size: 14px; font-weight: bold; color: #444; border: none; background: transparent; min-width: 65px;")
+        model_layout.addWidget(lbl_model_title)
+        
+        self.combo_model = QComboBox()
+        self.combo_nim_model = self.combo_model
+        self.model_selector = self.combo_model
+        self.combo_model.setStyleSheet(
+            f"QComboBox {{ background-color: {GLASS_BG}; border: 2px solid {COLOR_PINK}; border-radius: 10px; padding: 8px 12px; font-size: 14px; font-weight: bold; color: #333; }} "
+            f"QComboBox::drop-down {{ border: none; width: 24px; }} "
+            f"QComboBox QAbstractItemView {{ background-color: white; selection-background-color: {COLOR_PINK}; selection-color: white; font-size: 13px; }}"
+        )
+        self.combo_model.addItem("nvidia/nemotron-3.5-super-vl-120b-a12b", "nvidia/nemotron-3.5-super-vl-120b-a12b")
+        self.combo_model.addItem("mistralai/mistral-large-4-1t-a52b", "mistralai/mistral-large-4-1t-a52b")
+        self.combo_model.setCurrentIndex(0)
+        self.combo_model.currentIndexChanged.connect(self.on_model_changed)
+        model_layout.addWidget(self.combo_model, 4)
+        
+        self.lbl_model_status = QLabel("선택 모델: nvidia/nemotron-3.5-super-vl-120b-a12b")
+        self.lbl_model_status.setStyleSheet("font-size: 12px; font-weight: bold; color: #1e3a8a; border: none; background: transparent;")
+        self.lbl_model_status.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        model_layout.addWidget(self.lbl_model_status, 2)
+        
+        cred_layout.addLayout(model_layout)
+        layout.addWidget(cred_card)
+        
+        # 2. Scanner Trigger & Control Card
         ctrl_card = QWidget()
         ctrl_card.setStyleSheet(f"background-color: {GLASS_BG}; border: 2px solid {COLOR_PINK}; border-radius: 15px;")
         ctrl_layout = QVBoxLayout(ctrl_card)
-        ctrl_layout.setContentsMargins(20, 20, 20, 20)
+        ctrl_layout.setContentsMargins(20, 15, 20, 15)
+        ctrl_layout.setSpacing(10)
         
-        lbl_info = QLabel("▶ 스캐너 모드 시작 버튼을 누르고 게임 창을 띄운 뒤 [F9] 키를 누르면 즉시 캡처 후 검수 창으로 이동합니다.")
-        lbl_info.setStyleSheet("border: none; background: transparent; color: #333; font-size: 18px;")
+        lbl_info = QLabel("스캐너 모드 시작 버튼을 누르고 게임 창을 띄운 뒤 [F9] 키를 누르면 즉시 캡처 후 검수 창으로 이동합니다.")
+        lbl_info.setStyleSheet("border: none; background: transparent; color: #333; font-size: 15px;")
         ctrl_layout.addWidget(lbl_info)
+        
+        self.lbl_scanner_status = QLabel("스캐너 상태: 대기 중")
+        self.lbl_f9_status = self.lbl_scanner_status
+        self.lbl_trigger_status = self.lbl_scanner_status
+        self.lbl_scanner_status.setStyleSheet("font-size: 14px; font-weight: bold; color: #4b5563; border: none; background: transparent;")
+        ctrl_layout.addWidget(self.lbl_scanner_status)
         
         btn_layout = QHBoxLayout()
         self.btn_scanner_start = QPushButton("스캐너 캡처 시작 대기 (F9)")
@@ -747,19 +919,146 @@ class ExtractApp(QMainWindow):
         ctrl_layout.addLayout(btn_layout)
         layout.addWidget(ctrl_card)
         
+        # 3. Log Area
         self.scanner_log_area = QTextEdit()
         self.scanner_log_area.setReadOnly(True)
         self.scanner_log_area.setStyleSheet(COMMON_STYLE)
         layout.addWidget(self.scanner_log_area)
         
         self.stacked_widget.addWidget(self.scanner_view)
+        
+        self.load_saved_credentials()
+
+    def load_saved_credentials(self):
+        """Loads encrypted credentials and sets input field and model combo."""
+        saved_key, saved_model = self.credential_manager.load_credentials()
+        
+        if hasattr(self, 'input_api_key'):
+            self.input_api_key.blockSignals(True)
+            self.input_api_key.setText(saved_key if saved_key else "")
+            self.input_api_key.blockSignals(False)
+            
+        if hasattr(self, 'combo_model'):
+            self.combo_model.blockSignals(True)
+            idx = self.combo_model.findText(saved_model)
+            if idx < 0:
+                idx = self.combo_model.findData(saved_model)
+            if idx >= 0:
+                self.combo_model.setCurrentIndex(idx)
+            else:
+                self.combo_model.setCurrentIndex(0)
+            self.combo_model.blockSignals(False)
+            
+        self.update_status_indicators()
+
+    def get_api_key(self) -> str:
+        """Returns plain API key entered or stored."""
+        if hasattr(self, 'input_api_key'):
+            text = self.input_api_key.text().strip()
+            if text and not text.startswith("nvapi-****") and text != "****":
+                return text
+        saved_key, _ = self.credential_manager.load_credentials()
+        return saved_key or ""
+
+    def get_selected_model(self) -> str:
+        """Returns currently selected NIM vision model name."""
+        if hasattr(self, 'combo_model'):
+            return self.combo_model.currentText().strip() or DEFAULT_MODEL
+        return DEFAULT_MODEL
+
+    def save_api_credentials(self) -> bool:
+        """Persists API key and selected model into DPAPI storage."""
+        api_key = self.get_api_key()
+        model_name = self.get_selected_model()
+        
+        success = self.credential_manager.save_credentials(api_key, model_name)
+        if hasattr(self, 'scanner_instance'):
+            self.scanner_instance.api_key = api_key
+            self.scanner_instance.model = model_name
+        self.update_status_indicators()
+        
+        if hasattr(self, 'scanner_log_area'):
+            if success:
+                masked = mask_api_key(api_key) if api_key else "미설정"
+                self.scanner_log_area.append(f"[설정] API 자격증명 및 모델 저장 완료 ({masked} / {model_name})")
+            else:
+                self.scanner_log_area.append("[오류] API 자격증명 저장 실패")
+        return success
+
+    def reset_api_credentials(self, show_message: bool = False) -> bool:
+        """Clears stored NVIDIA NIM API key from DPAPI storage and UI fields."""
+        success = self.credential_manager.clear_credentials()
+        set_global_secret_key("")
+        
+        if hasattr(self, 'input_api_key'):
+            self.input_api_key.blockSignals(True)
+            self.input_api_key.clear()
+            self.input_api_key.blockSignals(False)
+            
+        if hasattr(self, 'scanner_instance'):
+            self.scanner_instance.api_key = ""
+            self.scanner_instance.nim_client = None
+            
+        self.update_status_indicators()
+        
+        if hasattr(self, 'scanner_log_area'):
+            if success:
+                self.scanner_log_area.append("[설정] 저장된 NVIDIA NIM API 키가 삭제(초기화)되었습니다.")
+            else:
+                self.scanner_log_area.append("[오류] API 키 삭제 실패")
+                
+        if show_message:
+            if success:
+                QMessageBox.information(self, "API 키 삭제 완료", "저장된 NVIDIA NIM API 키가 삭제되었습니다.")
+            else:
+                QMessageBox.warning(self, "삭제 오류", "API 키 삭제 중 오류가 발생했습니다.")
+        return success
+
+    clear_api_credentials = reset_api_credentials
+
+    def on_model_changed(self, index: int):
+        """Auto-syncs model choice to storage."""
+        selected_model = self.get_selected_model()
+        api_key = self.get_api_key()
+        self.credential_manager.save_credentials(api_key, selected_model)
+        if hasattr(self, 'scanner_instance'):
+            self.scanner_instance.model = selected_model
+            self.scanner_instance.api_key = api_key
+        self.update_status_indicators()
+        if hasattr(self, 'scanner_log_area'):
+            self.scanner_log_area.append(f"[설정] 활성 모델 변경: {selected_model}")
+
+    def update_status_indicators(self):
+        """Updates key and model status badges."""
+        has_key = self.credential_manager.has_key() or bool(self.get_api_key())
+        if hasattr(self, 'lbl_key_status'):
+            if has_key:
+                self.lbl_key_status.setText("API 키: 설정됨")
+                self.lbl_key_status.setStyleSheet("font-size: 13px; font-weight: bold; color: #15803d; border: none; background: transparent;")
+            else:
+                self.lbl_key_status.setText("API 키: 미설정")
+                self.lbl_key_status.setStyleSheet("font-size: 13px; font-weight: bold; color: #b91c1c; border: none; background: transparent;")
+                
+        if hasattr(self, 'lbl_model_status'):
+            model = self.get_selected_model()
+            self.lbl_model_status.setText(f"선택 모델: {model}")
 
     def start_scanner_listener(self):
         self.scanner_log_area.clear()
-        self.scanner_instance.start_listener()
+        if hasattr(self, 'lbl_scanner_status'):
+            self.lbl_scanner_status.setText("스캐너 상태: F9 입력 대기 중")
+            self.lbl_scanner_status.setStyleSheet("font-size: 14px; font-weight: bold; color: #2563eb; border: none; background: transparent;")
+        if hasattr(self, 'scanner_instance'):
+            self.scanner_instance.api_key = self.get_api_key()
+            self.scanner_instance.model = self.get_selected_model()
+            self.scanner_instance.start_listener()
         
     def back_to_mode_select(self):
-        self.scanner_instance.stop_listener()
+        if hasattr(self, 'scanner_instance'):
+            self.scanner_instance.stop_listener()
+        if hasattr(self, 'lbl_scanner_status'):
+            self.lbl_scanner_status.setText("스캐너 상태: 대기 중")
+            self.lbl_scanner_status.setStyleSheet("font-size: 14px; font-weight: bold; color: #4b5563; border: none; background: transparent;")
         self.stacked_widget.setCurrentWidget(self.mode_select_view)
 
     def back_to_mode_select_from_dash(self):
@@ -768,8 +1067,15 @@ class ExtractApp(QMainWindow):
 
     def on_scanner_done_signal(self, result):
         if not result:
+            if hasattr(self, 'lbl_scanner_status'):
+                self.lbl_scanner_status.setText("스캐너 상태: 분석 실패")
+                self.lbl_scanner_status.setStyleSheet("font-size: 14px; font-weight: bold; color: #b91c1c; border: none; background: transparent;")
             QMessageBox.warning(self, "추출 실패", "화면 캡처 및 인식에 실패했습니다. 다시 시도해주세요.")
             return
+            
+        if hasattr(self, 'lbl_scanner_status'):
+            self.lbl_scanner_status.setText("스캐너 상태: 분석 완료")
+            self.lbl_scanner_status.setStyleSheet("font-size: 14px; font-weight: bold; color: #15803d; border: none; background: transparent;")
             
         self.scanner_detail_view.load_scanner_data(result)
         self.stacked_widget.setCurrentWidget(self.scanner_detail_view)
@@ -791,7 +1097,7 @@ class ExtractApp(QMainWindow):
         ctrl_layout = QVBoxLayout(ctrl_card)
         ctrl_layout.setContentsMargins(20, 20, 20, 20)
         
-        self.lbl_path = QLabel("📁 선택된 경로: 없음")
+        self.lbl_path = QLabel("선택된 경로: 없음")
         self.lbl_path.setStyleSheet("border: none; background: transparent; color: #333; font-size: 16px;")
         ctrl_layout.addWidget(self.lbl_path)
         
@@ -818,7 +1124,7 @@ class ExtractApp(QMainWindow):
         self.btn_macro.clicked.connect(self.start_macro)
         btn_layout.addWidget(self.btn_macro)
         
-        self.btn_run = QPushButton("일괄 추출 시작 ▶")
+        self.btn_run = QPushButton("일괄 추출 시작")
         self.btn_run.setStyleSheet(COMMON_STYLE)
         self.btn_run.setEnabled(False)
         self.btn_run.clicked.connect(self.run_sync)
@@ -839,14 +1145,14 @@ class ExtractApp(QMainWindow):
         path, _ = QFileDialog.getOpenFileName(self, "파일 선택", "", "Image Files (*.png *.jpg *.jpeg)")
         if path:
             self.selected_path = path
-            self.lbl_path.setText(f"📁 선택된 파일: {path}")
+            self.lbl_path.setText(f"선택된 파일: {path}")
             self.btn_run.setEnabled(True)
             
     def select_folder(self):
         path = QFileDialog.getExistingDirectory(self, "폴더 선택")
         if path:
             self.selected_path = path
-            self.lbl_path.setText(f"📁 선택된 폴더: {path}")
+            self.lbl_path.setText(f"선택된 폴더: {path}")
             self.btn_run.setEnabled(True)
 
     def start_macro(self):
@@ -855,15 +1161,16 @@ class ExtractApp(QMainWindow):
 
     def on_macro_done_signal(self, save_dir):
         self.selected_path = save_dir
-        self.lbl_path.setText(f"📁 선택된 경로(매크로): {save_dir}")
+        self.lbl_path.setText(f"선택된 경로(매크로): {save_dir}")
         self.btn_run.setEnabled(True)
         self.run_sync()
 
     def append_log(self, msg):
+        sanitized = mask_text(str(msg))
         if hasattr(self, 'log_area'):
-            self.log_area.append(msg)
+            self.log_area.append(sanitized)
         if hasattr(self, 'scanner_log_area'):
-            self.scanner_log_area.append(msg)
+            self.scanner_log_area.append(sanitized)
 
     def run_sync(self):
         if not self.selected_path:
@@ -921,7 +1228,7 @@ class ExtractApp(QMainWindow):
             if not name:
                 continue
             if name in seen:
-                print(f"⚠️ 경고: '{name}' 캐릭터 스크린샷이 여러 장 발견되었습니다. 하나는 제외(건너뜀) 처리됩니다.")
+                print(f"[경고] '{name}' 캐릭터 스크린샷이 여러 장 발견되었습니다. 하나는 제외(건너뜀) 처리됩니다.")
                 res["status"] = "skipped"
                 res["needs_review"] = True
             else:
@@ -999,24 +1306,24 @@ class OverviewWindow(QMainWindow):
         
         btn_layout = QHBoxLayout()
         
-        btn_back = QPushButton("◀ 이전 (캡처 화면으로)")
+        btn_back = QPushButton("이전 (캡처 화면으로)")
         btn_back.setStyleSheet(COMMON_STYLE)
         btn_back.clicked.connect(self.close)
         btn_layout.addWidget(btn_back)
         
-        btn_detail = QPushButton("🔍 선택 항목 상세 검수")
+        btn_detail = QPushButton("선택 항목 상세 검수")
         btn_detail.setStyleSheet(COMMON_STYLE)
         btn_detail.clicked.connect(self.open_detail)
         btn_layout.addWidget(btn_detail)
         
         btn_layout.addStretch()
         
-        btn_upload = QPushButton("☁️ 서버에 일괄 업로드")
+        btn_upload = QPushButton("서버에 일괄 업로드")
         btn_upload.setStyleSheet(COMMON_STYLE)
         btn_upload.clicked.connect(self.upload_all)
         btn_layout.addWidget(btn_upload)
         
-        btn_sync = QPushButton("📦 데이터 압축 저장")
+        btn_sync = QPushButton("데이터 압축 저장")
         btn_sync.setStyleSheet(COMMON_STYLE)
         btn_sync.clicked.connect(self.save_local_zip)
         btn_layout.addWidget(btn_sync)
@@ -1027,11 +1334,11 @@ class OverviewWindow(QMainWindow):
         self.table.setRowCount(0)
         for i, res in enumerate(self.batch_results):
             self.table.insertRow(i)
-            status_text = "✅ 준비됨"
-            if res["needs_review"]: status_text = "⚠️ 검수 필요"
-            if res["status"] == "uploaded": status_text = "🚀 업로드 완료"
-            elif res["status"] == "skipped": status_text = "⏭️ 건너뜀"
-            elif res["status"] == "failed": status_text = "❌ 추출 실패"
+            status_text = "준비됨"
+            if res["needs_review"]: status_text = "검수 필요"
+            if res["status"] == "uploaded": status_text = "업로드 완료"
+            elif res["status"] == "skipped": status_text = "건너뜀"
+            elif res["status"] == "failed": status_text = "추출 실패"
             
             filename = os.path.basename(res["path"])
             s_name = res["data"].get("studentName", "알 수 없음")
@@ -1201,12 +1508,12 @@ class DetailWindow(GlassWidget):
         right_layout.addLayout(nav_layout)
         
         btn_nav_layout = QHBoxLayout()
-        btn_prev = QPushButton("◀ 이전")
+        btn_prev = QPushButton("이전")
         btn_prev.setStyleSheet(COMMON_STYLE)
         btn_prev.clicked.connect(self.on_prev)
         btn_nav_layout.addWidget(btn_prev)
         
-        btn_next = QPushButton("다음 ▶")
+        btn_next = QPushButton("다음")
         btn_next.setStyleSheet(COMMON_STYLE)
         btn_next.clicked.connect(self.on_next)
         btn_nav_layout.addWidget(btn_next)
@@ -1272,17 +1579,17 @@ class DetailWindow(GlassWidget):
         
         # Action Bar
         action_layout = QHBoxLayout()
-        btn_back = QPushButton("◀ 이전 (요약으로)")
+        btn_back = QPushButton("이전 (요약으로)")
         btn_back.setStyleSheet("background-color: #6b7280; color: white; border-radius: 10px; padding: 10px; font-size: 15px;")
         btn_back.clicked.connect(self.on_cancel_detail)
         action_layout.addWidget(btn_back)
 
-        btn_save = QPushButton("💾 저장 후 목록으로")
+        btn_save = QPushButton("저장 후 목록으로")
         btn_save.setStyleSheet(f"background-color: {COLOR_GREEN}; color: white; border-radius: 10px; padding: 10px; font-size: 15px;")
         btn_save.clicked.connect(self.on_save_close)
         action_layout.addWidget(btn_save)
         
-        btn_skip = QPushButton("⏭️ 건너뛰기")
+        btn_skip = QPushButton("건너뛰기")
         btn_skip.setStyleSheet(f"background-color: {COLOR_RED}; color: white; border-radius: 10px; padding: 10px; font-size: 15px;")
         btn_skip.clicked.connect(self.on_skip)
         action_layout.addWidget(btn_skip)
@@ -1470,12 +1777,12 @@ class ScannerDetailWindow(DetailWindow):
                 widget.deleteLater()
                 
         # Add new buttons
-        btn_upload = QPushButton("☁️ 바로 업로드")
+        btn_upload = QPushButton("바로 업로드")
         btn_upload.setStyleSheet(f"background-color: {COLOR_GREEN}; color: white; border-radius: 10px; padding: 10px; font-size: 15px;")
         btn_upload.clicked.connect(self.on_upload)
         action_layout.addWidget(btn_upload)
         
-        btn_cancel = QPushButton("◀ 이전 (캡처 화면으로)")
+        btn_cancel = QPushButton("이전 (캡처 화면으로)")
         btn_cancel.setStyleSheet("background-color: #6b7280; color: white; border-radius: 10px; padding: 10px; font-size: 15px;")
         btn_cancel.clicked.connect(self.on_cancel)
         action_layout.addWidget(btn_cancel)
