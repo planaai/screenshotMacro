@@ -52,6 +52,11 @@ from core.masking import MaskingEmittingStream, mask_api_key, mask_text, set_glo
 APP_VERSION = "1.7"
 GITHUB_REPO = "planaai/screenshotMacro"
 
+def _parse_version(v_str: str) -> tuple[int, ...]:
+    import re
+    numbers = [int(x) for x in re.findall(r'\d+', v_str)]
+    return tuple(numbers) if numbers else (0,)
+
 class UpdateCheckerThread(QThread):
     update_available = pyqtSignal(str, str, str)
     error_occurred = pyqtSignal(str)
@@ -65,7 +70,7 @@ class UpdateCheckerThread(QThread):
                 latest_version = data.get("tag_name", "")
                 clean_latest = latest_version.lower().replace("v", "").replace("ver.", "").strip()
                 clean_current = APP_VERSION.lower().replace("v", "").replace("ver.", "").strip()
-                if latest_version and clean_latest != clean_current:
+                if latest_version and _parse_version(clean_latest) > _parse_version(clean_current):
                     assets = data.get("assets", [])
                     download_url = ""
                     for asset in assets:
