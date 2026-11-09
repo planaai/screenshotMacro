@@ -49,7 +49,7 @@ import time
 from core.credentials import CredentialManager, DEFAULT_MODEL, ALT_MODEL, SUPPORTED_MODELS
 from core.masking import MaskingEmittingStream, mask_api_key, mask_text, set_global_secret_key
 
-APP_VERSION = "1.5.5"
+APP_VERSION = "1.7"
 GITHUB_REPO = "planaai/screenshotMacro"
 
 class UpdateCheckerThread(QThread):
