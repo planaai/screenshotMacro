@@ -25,13 +25,16 @@ import re
 import sys
 import time
 from dataclasses import asdict, dataclass, field
-from typing import Callable, Iterator, Optional
+from typing import TYPE_CHECKING, Any, Callable, Iterator, Optional
 
 import cv2
 import numpy as np
 import pyautogui
 
 from ocr_audit import NullAuditRecorder, OcrAuditRecorder
+
+if TYPE_CHECKING:
+    from core.coordinates import CoordinateService
 
 logger = logging.getLogger("equipment_scanner")
 
@@ -555,8 +558,8 @@ class EquipmentScreenReader:
                 found_tier = 1
                 found_tier_text = f"Lv.{found_level}"
             else:
-                for t in sorted(TIER_LEVEL_CAPS.keys()):
-                    if found_level <= TIER_LEVEL_CAPS[t]:
+                for t in sorted(TIER_MAX_LEVEL.keys()):
+                    if found_level <= TIER_MAX_LEVEL[t]:
                         found_tier = t
                         found_tier_text = f"Lv.{found_level}"
                         break
@@ -716,13 +719,13 @@ class OcrEngine:
 
 @dataclass(frozen=True)
 class UiLayout:
-    svc: "core.coordinates.CoordinateService"
+    svc: "CoordinateService"
     timing: dict[str, float]
     thresholds: dict[str, float]
     preset_name: Optional[str] = None
 
     @classmethod
-    def load(cls, svc: "core.coordinates.CoordinateService", tuning_path: str = TUNING_PATH, preset_name: Optional[str] = None) -> "UiLayout":
+    def load(cls, svc: "CoordinateService", tuning_path: str = TUNING_PATH, preset_name: Optional[str] = None) -> "UiLayout":
         with open(tuning_path, encoding="utf-8") as file:
             raw = json.load(file)
         return cls(
