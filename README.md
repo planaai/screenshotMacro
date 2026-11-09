@@ -35,17 +35,26 @@ QHD (2560*1440)<br>
 
 원하는 학생을 직접 확인하며 하나씩 스캔하고 업로드할 때 유용합니다.
 
-1. 프로그램에서 **[스캐너 캡쳐 시작 대기]** 버튼을 누른 후, Steam 버전 블루 아카이브 클라이언트를 켜주세요.
-   <br><img width="600" alt="스캐너 대기" src="https://github.com/user-attachments/assets/ef3a345b-f0e6-4e4c-803e-fce07f8ce0dc" />
 
-2. 인게임에서 **스캔할 학생의 상세 정보 창**을 띄워주세요.
+0. 스캐너 모드의 변경점으로 인해 단일 방식에는 API 키가 필요합니다.
+https://build.nvidia.com
+
+해당 링크에서 api키를 발급 받아주세요.
+(해당 사이트는 무료로 돌아가는 api이니 따로 청구서가 날아올 걱정은 안하셔도 됩니다)
+
+1. 프로그램에서 **[스캐너 캡쳐 시작 대기]** 버튼을 누른 후, Steam 버전 블루 아카이브 클라이언트를 켜주세요.
+<img width="1202" height="732" alt="image" src="https://github.com/user-attachments/assets/864b5a87-be3a-4a9a-ab99-d68d47abd994" />
+
+
+3. 인게임에서 **스캔할 학생의 상세 정보 창**을 띄워주세요.
    > **참고:** 블루 아카이브 창만 캡처하는 것이 아니라 전체 화면을 캡처하므로, 중간에 시스템 팝업 등이 나타나지 않도록 주의해 주세요.
    <br><img width="600" alt="학생 상세창" src="https://github.com/user-attachments/assets/7b392835-c576-4c69-92bc-2b189174ff63" />
 
-3. 캡처가 완료되면 프로그램에 나타난 **추출 결과를 검수**해 주세요.
-   <br><img width="600" alt="결과 검수" src="https://github.com/user-attachments/assets/3885e1d1-fd82-4806-85a4-20400d2e5839" />
+4. 캡처가 완료되면 프로그램에 나타난 **추출 결과를 검수**해 주세요.
+   <img width="1231" height="732" alt="image" src="https://github.com/user-attachments/assets/b2304ceb-f431-4211-8f87-514546180a5c" />
 
-4. 검수가 끝났다면 **바로 업로드**를 진행합니다. 캡처가 잘못되었다면 취소 후, 다시 대기 상태 버튼을 눌러 2번 과정부터 재시도하시면 됩니다.
+
+5. 검수가 끝났다면 **바로 업로드**를 진행합니다. 캡처가 잘못되었다면 취소 후, 다시 대기 상태 버튼을 눌러 2번 과정부터 재시도하시면 됩니다.
 
 ---
 
